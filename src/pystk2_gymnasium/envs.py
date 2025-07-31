@@ -37,6 +37,11 @@ def kart_action_space():
         }
     )
 
+# config = pystk2.GraphicsConfig()
+# pystk2.init(config)
+# print(pystk2.list_karts())
+kart_skin = ['adiumy', 'amanda', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_racer', 'sara_the_wizard', 'suzanne', 'tux', 'wilber', 'xue']
+
 
 class Phase(Enum):
     """A phase in PySTK (subset of STK phases)"""
@@ -461,7 +466,8 @@ class STKRaceEnv(BaseSTKRaceEnv):
             self.config.players[
                 self.kart_ix
             ].controller = pystk2.PlayerConfig.Controller.PLAYER_CONTROL
-
+            print('coucou: ', kart_skin[self.kart_ix])
+            self.config.players[self.kart_ix].kart = kart_skin[self.kart_ix]
         self.warmup_race()
         self.world_update(False)
 
@@ -554,6 +560,8 @@ class STKRaceMultiEnv(BaseSTKRaceEnv):
                 self.config.players[
                     kart_ix
                 ].controller = pystk2.PlayerConfig.Controller.PLAYER_CONTROL
+                print('coucou: ', kart_skin[kart_ix])
+                self.config.players[kart_ix].kart = kart_skin[kart_ix]
             self.config.players[kart_ix].name = agent.name
 
         self.kart_m_indices = list(range(len(self.kart_indices)))
