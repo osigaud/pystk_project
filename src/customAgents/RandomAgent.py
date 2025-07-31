@@ -25,12 +25,13 @@ class RandomAgent:
         action = {
             "acceleration": acceleration,
             "steer": steering,
-            "brake": random.choice(),
-            "drift": random.choice(),
-            "nitro": random.choice(),
-            "rescue": random.choice(),
-            "fire": random.choice(),
+            "brake": False, # bool(random.getrandbits(1)),
+            "drift": bool(random.getrandbits(1)),
+            "nitro": bool(random.getrandbits(1)),
+            "rescue":bool(random.getrandbits(1)),
+            "fire": bool(random.getrandbits(1)),
         }
+        return action
 
     def step(self):
         action = choose_action(self.obs)

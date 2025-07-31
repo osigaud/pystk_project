@@ -1,7 +1,7 @@
 """
 MultiAgent race
 
-All agents are RandomAgent, apart from 1 AI agent
+All agents are RandomAgent
 The simulation runs on the "black_forest" track with 7 karts.
 """
 
@@ -28,11 +28,10 @@ agents_specs = [
     AgentSpec(name="Random5", rank_start=4, use_ai=False),
     AgentSpec(name="Random6", rank_start=5, use_ai=False),
     AgentSpec(name="Random7", rank_start=6, use_ai=False),
-    AgentSpec(name="Bot", rank_start=7, use_ai=True)
 ]
 
 # Create the multi-agent environment for N karts.
-env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=5)
+env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=7)
 
 # Instantiate the agents.
 
@@ -54,8 +53,8 @@ def main():
         actions["2"] = agent3.choose_action(obs["2"])
         actions["3"] = agent4.choose_action(obs["3"])
         actions["4"] = agent5.choose_action(obs["4"])
-        actions["5"] = agent6.choose_action(obs["4"])
-        actions["6"] = agent7.choose_action(obs["4"])
+        actions["5"] = agent6.choose_action(obs["5"])
+        actions["6"] = agent7.choose_action(obs["6"])
         obs, reward, done, truncated, info = env.step(actions)
         if done or truncated:
             break

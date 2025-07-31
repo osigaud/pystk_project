@@ -134,6 +134,7 @@ class STKAction(TypedDict):
 
 
 def get_action(action: STKAction):
+
     return pystk2.Action(
         brake=int(action["brake"]) > 0,
         nitro=int(action["nitro"] > 0),
