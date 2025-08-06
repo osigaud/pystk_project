@@ -11,7 +11,13 @@ import numpy as np
 # Append the "src" folder to sys.path.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "src")))
 
-from customAgents.RandomAgent import RandomAgent
+from agents.team1.Agent1 import Agent1
+from agents.team2.Agent2 import Agent2
+from agents.team3.Agent3 import Agent3
+from agents.team4.Agent4 import Agent4
+from agents.team5.Agent5 import Agent5
+from agents.team6.Agent6 import Agent6
+from agents.team7.Agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 
 # Make AgentSpec hashable.
@@ -21,13 +27,13 @@ AgentSpec.__hash__ = agent_spec_hash
 
 # Create agents specifications.
 agents_specs = [
-    AgentSpec(name="Random1", rank_start=0, use_ai=False),
-    AgentSpec(name="Random2", rank_start=1, use_ai=False),
-    AgentSpec(name="Random3", rank_start=2, use_ai=False),
-    AgentSpec(name="Random4", rank_start=3, use_ai=False),
-    AgentSpec(name="Random5", rank_start=4, use_ai=False),
-    AgentSpec(name="Random6", rank_start=5, use_ai=False),
-    AgentSpec(name="Random7", rank_start=6, use_ai=False),
+    AgentSpec(name="Team1", rank_start=0, use_ai=False),
+    AgentSpec(name="Team2", rank_start=1, use_ai=False),
+    AgentSpec(name="Team3", rank_start=2, use_ai=False),
+    AgentSpec(name="Team4", rank_start=3, use_ai=False),
+    AgentSpec(name="Team5", rank_start=4, use_ai=False),
+    AgentSpec(name="Team6", rank_start=5, use_ai=False),
+    AgentSpec(name="Team7", rank_start=6, use_ai=False),
 ]
 
 # Create the multi-agent environment for N karts.
@@ -35,13 +41,13 @@ env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", n
 
 # Instantiate the agents.
 
-agent1 = RandomAgent(env, path_lookahead=3)
-agent2 = RandomAgent(env, path_lookahead=3)
-agent3 = RandomAgent(env, path_lookahead=3)
-agent4 = RandomAgent(env, path_lookahead=3)
-agent5 = RandomAgent(env, path_lookahead=3)
-agent6 = RandomAgent(env, path_lookahead=3)
-agent7 = RandomAgent(env, path_lookahead=3)
+agent1 = Agent1(env, path_lookahead=3)
+agent2 = Agent2(env, path_lookahead=3)
+agent3 = Agent3(env, path_lookahead=3)
+agent4 = Agent4(env, path_lookahead=3)
+agent5 = Agent5(env, path_lookahead=3)
+agent6 = Agent6(env, path_lookahead=3)
+agent7 = Agent7(env, path_lookahead=3)
 
 def main():
     obs, _ = env.reset()
