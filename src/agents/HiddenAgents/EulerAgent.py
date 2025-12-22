@@ -36,21 +36,6 @@ class EulerAgent:
         curvature = np.clip(curvature * 2.0, 0.01, 1.0)
         return curvature
 
-    ###def calculate_action(self, obs):
-        # Get the base action from the wrapped agent.
-        base_action = self.agent.calculate_action(obs)
-        path_ends = obs["paths_end"][:self.path_lookahead]
-        curvature = float(self.euler_spiral_curvature(path_ends))
-        slope = float(compute_slope(path_ends[:2]))
-        # Compute direction from kart front to target node.
-        direction_to_target = obs["paths_end"][self.path_lookahead - 1] - obs["front"]
-        # Adjust steering using Euler's formula.
-        steering = 0.4 * direction_to_target[0] / (1.0 + abs(curvature) * 0.5)
-        base_action["steer"] = np.clip(steering, -1, 1)
-        base_action["acceleration"] = max(0.5, 1 - abs(curvature) + max(0, slope))
-        base_action["nitro"] = (abs(curvature) < 0.05)
-        return base_action
-    ###
     def calculate_action(self, obs):
         base_action = self.agent.calculate_action(obs)
         if self.agent.endOfTrack():
