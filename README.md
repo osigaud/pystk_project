@@ -11,51 +11,54 @@ We assume you are on linux
 
 Read this uv tutorial: https://www.datacamp.com/tutorial/python-uv
 
-- Fork this project onto your disk: 
-- install uv: sudo snap install astral-uv
-- create your project: uv init "myprojectname"
-- install the requirements: uv pip install -r requirements.txt
-- install the project: uv pip install -e .
+- Fork this project onto your disk: https://docs.github.com/fr/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo
+- install uv: `sudo snap install astral-uv`
+- create your project: `uv init "myprojectname"`
+- install the requirements: `uv pip install -r` requirements.txt
+- install the project: `uv pip install -e .`
 
 You are done.
 
 
 ### Run project
 
-To run the race with graphical display:
+To run a race on a single track with graphical display:
 
 - cd src/main
-- uv run race-display.py
+- uv run monorace-display.py
+
+To run many races on multiple tracks without graphical display and get the ranked performance of agents:
+
+- cd src/main
+- uv run ranking.py
 
 ### Create your own agent
 
 All agents are in src/agents/
 
-Yours is in src/agents/teamX/agentX.py, where X is the number of your team. The initial version plays random actions. Your goal is to provide a better agent.
+Yours is in src/agents/teamX/agentX.py, where X is the number of your team. The initial version plays random actions. Your goal is to improve your agent all along the project and win the races.
 
 ### Submit your agent
 
-You have to perform a pull request on the source project:
+You have to perform a pull request on the source project: https://docs.github.com/fr/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests
 
-https://github.com/osigaud/pystk_project
+The project is here: https://github.com/osigaud/pystk_project
 
   
 ## AgentSpec
 
 Each controlled kart is parametrized by `pystk2_gymnasium.AgentSpec`:
 
-- `name` defines name of the player (displayed on top of the kart)
+- `name` defines the name of the player 
 - `rank_start` defines the starting position (None for random, which is the
   default)
-- `use_ai` flag (False by default) to ignore actions (when calling `step`,  a
-  SuperTuxKart bot is used instead of using the action)
-- `camera_mode` can be set to `AUTO` (camera on for non STK bots), `ON` (camera
-  on) or `OFF` (no camera).
+- `use_ai` flag (False by default) to ignore actions (when calling `step`,  a SuperTuxKart bot is used instead of using the action)
+- `camera_mode` can be set to `AUTO` (camera on for non STK bots), `ON` (camera on) or `OFF` (no camera).
 
 
 ## Current limitations
 
--  no graphics information is available (i.e. pixmap)
+-  the agent cannot use graphics information (i.e. pixmap)
 
 
 ## Environments
