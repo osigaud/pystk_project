@@ -48,6 +48,7 @@ env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", n
 # Instantiate the agents.
 
 agents = []
+names = []
 
 agents.append(Agent1(env, path_lookahead=3))
 agents.append(Agent2(env, path_lookahead=3))
@@ -56,11 +57,17 @@ agents.append(Agent4(env, path_lookahead=3))
 agents.append(Agent5(env, path_lookahead=3))
 agents.append(Agent6(env, path_lookahead=3))
 agents.append(Agent7(env, path_lookahead=3))
+np.random.shuffle(agents)
+
+for i in range(MAX_TEAMS):
+    names.append(agents[i].name)
 
 def main():
     obs, _ = env.reset()
     done = False
-    while not done:
+    steps = 0
+    positions = []
+    while not done and steps < 100:
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
@@ -69,9 +76,22 @@ def main():
             except Exception as e:
                 print(f"Team {i+1} error: {e}")
                 actions[str] = default_action
-        obs, _, terminated, truncated, _ = env.step(actions)
-        if terminated or truncated:
-            break
+        obs, _, terminated, truncated, info = env.step(actions)
+        #print(f"{info['infos']}")
+        pos = np.zeros(MAX_TEAMS)
+        dist = np.zeros(MAX_TEAMS)
+        for i in range(MAX_TEAMS):
+            str = f"{i}"
+            pos[i] = info['infos'][str]['position']
+            dist[i] = info['infos'][str]['distance']
+        # print(f"{names}{pos}")
+        steps = steps + 1
+        done = terminated or truncated
+        positions.append(pos)
+    average_pos = np.array(positions).mean(axis=0)
+    std_pos = np.array(positions).std(axis=0)
+    for i in range(MAX_TEAMS):
+        print(f"{names[i]} avg:{average_pos[i]} std:{std_pos[i]}")
     env.close()
 
 if __name__ == "__main__":

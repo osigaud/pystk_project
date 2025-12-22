@@ -466,7 +466,6 @@ class STKRaceEnv(BaseSTKRaceEnv):
             self.config.players[
                 self.kart_ix
             ].controller = pystk2.PlayerConfig.Controller.PLAYER_CONTROL
-            print('reset')
             self.config.players[self.kart_ix].kart = kart_skin[self.kart_ix]
         self.warmup_race()
         self.world_update(False)

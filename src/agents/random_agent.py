@@ -4,15 +4,13 @@ import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 
-
-class Agent1(KartAgent):
+class RandomAgent(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)
         self.path_lookahead = path_lookahead
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
-        self.name = "Team1" # replace with your chosen name
 
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -34,3 +32,18 @@ class Agent1(KartAgent):
             "fire": bool(random.getrandbits(1)),
         }
         return action
+
+    def step(self):
+        action = self.choose_action(self.obs)
+        self.obs, reward, done, truncated, info = self.env.step(action)
+        self.agent_positions.append(np.array(self.env.unwrapped.world.karts[0].location))
+        return done
+
+    def run(self, steps=10000):
+        self.reset()
+        for _ in range(steps):
+            done = self.step()
+            yield self.obs
+            if done:
+                break
+        self.env.close()
