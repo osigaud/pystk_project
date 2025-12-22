@@ -466,7 +466,7 @@ class STKRaceEnv(BaseSTKRaceEnv):
             self.config.players[
                 self.kart_ix
             ].controller = pystk2.PlayerConfig.Controller.PLAYER_CONTROL
-            print('coucou: ', kart_skin[self.kart_ix])
+            print('reset')
             self.config.players[self.kart_ix].kart = kart_skin[self.kart_ix]
         self.warmup_race()
         self.world_update(False)
@@ -560,7 +560,7 @@ class STKRaceMultiEnv(BaseSTKRaceEnv):
                 self.config.players[
                     kart_ix
                 ].controller = pystk2.PlayerConfig.Controller.PLAYER_CONTROL
-                print('coucou: ', kart_skin[kart_ix])
+                print(f'kartname: Team{kart_ix} ({kart_skin[kart_ix]})')
                 self.config.players[kart_ix].kart = kart_skin[kart_ix]
             self.config.players[kart_ix].name = agent.name
 

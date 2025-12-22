@@ -11,13 +11,13 @@ import numpy as np
 # Append the "src" folder to sys.path.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "src")))
 
-from agents.team1.Agent1 import Agent1
-from agents.team2.Agent2 import Agent2
-from agents.team3.Agent3 import Agent3
-from agents.team4.Agent4 import Agent4
-from agents.team5.Agent5 import Agent5
-from agents.team6.Agent6 import Agent6
-from agents.team7.Agent7 import Agent7
+from agents.team1.agent1 import Agent1
+from agents.team2.agent2 import Agent2
+from agents.team3.agent3 import Agent3
+from agents.team4.agent4 import Agent4
+from agents.team5.agent5 import Agent5
+from agents.team6.agent6 import Agent6
+from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 
 # Make AgentSpec hashable.
