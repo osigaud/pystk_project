@@ -560,7 +560,7 @@ class STKRaceMultiEnv(BaseSTKRaceEnv):
                 self.config.players[
                     kart_ix
                 ].controller = pystk2.PlayerConfig.Controller.PLAYER_CONTROL
-                print(f'kartname: Team{kart_ix} ({kart_skin[kart_ix]})')
+                print(f'kartname: Team{kart_ix + 1} ({kart_skin[kart_ix]})')
                 self.config.players[kart_ix].kart = kart_skin[kart_ix]
             self.config.players[kart_ix].name = agent.name
 

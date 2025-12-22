@@ -34,10 +34,10 @@ class Agent7:
         return action
 
     def step(self):
-        action = choose_action(self.obs)
-        self.obs, reward, done, truncated, info = self.env.step(action)
+        action = self.choose_action(self.obs)
+        self.obs, _, terminated, _, _ = self.env.step(action)
         self.agent_positions.append(np.array(self.env.unwrapped.world.karts[0].location))
-        return done
+        return terminated
 
     def run(self, steps=10000):
         self.reset()
