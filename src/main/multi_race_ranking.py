@@ -15,9 +15,7 @@ import re
 import subprocess
 import sys
 from typing import Iterable, List, Optional
-from urllib.parse import urlparse
 import numpy as np
-from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 import tempfile
@@ -242,7 +240,8 @@ if __name__ == "__main__":  # noqa: C901
     results_lock = threading.Lock()
 
     def generate_race(race_counter: List[int]) -> Optional[tuple[int, List[Project]]]:
-        """Generate a new race with remaining candidates. Returns (race_id, selected) or None if done."""
+        """Generate a new race with remaining candidates.
+        Returns (race_id, selected) or None if done."""
         candidates: list[Project] = [
             project for project in valid.values() if project.runs < args.runs
         ]

@@ -1,5 +1,5 @@
 import numpy as np
-from utils.TrackUtils import compute_curvature, compute_slope
+from utils.track_utils import compute_curvature, compute_slope
 
 class MedianAgent:
     def __init__(self, env, path_lookahead=3):

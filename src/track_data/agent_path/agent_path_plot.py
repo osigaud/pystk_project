@@ -6,7 +6,7 @@ import csv
 import pandas as pd
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src")))
 from pystk2_gymnasium.envs import AgentSpec
-from utils.TrackUtils import TrackVisualizer  
+from utils.track_utils import TrackVisualizer  
 
 from customAgents.MedianAgent import MedianAgent
 from customAgents.EulerAgent import EulerAgent

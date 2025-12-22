@@ -1,5 +1,5 @@
 import numpy as np
-from utils.TrackUtils import compute_slope
+from utils.track_utils import compute_slope
 
 """
 A decorator that wraps an existing agent (here it decorates a MedianAgent) to add curvature-based adjustments.
