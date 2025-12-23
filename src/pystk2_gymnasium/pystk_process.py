@@ -32,17 +32,18 @@ class PySTKRemoteProcess:
                 # We stop if the command is None
                 pipe.send(None)
                 sys.exit()
-
-            logging.debug(
-                "Received command %s, args=%s, kwargs=%s",
-                command.func,
-                command.args,
-                command.keywords,
-            )
+            if logging.debug:
+                logging.debug(
+                    "Received command %s, args=%s, kwargs=%s",
+                    command.func,
+                    command.args,
+                    command.keywords,
+                )
             assert isinstance(command, partialmethod)
 
             result = command.func(stk, *command.args, **command.keywords)
-            logging.debug("Sending result %s", result)
+            if logging.debug:
+                logging.debug("Sending result %s", result)
             pipe.send(result)
 
     def list_tracks(self) -> List[str]:
@@ -122,7 +123,8 @@ class PySTKProcess:
         return result
 
     def __del__(self):
-        logging.debug("Stopping the process")
+        if logging.debug:
+            logging.debug("Stopping the process")
         try:
             self.close()
         except BrokenPipeError:
