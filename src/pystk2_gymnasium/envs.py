@@ -481,7 +481,7 @@ class STKRaceEnv(BaseSTKRaceEnv):
 
         # Camera setup
         self.config.players[self.kart_ix].camera_mode = (
-            pystk2.PlayerConfig.CameraMode.ON
+            pystk2.PlayerConfig.CameraMode.OFF # was AUTO
         )
         self.config.players[self.kart_ix].name = self.agent.name
         self.config.players[self.kart_ix].kart = kart_skin[self.kart_ix]
@@ -490,7 +490,7 @@ class STKRaceEnv(BaseSTKRaceEnv):
             self.config.players[self.kart_ix].controller = (
                 pystk2.PlayerConfig.Controller.PLAYER_CONTROL
             )
-        print(f'kart name: {self.agent.name} ({kart_skin[self.kart_ix]})')
+        print(f'kart name: {self.agent.name} ({kart_skin[self.kart_ix]}): {self.agent.camera_mode}')
 
         self.warmup_race()
         self.world_update(False)
@@ -578,7 +578,7 @@ class STKRaceMultiEnv(BaseSTKRaceEnv):
                 self.config.players[kart_ix].controller = (
                     pystk2.PlayerConfig.Controller.PLAYER_CONTROL
                 )
-            print(f'kart name: {agent.name} ({kart_skin[kart_ix]})')
+            print(f'kart name: {agent.name} ({kart_skin[kart_ix]}): {agent.camera_mode}')
             self.config.players[kart_ix].kart = kart_skin[kart_ix]
             self.config.players[kart_ix].name = agent.name
 

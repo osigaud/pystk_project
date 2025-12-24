@@ -11,6 +11,8 @@ from datetime import datetime
 from pathlib import Path
 from dataclasses import dataclass
 
+
+
 # Append the "src" folder to sys.path.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "src")))
 
@@ -22,6 +24,7 @@ from agents.team5.agent5 import Agent5
 from agents.team6.agent6 import Agent6
 from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
+from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 7
 
@@ -54,7 +57,7 @@ AgentSpec.__hash__ = agent_spec_hash
 
 # Create agents specifications.
 agents_specs = [
-    AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False) for i in range(MAX_TEAMS)
+    AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.OFF) for i in range(MAX_TEAMS)
 ]
 
 # Create the multi-agent environment for N karts.
@@ -99,7 +102,7 @@ def main():
             str = f"{i}"
             pos[i] = info['infos'][str]['position']
             dist[i] = info['infos'][str]['distance']
-        # print(f"{names}{pos}")
+        print(f"{names}{dist}")
         steps = steps + 1
         done = terminated or truncated
         positions.append(pos)
