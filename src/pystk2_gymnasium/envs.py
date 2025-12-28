@@ -193,7 +193,7 @@ class BaseSTKRaceEnv(gym.Env[Any, STKAction]):
         """
         super().__init__()
 
-        assert render_mode is None or render_mode in self.metadata["render_modes"]
+        assert render_mode is None or render_mode in self.metadata["render_modes"], "unkown render_mode"
         self.render_mode = render_mode
         self.initialize(render_mode == "human")
 
@@ -248,7 +248,7 @@ class BaseSTKRaceEnv(gym.Env[Any, STKAction]):
         return self.world
 
     def get_state(self, kart_ix: int, use_ai: bool):
-        assert self.world is not None
+        assert self.world is not None, "World is None"
         kart: pystk2.Kart = self.world.karts[kart_ix]
         terminated = kart.has_finished_race
 
@@ -274,7 +274,7 @@ class BaseSTKRaceEnv(gym.Env[Any, STKAction]):
         )
 
     def get_observation(self, kart_ix, use_ai):
-        assert self.world is not None
+        assert self.world is not None, "World is None"
 
         kart: pystk2.Kart = self.world.karts[kart_ix]
 
@@ -428,11 +428,12 @@ class BaseSTKRaceEnv(gym.Env[Any, STKAction]):
         pass
 
     def race_step(self, *action):
+        print("dans race_step 431", *action)
         return self._process.race_step(*action)
 
     def warmup_race(self):
         self.track = self._process.warmup_race(self.config)
-        assert len(self.track.successors) == len(self.track.path_nodes)
+        assert len(self.track.successors) == len(self.track.path_nodes), f" ({len(self.track.successors)}) successors for {self.track.path_nodes} path nodes"
 
     def close(self):
         self._process.close()
@@ -481,7 +482,7 @@ class STKRaceEnv(BaseSTKRaceEnv):
 
         # Camera setup
         self.config.players[self.kart_ix].camera_mode = (
-            pystk2.PlayerConfig.CameraMode.OFF # was AUTO
+            pystk2.PlayerConfig.CameraMode.AUTO # was AUTO, OFF, ON
         )
         self.config.players[self.kart_ix].name = self.agent.name
         self.config.players[self.kart_ix].kart = kart_skin[self.kart_ix]
@@ -606,14 +607,14 @@ class STKRaceMultiEnv(BaseSTKRaceEnv):
         self, actions: Dict[str, STKAction]
     ) -> Tuple[pystk2.WorldState, float, bool, bool, Dict[str, Any]]:
         # Performs the action
-        assert len(actions) == len(self.agents)
-        self.race_step(
-            [
+        assert len(actions) == len(self.agents), f"{len(actions)} does not match {len(self.agents)}"
+        param = [
                 get_action(actions[str(agent_ix)])
                 for agent_ix, agent in zip(self.kart_m_indices, self.agents)
                 if not agent.use_ai
             ]
-        )
+        print("param", param)
+        self.race_step(param)
 
         # Update the world state
         self.world_update()
