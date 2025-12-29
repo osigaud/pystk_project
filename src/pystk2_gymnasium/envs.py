@@ -230,12 +230,11 @@ class BaseSTKRaceEnv(gym.Env[Any, STKAction]):
             track=self.current_track,
             laps=self.laps,
         )
-
         for ix in range(self.num_kart):
             if ix > 0:
                 self.config.players.append(pystk2.PlayerConfig())
             self.config.players[ix].controller = (
-                pystk2.PlayerConfig.Controller.AI_CONTROL
+                pystk2.PlayerConfig.Controller.PLAYER_CONTROL
             )
 
     def world_update(self, keep=True):
@@ -428,7 +427,6 @@ class BaseSTKRaceEnv(gym.Env[Any, STKAction]):
         pass
 
     def race_step(self, *action):
-        print("dans race_step 431", *action)
         return self._process.race_step(*action)
 
     def warmup_race(self):
@@ -613,7 +611,6 @@ class STKRaceMultiEnv(BaseSTKRaceEnv):
                 for agent_ix, agent in zip(self.kart_m_indices, self.agents)
                 if not agent.use_ai
             ]
-        print("param", param)
         self.race_step(param)
 
         # Update the world state

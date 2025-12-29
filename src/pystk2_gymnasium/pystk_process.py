@@ -40,7 +40,6 @@ class PySTKRemoteProcess:
                     command.keywords,
                 )
             assert isinstance(command, partialmethod)
-            print("dans run process 43: ", *command.args, **command.keywords)
 
             result = command.func(stk, *command.args, **command.keywords)
             if logging.debug:
@@ -87,7 +86,6 @@ class PySTKRemoteProcess:
     def race_step(self, *args):
         if self.race is None:
             return Exception("Cannot step since race has not been started")
-        print("dans race_step process 90 : ", *args)
         return self.race.step(*args)
 
     def get_kart_action(self, kart_ix):
@@ -118,7 +116,6 @@ class PySTKProcess:
             assert len(args) == 0 and len(kwargs) == 0
 
         self.pipe.send(method)
-        print("dans process _run 121 method", method)
         result = self.pipe.recv()
         logging.debug("Got %s", result)
         if isinstance(result, Exception):

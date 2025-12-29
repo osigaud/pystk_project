@@ -94,7 +94,6 @@ def main():
             except Exception as e:
                 print(f"Team {i+1} error: {e}")
                 actions[str] = default_action
-        print(actions)
         obs, _, terminated, truncated, info = env.step(actions)
         #print(f"{info['infos']}")
         pos = np.zeros(MAX_TEAMS)
