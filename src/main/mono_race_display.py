@@ -60,32 +60,36 @@ agents_specs = [
     AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.OFF) for i in range(MAX_TEAMS)
 ]
 
-# Create the multi-agent environment for N karts.
-env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)
+def create_race():
+    # Create the multi-agent environment for N karts.
+    #env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)
+    env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
 
-# Instantiate the agents.
+    # Instantiate the agents.
 
-agents = []
-names = []
+    agents = []
+    names = []
 
-agents.append(Agent1(env, path_lookahead=3))
-agents.append(Agent2(env, path_lookahead=3))
-agents.append(Agent3(env, path_lookahead=3))
-agents.append(Agent4(env, path_lookahead=3))
-agents.append(Agent5(env, path_lookahead=3))
-agents.append(Agent6(env, path_lookahead=3))
-agents.append(Agent7(env, path_lookahead=3))
-np.random.shuffle(agents)
+    agents.append(Agent1(env, path_lookahead=3))
+    agents.append(Agent2(env, path_lookahead=3))
+    agents.append(Agent3(env, path_lookahead=3))
+    agents.append(Agent4(env, path_lookahead=3))
+    agents.append(Agent5(env, path_lookahead=3))
+    agents.append(Agent6(env, path_lookahead=3))
+    agents.append(Agent7(env, path_lookahead=3))
+    np.random.shuffle(agents)
 
-for i in range(MAX_TEAMS):
-    names.append(agents[i].name)
+    for i in range(MAX_TEAMS):
+        names.append(agents[i].name)
+    return env, agents, names
 
-def main():
+
+def single_race(env, agents, names):
     obs, _ = env.reset()
     done = False
     steps = 0
     positions = []
-    while not done and steps < 1000:
+    while not done and steps < 100:
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
@@ -111,7 +115,17 @@ def main():
     scores = []
     for i in range(MAX_TEAMS):
         scores.append(Scores(names[i], average_pos[i], std_pos[i]))
-    env.close()
+    return scores
+
+def main_loop():
+    for i in range(5):
+        print(f"race : {i}")
+        env, agents, names = create_race()
+        scores = single_race(env, agents, names)
+        global_scores = []
+        for i in range(MAX_TEAMS):
+            global_scores[i].append(scores[i])
+        env.close()
     return scores
 
 
@@ -159,5 +173,5 @@ def output_html(output: Path, scores: Scores):
 
 
 if __name__ == "__main__":
-    scores = main()
+    scores = main_loop()
     output_html(Path("./results.html"), scores)
