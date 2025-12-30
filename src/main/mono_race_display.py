@@ -12,7 +12,6 @@ from pathlib import Path
 from dataclasses import dataclass
 
 
-
 # Append the "src" folder to sys.path.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "src")))
 
@@ -27,6 +26,7 @@ from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 7
+NB_RACES = 2
 
 # Get the current timestamp
 current_timestamp = datetime.now()
@@ -36,9 +36,32 @@ formatted_timestamp = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
 @dataclass
 class Scores:
-    name: str
-    position: float
-    pos_std: float
+    def __init__(self):
+        self.dict = {}
+    
+    def init(self, name):
+        self.dict[name] = [[], []]
+
+    def append(self, name, pos, std):
+        self.dict[name][0].append(pos)
+        self.dict[name][1].append(std)
+
+    def display(self):
+        print(self.dict)
+
+    def display_mean(self):
+        for k in self.dict:
+            print(f"{k}: {np.array(self.dict[k][0]).mean()}, {np.array(self.dict[k][1]).mean()}")
+
+    def display_html(self, fp):
+        for k in self.dict:
+            fp.write(f"""<tr><td>{k}</td>""")
+            fp.write(
+                    f"""<td>{np.array(self.dict[k][0]).mean():.2f}</td>"""
+                    f"""<td>{np.array(self.dict[k][1]).mean():.2f}</td>"""
+                    "</tr>"
+                )
+            
 
 default_action = {
             "acceleration": 0.0,
@@ -49,6 +72,7 @@ default_action = {
             "rescue":False, # bool(random.getrandbits(1)),
             "fire": False, # bool(random.getrandbits(1)),
         }
+
 
 # Make AgentSpec hashable.
 def agent_spec_hash(self):
@@ -62,8 +86,10 @@ agents_specs = [
 
 def create_race():
     # Create the multi-agent environment for N karts.
-    #env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)
-    env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
+    if NB_RACES==1:
+        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)
+    else:
+        env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
 
     # Instantiate the agents.
 
@@ -84,7 +110,7 @@ def create_race():
     return env, agents, names
 
 
-def single_race(env, agents, names):
+def single_race(env, agents, names, scores):
     obs, _ = env.reset()
     done = False
     steps = 0
@@ -106,26 +132,32 @@ def single_race(env, agents, names):
             str = f"{i}"
             pos[i] = info['infos'][str]['position']
             dist[i] = info['infos'][str]['distance']
-        print(f"{names}{dist}")
+        # print(f"{names}{dist}")
         steps = steps + 1
         done = terminated or truncated
         positions.append(pos)
-    average_pos = np.array(positions).mean(axis=0)
+    avg_pos = np.array(positions).mean(axis=0)
     std_pos = np.array(positions).std(axis=0)
-    scores = []
     for i in range(MAX_TEAMS):
-        scores.append(Scores(names[i], average_pos[i], std_pos[i]))
-    return scores
+        scores.append(names[i], avg_pos[i], std_pos[i])
 
 def main_loop():
-    for i in range(5):
-        print(f"race : {i}")
+    scores = Scores()
+    #unsatisfactory: first call just to init the names
+    env, agents, names = create_race()
+    for i in range(MAX_TEAMS):
+        scores.init(names[i])
+
+    for j in range(NB_RACES):
+        print(f"race : {j}")
         env, agents, names = create_race()
-        scores = single_race(env, agents, names)
-        global_scores = []
-        for i in range(MAX_TEAMS):
-            global_scores[i].append(scores[i])
+        single_race(env, agents, names, scores)
+
         env.close()
+
+    print("final scores:")
+    scores.display()
+    scores.display_mean()
     return scores
 
 
@@ -150,13 +182,8 @@ def output_html(output: Path, scores: Scores):
   <tbody>"""
         )
 
-        for i in range(MAX_TEAMS):
-            fp.write(f"""<tr><td>{scores[i].name}</td>""")
-            fp.write(
-                    f"""<td>{scores[i].position:.2f}</td>"""
-                    f"""<td>{scores[i].pos_std:.2f}</td>"""
-                    "</tr>"
-                )
+        scores.display_html(fp)
+            
         fp.write(
             """<script>
   window.addEventListener('load', function () {
