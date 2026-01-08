@@ -25,7 +25,11 @@ You are done.
 To run a race on a single track with graphical display:
 
 - cd src/main
-- uv run monorace-display.py
+- uv run single_track_race_display.py
+
+or
+
+- uv run multi_track_race_display.py
 
 To run many races on multiple tracks without graphical display and get the ranked performance of agents:
 
@@ -46,6 +50,9 @@ You have to perform a pull request on the source project: https://docs.github.co
 
 The project is here: https://github.com/osigaud/pystk_project
 
+### Watch the current results
+
+The current race results are visible [here](./results.html), they will be updated each week.
   
 ## AgentSpec
 

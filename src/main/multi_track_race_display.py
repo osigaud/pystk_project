@@ -26,7 +26,7 @@ from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 7
-NB_RACES = 2
+NB_RACES = 10
 
 # Get the current timestamp
 current_timestamp = datetime.now()
