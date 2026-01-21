@@ -23,14 +23,14 @@ class Agent5(KartAgent):
 
     def choose_action(self, obs):
         acceleration = random.random()
-        steering = random.random()
+        steering = 0 #random.random()
         action = {
             "acceleration": acceleration,
             "steer": steering,
-            "brake": False, # bool(random.getrandbits(1)),
-            "drift": bool(random.getrandbits(1)),
-            "nitro": bool(random.getrandbits(1)),
-            "rescue":bool(random.getrandbits(1)),
-            "fire": bool(random.getrandbits(1)),
+            "brake": True, # bool(random.getrandbits(1)),
+            "drift": 0,#bool(random.getrandbits(1)),
+            "nitro": 0,#bool(random.getrandbits(1)),
+            "rescue":0,#bool(random.getrandbits(1)),
+            "fire": 0,#bool(random.getrandbits(1)),
         }
         return action
