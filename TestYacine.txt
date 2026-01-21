@@ -1,1 +1,2 @@
 Ceci est un fichier.
+Ceci est un conflit.
