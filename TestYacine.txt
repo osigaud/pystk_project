@@ -1,3 +1,0 @@
-Ceci est un test pour add/commit/push
-Ceci est une modification
-Ceci est une deuxième modification
