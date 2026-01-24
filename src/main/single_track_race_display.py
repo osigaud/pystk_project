@@ -115,7 +115,7 @@ def single_race(env, agents, names, scores):
     done = False
     steps = 0
     positions = []
-    while not done and steps < 100:
+    while not done and steps < 100: #step influence le temps de la course
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
