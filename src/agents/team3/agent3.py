@@ -18,19 +18,20 @@ class Agent3(KartAgent):
 
     def endOfTrack(self):
         return self.isEnd
-
+    
     def choose_action(self, obs):
-        acceleration = 0.7
         target = obs["paths_end"][0] #return a vector [x,y,z]
-        x = target[0] #We extract the x axis
-        if (x > 1):
-        	x = 1 #Here, x represents the steering wheel in order to change the path
-        elif (x < -1):
-        	x = -1
+        x = target[0] #Extracting the x
+        if (abs(x) > 0.5):
+        	acceleration = 0.01
+        	brake = 1.0
+        else:
+        	acceleration = 0.7
+        	brake = 0.0
         action = {
             "acceleration": acceleration,
             "steer": x,
-            "brake": False,
+            "brake": brake,
             "drift": False,
             "nitro": False,
             "rescue": False,
