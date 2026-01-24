@@ -23,7 +23,7 @@ class Agent5(KartAgent):
 
     def choose_action(self, obs):
         acceleration = random.random()
-        steering = 0 #random.random()
+        steering = 0 #random.random() #De -1 (Gauche) à 1 (Droite)
         action = {
             "acceleration": acceleration,
             "steer": steering,
