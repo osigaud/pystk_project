@@ -52,7 +52,7 @@ The project is here: https://github.com/osigaud/pystk_project
 
 ### Watch the current results
 
-The current race results are visible [here](https://osigaud.github.io/pystk_project), they will be updated each week.
+The current race results are visible [here](https://osigaud.github.io/pystk_project/docs/index.html), they will be updated each week.
   
 ## AgentSpec
 
