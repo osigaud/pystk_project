@@ -24,10 +24,10 @@ class Agent3(KartAgent):
         x = target[0] #Extracting the x
         if (abs(x) > 0.5 and obs["distance_down_track"] > 5):
         	acceleration = 0.01
-        	brake = 1.0
+        	brake = True
         else:
         	acceleration = 0.7
-        	brake = 0.0
+        	brake = False
         action = {
             "acceleration": acceleration,
             "steer": x,
