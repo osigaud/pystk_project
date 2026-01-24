@@ -1,9 +1,7 @@
 import numpy as np
-import random
 
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
-
 
 class Agent3(KartAgent):
     def __init__(self, env, path_lookahead=3):
@@ -12,7 +10,7 @@ class Agent3(KartAgent):
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
-        self.name = "TEAM L'ÉCLAIR" # replace with your chosen name
+        self.name = "TEAM L'ÉCLAIR"
 
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -22,15 +20,20 @@ class Agent3(KartAgent):
         return self.isEnd
 
     def choose_action(self, obs):
-        acceleration = random.random()
-        steering = random.random()
+        acceleration = 0.7
+        target = obs["paths_end"][0] #return a vector [x,y,z]
+        x = target[0] #We extract the x axis
+        if (x > 1):
+        	x = 1 #Here, x represents the steering wheel in order to change the path
+        elif (x < -1):
+        	x = -1
         action = {
             "acceleration": acceleration,
-            "steer": steering,
-            "brake": False, # bool(random.getrandbits(1)),
-            "drift": bool(random.getrandbits(1)),
-            "nitro": bool(random.getrandbits(1)),
-            "rescue":bool(random.getrandbits(1)),
-            "fire": bool(random.getrandbits(1)),
+            "steer": x,
+            "brake": False,
+            "drift": False,
+            "nitro": False,
+            "rescue": False,
+            "fire": False,
         }
         return action
