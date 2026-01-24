@@ -1,7 +1,0 @@
-agents
-main
-pystk2_gymnasium
-race_utils
-track_data
-unit_tests
-utils
