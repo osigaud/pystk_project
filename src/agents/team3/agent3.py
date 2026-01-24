@@ -22,7 +22,7 @@ class Agent3(KartAgent):
     def choose_action(self, obs):
         target = obs["paths_end"][0] #return a vector [x,y,z]
         x = target[0] #Extracting the x
-        if (abs(x) > 0.5):
+        if (abs(x) > 0.5 and obs["distance_down_track"] > 5):
         	acceleration = 0.01
         	brake = 1.0
         else:
