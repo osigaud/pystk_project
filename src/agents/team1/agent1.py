@@ -2,8 +2,6 @@ import numpy as np
 import random
 import math
 
-#TESTk:!d!c!!sd!!!!!
-
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 
@@ -15,7 +13,7 @@ class Agent1(KartAgent):
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
-        self.name = "Team1" # replace with your chosen name
+        self.name = "Tasty Crousteam" # nom de l'équipe
 
     def reset(self):
         self.obs, _ = self.env.reset()
