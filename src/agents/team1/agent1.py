@@ -26,10 +26,10 @@ class Agent1(KartAgent):
         acceleration = random.random()
         steering = random.random()
         action = {
-            "acceleration": acceleration,
-            "steer": steering,
+            "acceleration": 1,
+            "steer": 0,
             "brake": False, # bool(random.getrandbits(1)),
-            "drift": bool(random.getrandbits(1)),
+            "drift": False, #pour pas qu'il drift et qu'il roule tout droit
             "nitro": bool(random.getrandbits(1)),
             "rescue":bool(random.getrandbits(1)),
             "fire": bool(random.getrandbits(1)),
