@@ -2,6 +2,7 @@
 Code repris du script single_track_race_display.py
 Avec tous les autres agents mais je veux les supprimer pour que ça garde que le nôtre (équipe 1)
 Pas d'écriture sur le HTML aussi
+test
 
 Affichage des variables auxquelles on a accès pour la position etc.
 
