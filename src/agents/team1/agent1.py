@@ -30,8 +30,8 @@ class Agent1(KartAgent):
             "steer": 0,
             "brake": False, # bool(random.getrandbits(1)),
             "drift": False, #pour pas qu'il drift et qu'il roule tout droit
-            "nitro": bool(random.getrandbits(1)),
-            "rescue":bool(random.getrandbits(1)),
-            "fire": bool(random.getrandbits(1)),
+            "nitro": False, #bool(random.getrandbits(1)),
+            "rescue": False, #bool(random.getrandbits(1)),
+            "fire": False, #bool(random.getrandbits(1)),
         }
         return action
