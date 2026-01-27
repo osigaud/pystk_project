@@ -201,4 +201,4 @@ def output_html(output: Path, scores: Scores):
 
 if __name__ == "__main__":
     scores = main_loop()
-    output_html(Path("../../docs/results.html"), scores)
+    output_html(Path("../../docs/index.html"), scores)
