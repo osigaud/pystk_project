@@ -2,7 +2,6 @@
 Code repris du script single_track_race_display.py
 Avec tous les autres agents mais je veux les supprimer pour que ça garde que le nôtre (équipe 1)
 Pas d'écriture sur le HTML aussi
-test
 
 Affichage des variables auxquelles on a accès pour la position etc.
 
@@ -16,8 +15,8 @@ from datetime import datetime
 from pathlib import Path
 from dataclasses import dataclass
 
-import time #c pour test
-INTERVALLE = 1  # secondes
+import time
+INTERVALLE = 1  # 1 seconde
 dernier_affichage = 0
 
 
@@ -26,15 +25,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.
 
 from agents.team1.agent1 import Agent1
 from agents.team2.agent2 import Agent2
+"""
 from agents.team3.agent3 import Agent3
 from agents.team4.agent4 import Agent4
 from agents.team5.agent5 import Agent5
 from agents.team6.agent6 import Agent6
 from agents.team7.agent7 import Agent7
+"""
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 7
+MAX_TEAMS = 2
 NB_RACES = 1
 
 # Get the current timestamp
@@ -107,11 +108,13 @@ def create_race():
 
     agents.append(Agent1(env, path_lookahead=3))
     agents.append(Agent2(env, path_lookahead=3))
+    """
     agents.append(Agent3(env, path_lookahead=3))
     agents.append(Agent4(env, path_lookahead=3))
     agents.append(Agent5(env, path_lookahead=3))
     agents.append(Agent6(env, path_lookahead=3))
     agents.append(Agent7(env, path_lookahead=3))
+    """
     #Pour pas que ça shuffle et qu'on puisse récupérer les données de notre agent plus facilement
     #np.random.shuffle(agents) 
 
@@ -119,34 +122,40 @@ def create_race():
         names.append(agents[i].name)
     return env, agents, names
 
-def affichage_variables(action) :
-    """Affichage des variables toutes les secondes"""
+def affichage_variables(action, obs) :
+    """Affichage des variables toutes les secondes
+    num : str du numéro de l'équipe"""
     global dernier_affichage
     maintenant = time.time()
     if maintenant - dernier_affichage >= INTERVALLE:
         dernier_affichage = maintenant
-        print(action)
+        #print(action)
+        #print(obs["0"]["center_path_distance"])
+        for i in range(len(obs["0"]["paths_start"])) : 
+            print(obs["0"]["paths_start"][i])
+    #Affichage de la position en continu
+    #print(obs["0"]["distance_down_track"])
 
 def single_race(env, agents, names, scores):
     obs, _ = env.reset()
     done = False
     steps = 0
     positions = []
-    while not done and steps < 100:
+    while not done and steps < 100: #Changer ici pour que la course dure + longtemps
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
             try:
                 actions[str] = agents[i].choose_action(obs[str])
 
-                #affichage des variables du kart de l'équipe 1
-                if (i == 0) : 
-                    affichage_variables(actions[str])
-
             except Exception as e:
                 print(f"Team {i+1} error: {e}")
                 actions[str] = default_action
         obs, _, terminated, truncated, info = env.step(actions)
+
+        #affichage des variables du kart de l'équipe 1 (indice 0)
+        affichage_variables(actions["0"], obs)
+
         #print(f"{info['infos']}")
         pos = np.zeros(MAX_TEAMS)
         dist = np.zeros(MAX_TEAMS)
