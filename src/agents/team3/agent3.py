@@ -51,33 +51,3 @@ class Agent3(KartAgent):
             "fire": False,
         }
         return action
-    def dodge(self,obs):
-        danger_dist = 6.5
-        dodge_strength = 0.8
-        dodge = 0.0
-        eps=0.05
-        slow_down = False       
-        path_width = obs["paths_width"][0]
-        lane_width = path_width/2
-        
-        for i in range (len(obs["items_position"])):
-            pos=obs["items_position"][i]
-            it_type=obs["items_type"][i]
-            x=pos[0]
-            z=pos[2]
-            if it_type==1: #banana
-                if z>0 and z < danger_dist :    #item is in front and is dangerously close
-                    if abs(x) < lane_width:    #item is in the current lane
-                        if abs(x)<eps:    #item directly in front
-                             center_x = obs["center_path"][0]
-                             if center_x > 0 :
-                                 dodge = -dodge_strength     #steer right
-                             else: 
-                                 dodge = dodge_strength    #steer left
-                        elif x>0:    #item to the left
-                            dodge = -dodge_strength     #steering negative/turning right
-                        else :     #item to the right
-                            dodge = dodge_strength    #steering positive/turning left
-                        slow_down=True  
-                        break
-        return dodge,slow_down
