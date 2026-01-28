@@ -25,7 +25,7 @@ from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 7
+MAX_TEAMS = 2
 NB_RACES = 1
 
 # Get the current timestamp
@@ -87,7 +87,7 @@ agents_specs = [
 def create_race():
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)
+        env = STKRaceMultiEnv(agents=agents_specs, track="cornfield_crossing", render_mode="human", num_kart=MAX_TEAMS)
     else:
         env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
 
@@ -97,13 +97,13 @@ def create_race():
     names = []
 
     agents.append(Agent1(env, path_lookahead=3))
-    agents.append(Agent2(env, path_lookahead=3))
+    #agents.append(Agent2(env, path_lookahead=3))
     agents.append(Agent3(env, path_lookahead=3))
-    agents.append(Agent4(env, path_lookahead=3))
-    agents.append(Agent5(env, path_lookahead=3))
-    agents.append(Agent6(env, path_lookahead=3))
-    agents.append(Agent7(env, path_lookahead=3))
-    np.random.shuffle(agents)
+    #agents.append(Agent4(env, path_lookahead=3))
+    #agents.append(Agent5(env, path_lookahead=3))
+    #agents.append(Agent6(env, path_lookahead=3))
+    #agents.append(Agent7(env, path_lookahead=3))
+    #np.random.shuffle(agents)
 
     for i in range(MAX_TEAMS):
         names.append(agents[i].name)
@@ -115,7 +115,7 @@ def single_race(env, agents, names, scores):
     done = False
     steps = 0
     positions = []
-    while not done and steps < 100:
+    while not done and steps < 10000:
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
