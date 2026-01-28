@@ -17,6 +17,9 @@ class Agent3(KartAgent):
         self.obs, _ = self.env.reset()
         self.agent_positions = []
 
+
+        
+
     def endOfTrack(self):
         return self.isEnd
     
