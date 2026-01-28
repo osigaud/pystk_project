@@ -23,7 +23,7 @@ class Agent2(KartAgent):
 
     def choose_action(self, obs):
         acceleration = 1.0
-        steering = 0.1
+        steering = 0
         action = {
             "acceleration": acceleration,
             "steer": steering,
