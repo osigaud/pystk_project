@@ -9,6 +9,9 @@ All initial agents are RandomAgent
 The simulation runs on the "black_forest" track with MAX_TEAMS karts.
 """
 
+
+"""verification des droits ecriture de Wiam"""
+
 import sys, os
 import numpy as np
 from datetime import datetime
