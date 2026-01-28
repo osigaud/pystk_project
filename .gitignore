@@ -1,4 +1,5 @@
 docs/index.html
+uv.lock
 src/agents/__pycache__/kart_agent.cpython-312.pyc
 src/agents/__pycache__/kart_agent.cpython-314.pyc
 src/agents/team1/__pycache__/agent1.cpython-312.pyc
