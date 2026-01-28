@@ -1,4 +1,0 @@
-Ceci est un fichier.
-lop
-
-Ceci est un test 
