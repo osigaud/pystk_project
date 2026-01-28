@@ -27,10 +27,10 @@ class Agent2(KartAgent):
         action = {
             "acceleration": acceleration,
             "steer": steering,
-            "brake": bool(random.getrandbits(1)),
+            "brake": False, #bool(random.getrandbits(1)),
             "drift": bool(random.getrandbits(1)),
             "nitro": bool(random.getrandbits(1)),
-            "rescue": bool(random.getrandbits(1)),
+            "rescue":bool(random.getrandbits(1)),
             "fire": bool(random.getrandbits(1)),
         }
         return action
