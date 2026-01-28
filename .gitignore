@@ -7,3 +7,4 @@
 
 src/agents/team1/__pycache__/agent1.cpython-312.pyc
 src/utils/__pycache__/track_utils.cpython-312.pyc
+docs/*
