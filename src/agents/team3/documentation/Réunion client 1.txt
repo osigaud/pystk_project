@@ -1,0 +1,19 @@
+On aurait du faire une documentation 
+pour la tache "jouer au jeu et donner
+feedback"
+On doit pas coder tous au même temps (pas productif)
+Il doit y avoir un codeur et un 
+testeur pour chaque tache
+On n'a pas le droit d'ajouter des 
+taches en milieu de semaine, il faut 
+directement les mettre en fait la 
+semaine d'après
+Faire une documentation à mesure 
+qu'on avance sur le code
+Pull request doit être faite avant 
+le mercredi
+Pouvoir être capable de montrer sur 
+la démo les changements de comportement
+par rapport à la semaine d'avant
+Les taches doivent être faites de
+manière plus individuelles
