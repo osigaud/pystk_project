@@ -25,7 +25,7 @@ from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 2
+MAX_TEAMS = 7
 NB_RACES = 1
 
 # Get the current timestamp
@@ -97,13 +97,13 @@ def create_race():
     names = []
 
     agents.append(Agent1(env, path_lookahead=3))
-    #agents.append(Agent2(env, path_lookahead=3))
+    agents.append(Agent2(env, path_lookahead=3))
     agents.append(Agent3(env, path_lookahead=3))
-    #agents.append(Agent4(env, path_lookahead=3))
-    #agents.append(Agent5(env, path_lookahead=3))
-    #agents.append(Agent6(env, path_lookahead=3))
-    #agents.append(Agent7(env, path_lookahead=3))
-    #np.random.shuffle(agents)
+    agents.append(Agent4(env, path_lookahead=3))
+    agents.append(Agent5(env, path_lookahead=3))
+    agents.append(Agent6(env, path_lookahead=3))
+    agents.append(Agent7(env, path_lookahead=3))
+    np.random.shuffle(agents)
 
     for i in range(MAX_TEAMS):
         names.append(agents[i].name)
@@ -196,8 +196,6 @@ def output_html(output: Path, scores: Scores):
 """
         )
         fp.write("""</body>""")
-
-
 
 if __name__ == "__main__":
     scores = main_loop()
