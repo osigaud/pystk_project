@@ -38,16 +38,7 @@ class AgentBase(KartAgent):
 
 #Agent qui roule tout droit
 class AgentStraight(AgentBase):
-    def __init__(self, env, path_lookahead=3):        
-        super().__init__(env)
-        self.path_lookahead = path_lookahead
-        self.agent_positions = []
-        self.obs = None
-        self.isEnd = False
-
     def choose_action(self, obs):
-        acceleration = random.random()
-        steering = random.random()
         action = {
             "acceleration": 1, 
             "steer": 0, 
