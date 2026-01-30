@@ -123,18 +123,15 @@ def create_race():
     return env, agents, names
 
 def affichage_variables(action, obs) :
-    """Affichage des variables toutes les secondes
-    num : str du numéro de l'équipe"""
+    """Affichage des variables toutes les secondes"""
     global dernier_affichage
     maintenant = time.time()
     if maintenant - dernier_affichage >= INTERVALLE:
         dernier_affichage = maintenant
-        #print(action)
-        #print(obs["0"]["center_path_distance"])
+        """
         for i in range(len(obs["0"]["paths_start"])) : 
             print(obs["0"]["paths_start"][i])
-    #Affichage de la position en continu
-    #print(obs["0"]["distance_down_track"])
+        """
 
 def single_race(env, agents, names, scores):
     obs, _ = env.reset()

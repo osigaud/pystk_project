@@ -5,8 +5,8 @@ import math
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 
-
-class Agent1(KartAgent):
+#Base d'Agent, mouvements aléatoires, initialisation des variables
+class AgentBase(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)
         self.path_lookahead = path_lookahead
@@ -26,12 +26,40 @@ class Agent1(KartAgent):
         acceleration = random.random()
         steering = random.random()
         action = {
-            "acceleration": 1, #acceleration,
-            "steer": 0, #steering,
-            "brake": False, # bool(random.getrandbits(1)),
-            "drift": False, #pour pas qu'il drift et qu'il roule tout droit
-            "nitro": False, #bool(random.getrandbits(1)),
-            "rescue": False, #bool(random.getrandbits(1)),
-            "fire": False, #bool(random.getrandbits(1)),
+            "acceleration": acceleration,
+            "steer": steering,
+            "brake": bool(random.getrandbits(1)),
+            "drift": bool(random.getrandbits(1)),
+            "nitro": bool(random.getrandbits(1)),
+            "rescue": bool(random.getrandbits(1)),
+            "fire": bool(random.getrandbits(1)),
         }
         return action
+
+#Agent qui roule tout droit
+class AgentStraight(AgentBase):
+    def __init__(self, env, path_lookahead=3):        
+        super().__init__(env)
+        self.path_lookahead = path_lookahead
+        self.agent_positions = []
+        self.obs = None
+        self.isEnd = False
+
+    def choose_action(self, obs):
+        acceleration = random.random()
+        steering = random.random()
+        action = {
+            "acceleration": 1, 
+            "steer": 0, 
+            "brake": False, 
+            "drift": False, 
+            "nitro": False, 
+            "rescue": False, 
+            "fire": False, 
+        }
+        return action
+
+#AGENT FINAL :
+class Agent1(AgentStraight):
+    def __init__(self, env, path_lookahead=3):        
+        super().__init__(env, path_lookahead)
