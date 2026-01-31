@@ -46,8 +46,8 @@ class Agent3(KartAgent):
             "steer": x,
             "brake": brake,
             "drift": False,
-            "nitro": use_nitro,
+            "nitro": False,
             "rescue": False,
-            "fire": use_fire,
+            "fire": False,
         }
         return action
