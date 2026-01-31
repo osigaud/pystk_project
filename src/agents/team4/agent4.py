@@ -13,7 +13,7 @@ class Agent4(KartAgent):
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
-        self.name = "The Winners" # replace with your chosen name
+        self.name = "The Winners"
         self.steering = Steering()
 
     def reset(self):
@@ -24,12 +24,12 @@ class Agent4(KartAgent):
         return self.isEnd
 
     def choose_action(self, obs):
-        acceleration = 0.4
+        acceleration = 0.3
         steering = self.steering.steering(obs)
         action = {
             "acceleration": acceleration,
             "steer": steering,
-            "brake": False, # bool(random.getrandbits(1)),
+            "brake": False,
             "drift": False,
             "nitro": False,
             "rescue":False,
