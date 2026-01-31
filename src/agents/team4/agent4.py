@@ -24,7 +24,7 @@ class Agent4(KartAgent):
         return self.isEnd
 
     def choose_action(self, obs):
-        acceleration = 1.0
+        acceleration = 0.4
         steering = self.steering.steering(obs)
         action = {
             "acceleration": acceleration,
