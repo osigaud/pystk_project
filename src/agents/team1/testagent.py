@@ -128,6 +128,7 @@ def affichage_variables(action, obs) :
     maintenant = time.time()
     if maintenant - dernier_affichage >= INTERVALLE:
         dernier_affichage = maintenant
+        #print("Clés de obs : ", obs['0'].keys())
         """
         for i in range(len(obs["0"]["paths_start"])) : 
             print(obs["0"]["paths_start"][i])
@@ -138,7 +139,7 @@ def single_race(env, agents, names, scores):
     done = False
     steps = 0
     positions = []
-    while not done and steps < 100: #Changer ici pour que la course dure + longtemps
+    while not done and steps < 200: #Changer ici pour que la course dure + longtemps
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"

@@ -50,7 +50,22 @@ class AgentStraight(AgentBase):
         }
         return action
 
+#Agent qui suit le centre de la piste
+#méthodes à rajouter ici
+class AgentCenter(AgentStraight) :
+    def choose_action(self, obs):
+        action = {
+            "acceleration": 1, 
+            "steer": 0,
+            "brake": False, 
+            "drift": False, 
+            "nitro": False, 
+            "rescue": False, 
+            "fire": False, 
+        }
+        return action
+
 #AGENT FINAL :
-class Agent1(AgentStraight):
+class Agent1(AgentCenter):
     def __init__(self, env, path_lookahead=3):        
         super().__init__(env, path_lookahead)
