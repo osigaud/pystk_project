@@ -11,7 +11,7 @@ class Agent3(KartAgent):
         self.obs = None
         self.isEnd = False
         self.name = "TEAM L'ÉCLAIR"
-        self.times_blocked = 0
+        self.time_blocked = 0
 
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -34,20 +34,20 @@ class Agent3(KartAgent):
         	brake = False
         speed = obs["velocity"][2]
         if (speed < 0.20 and obs["distance_down_track"] > 5.0):
-        	self.times_blocked = self.times_blocked + 1
-        	if (self.times_blocked > 10):
+        	self.time_blocked = self.time_blocked + 1
+        	if (self.time_blocked > 10):
         		acceleration = 0.0
         		brake = True
         		x = -x
-        if (self.times_blocked == 18):
-        	self.times_blocked = 0
+        if (self.time_blocked == 18):
+        	self.time_blocked = 0
         action = {
             "acceleration": acceleration,
             "steer": x,
             "brake": brake,
             "drift": False,
-            "nitro": False,
+            "nitro": use_nitro,
             "rescue": False,
-            "fire": False,
+            "fire": use_fire,
         }
         return action
