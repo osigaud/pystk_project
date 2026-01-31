@@ -41,6 +41,15 @@ class Agent3(KartAgent):
         		x = -x
         if (self.time_blocked == 18):
         	self.time_blocked = 0
+        next_item = obs["items_position"][0]
+        item_x_axis = next_item[0]
+        item_z_axis = next_item[2]
+        item = obs["items_type"][0]
+        if (item == 1 and item_z_axis < 15 and abs(item_x_axis) < 5.0):
+        	if (item_x_axis > 0):
+        		x = -0.3
+        	else:
+        		x = 0.3
         action = {
             "acceleration": acceleration,
             "steer": x,
