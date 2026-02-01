@@ -52,7 +52,7 @@ class AgentStraight(AgentBase):
 
 #Agent qui suit le centre de la piste
 #méthodes à rajouter ici
-class AgentCenter(KartAgent):
+class AgentCenter(AgentStraight):
     def __init__(self, env, dist, ajust, base_agent):
         super().__init__(env)
         self.base = base_agent
