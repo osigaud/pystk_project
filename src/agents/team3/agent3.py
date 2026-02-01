@@ -30,7 +30,7 @@ class Agent3(KartAgent):
         	acceleration = 0.15
         	brake = True
         else:
-        	acceleration = 0.9
+        	acceleration = 0.75
         	brake = False
         speed = obs["velocity"][2]
         if (speed < 0.20 and obs["distance_down_track"] > 5.0):
@@ -41,6 +41,35 @@ class Agent3(KartAgent):
         		x = -x
         if (self.times_blocked == 18):
         	self.times_blocked = 0
+
+       
+
+        boost=obs["attachment"]
+        use_fire=False;
+        print(obs["attachment"])  
+
+
+       
+
+        boost=obs["attachment"]
+        use_fire=False;
+        print(obs["items_type"]) #items_type
+
+
+        #code hakim fonctionne pas totalement(les attachements sactive juste avant de toucher une banane)
+        #if boost !=None:
+        #    if (boost in [0,1,2,3]): # detecte les attachements 
+        #        use_fire=True;
+
+
+        #code dylan qui fonctionne mieux mais que je (hakim) comprend pas la logique
+        if boost !=None:
+            use_fire = False
+            if (obs["items_type"][0] == 0 and boost == 9): #extracting the next attachement on the track 
+                use_fire = True
+    
+
+
         action = {
             "acceleration": acceleration,
             "steer": x,
@@ -48,6 +77,6 @@ class Agent3(KartAgent):
             "drift": False,
             "nitro": False,
             "rescue": False,
-            "fire": False,
+            "fire": use_fire,
         }
         return action
