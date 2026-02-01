@@ -56,22 +56,25 @@ class AgentCenter(KartAgent):
     def __init__(self, env, dist, ajust, base_agent):
         super().__init__(env)
         self.base = base_agent
-        self.dist = dist
-        self.ajust = ajust
+        self.dist = dist #écart max au centre de la piste qu'on accepte
+        self.ajust = ajust #la valeur que l'on veut addi/soustr à notre steer, qui sert d'ajustement de la trajectoire
 
-    def path_ajust(self, act, obs, min_d, max_d):
-        s = act["steer"]
-        center = obs["center_path_distance"]
-        if center < min_d: 
-            s=s+self.ajust
-        elif center > max_d: 
-            s=s-self.ajust
+#initialisation de l'agent center de base
+
+
+    def path_ajust(self, act, obs):
+        s = act["steer"] #recuper le steer actuel
+        center = obs["center_path_distance"] #variable donnant la distance au centre de la piste
+        if center < -self.dist: #si inferieur au seuil choisi
+            s=s+self.ajust #tourner à gauche
+        elif center > self.dist: #si superieur au seuil choisi
+            s=s-self.ajust #tourner à droite 
         act["steer"] = s
         return act 
     
     def choose_action(self, obs):
             act = self.base.choose_action(obs)
-            act_corr = self.path_ajust(act, obs, -0.5, 0.5)
+            act_corr = self.path_ajust(act, obs)
             return act_corr
 
 #AGENT FINAL :
