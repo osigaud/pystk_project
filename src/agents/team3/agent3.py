@@ -15,10 +15,7 @@ class Agent3(KartAgent):
 
     def reset(self):
         self.obs, _ = self.env.reset()
-        self.agent_positions = []
-
-
-        
+        self.agent_positions = [] 
 
     def endOfTrack(self):
         return self.isEnd
@@ -26,6 +23,22 @@ class Agent3(KartAgent):
     def choose_action(self, obs):
         target = obs["paths_end"][0] #return a vector [x,y,z]
         x = target[0] #Extracting the x
+        items_pos = obs["items_position"]
+        items_type = obs["items_type"]
+        clost_dist = np.inf
+        bonus_x = None
+        for i in range(len(items_pos)):
+        	pos = items_pos[i]
+        	typ = items_type[i]
+        	if (typ == 2 or typ == 3 or typ == 0):
+        		dist_z = pos[2]
+        		dist_x = pos[0]
+        		if (0 < dist_z < 30 and abs(dist_x) < 4.0):
+        			if (dist_z < clost_dist):
+        				clost_dist = dist_z
+        				bonus_x = dist_x
+        if bonus_x is not None:
+        	x = bonus_x
         if (abs(x) > 0.5 and obs["distance_down_track"] > 5.0):
         	acceleration = 0.15
         	brake = True
@@ -39,42 +52,30 @@ class Agent3(KartAgent):
         		acceleration = 0.0
         		brake = True
         		x = -x
-                
-        if (self.times_blocked == 18):
-        	self.times_blocked = 0
-
-
+        if (self.time_blocked == 18):
+        	self.time_blocked = 0
         next_item = obs["items_position"][0]
         item_x_axis = next_item[0]
         item_z_axis = next_item[2]
         item = obs["items_type"][0]
         if (item == 1 and item_z_axis < 15 and abs(item_x_axis) < 5.0):
             if (item_x_axis > 0):
-                x = -0.3
+                x = -0.35
             else:
-                x = 0.3  
-
-       
-
+                x = 0.35
         boost=obs["attachment"]
         use_fire=False;
-        print(obs["items_type"]) #items_type
-
 
         #code hakim fonctionne pas totalement(les attachements sactive juste avant de toucher une banane)
         #if boost !=None:
         #    if (boost in [0,1,2,3]): # detecte les attachements 
         #        use_fire=True;
 
-
         #code dylan qui fonctionne mieux mais que je (hakim) comprend pas la logique
         if boost !=None:
             use_fire = False
             if (obs["items_type"][0] == 0 and boost == 9): #extracting the next attachement on the track 
                 use_fire = True
-    
-
-
 
         action = {
             "acceleration": acceleration,
