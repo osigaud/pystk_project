@@ -24,14 +24,9 @@ dernier_affichage = 0
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src"))) #Changement du path ici pour que ce soit adapté
 
 from agents.team1.agent1 import Agent1
-from agents.team2.agent2 import Agent2
-"""
-from agents.team3.agent3 import Agent3
-from agents.team4.agent4 import Agent4
-from agents.team5.agent5 import Agent5
-from agents.team6.agent6 import Agent6
-from agents.team7.agent7 import Agent7
-"""
+from agents.team1.agent1 import AgentStraight
+from agents.team1.agent1 import AgentCenter
+
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
@@ -106,15 +101,10 @@ def create_race():
     agents = []
     names = []
 
-    agents.append(Agent1(env, path_lookahead=3))
-    agents.append(Agent2(env, path_lookahead=3))
-    """
-    agents.append(Agent3(env, path_lookahead=3))
-    agents.append(Agent4(env, path_lookahead=3))
-    agents.append(Agent5(env, path_lookahead=3))
-    agents.append(Agent6(env, path_lookahead=3))
-    agents.append(Agent7(env, path_lookahead=3))
-    """
+    agents.append(AgentCenter(env, dist=0.5, ajust=0.1)) #CHANGEMENT DES VARIABLES ICI
+    agents.append(AgentStraight(env, path_lookahead=3)) 
+
+
     #Pour pas que ça shuffle et qu'on puisse récupérer les données de notre agent plus facilement
     #np.random.shuffle(agents) 
 
@@ -122,17 +112,17 @@ def create_race():
         names.append(agents[i].name)
     return env, agents, names
 
+"""
 def affichage_variables(action, obs) :
-    """Affichage des variables toutes les secondes"""
+    #affichage des variables toutes les secondes
     global dernier_affichage
     maintenant = time.time()
     if maintenant - dernier_affichage >= INTERVALLE:
         dernier_affichage = maintenant
         #print("Clés de obs : ", obs['0'].keys())
-        """
         for i in range(len(obs["0"]["paths_start"])) : 
             print(obs["0"]["paths_start"][i])
-        """
+"""
 
 def single_race(env, agents, names, scores):
     obs, _ = env.reset()
@@ -152,7 +142,7 @@ def single_race(env, agents, names, scores):
         obs, _, terminated, truncated, info = env.step(actions)
 
         #affichage des variables du kart de l'équipe 1 (indice 0)
-        affichage_variables(actions["0"], obs)
+        #affichage_variables(actions["0"], obs)
 
         #print(f"{info['infos']}")
         pos = np.zeros(MAX_TEAMS)
