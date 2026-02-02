@@ -40,7 +40,7 @@ class AgentBase(KartAgent):
 class AgentStraight(AgentBase):
     def choose_action(self, obs):
         action = {
-            "acceleration": 1, 
+            "acceleration": 0.5, 
             "steer": 0, 
             "brake": False, 
             "drift": False, 
