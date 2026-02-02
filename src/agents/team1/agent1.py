@@ -84,6 +84,86 @@ class AgentCenter(AgentStraight):
             act = super().choose_action(obs)
             act_corr = self.path_ajust(act, obs)
             return act_corr
+            
+#Agent qui adapte la vitesse en fonction des virages
+class AgentTurn(AgentCenter):
+    def __init__(self, env, dist, ajust, ecartpetit, ecartgrand, longpetite, longgrande, msapetit, msagrand):
+        super().__init__(env, dist, ajust)
+        self.ecartpetit = ecartpetit #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
+        self.ecartgrand = ecartgrand #seuil a partir du quel on considere l'ecart comme grand (virage serré)
+        self.longpetite = longpetite #seuil a partir du quel on considere le segment comme court
+        self.longgrande = longgrande #seuil a partir du quel on considere le segment comme long
+        self.msapetit = msapetit
+        self.msagrand = msagrand
+        
+    def analyse(self, obs):
+        s = []
+       	nbsegments = min(self.path_lookahead, len(obs["paths_start"]))
+       	for i in range(nbsegments):
+       		segdirection = obs["paths_end"][i] - obs["paths_start"][i]
+       		diff = segdirection - obs["front"]
+       		ecart = math.sqrt(diff[0]**2 + diff[1]**2 + diff[2]**2)
+       		seglong = obs["paths_distance"][i][1] - obs["paths_distance"][i][0]
+        		
+        	if ecart >= self.ecartgrand:
+        		s.append("virage serre")
+       		elif self.ecartgrand > ecart > self.ecartpetit:
+       			s.append("virage leger")
+       		elif ecart <= self.ecartpetit:
+       			s.append("ligne droite") 
+        	
+       	react = "ligne droite"
+       	if "virage serre" in s: 
+       		react = "virage serre"
+       		return react
+        elif "virage leger" in s: 
+        	react = "virage leger"
+        	return react
+       	else: 
+       		return react
+        		
+    def reaction(self, react, act, obs):
+		msa = obs["max_steer_angle"]
+		
+		if react == "ligne droite":
+			act["acceleration"] = 1
+			return act
+			
+		if react == "virage leger":
+			
+			if msa <= self.msapetit: 
+				accel = act["acceleration"]
+				accel = accel - 0.2
+				act["acceleration"] = accel
+				return act
+			elif self.msapetit < msa < self.msagrand:
+				return act
+			elif msa >= self.msagrand:
+				accel = act["acceleration"]
+				accel = accel + 0.4
+				act["acceleration"] = accel
+				return act
+				
+		if react == "virage serre":
+			
+			if msa <= self.msapetit: 
+				accel = act["acceleration"]
+				accel = accel - 0.4
+				act["acceleration"] = accel
+				return act
+			elif self.msapetit < msa < self.msagrand:
+				return act
+			elif msa >= self.msagrand:
+				accel = act["acceleration"]
+				accel = accel + 0.2
+				act["acceleration"] = accel
+				return act
+				
+    def choose_action(self, obs):
+		act = super().choose_action(obs)
+		react = self.analyse(obs)
+		act_corr = self.reaction(react, act, obs)
+		return act_corr
 
 #AGENT FINAL :
 class Agent1(AgentCenter):
