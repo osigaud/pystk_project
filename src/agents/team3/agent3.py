@@ -39,9 +39,15 @@ class Agent3(KartAgent):
         				bonus_x = dist_x
         if bonus_x is not None:
         	x = bonus_x
+        energy = obs["energy"][0]
+        nitro = False
         if (abs(x) > 0.5 and obs["distance_down_track"] > 5.0):
         	acceleration = 0.15
         	brake = True
+        elif (energy > 0.0 and abs(x) < 0.1):
+        	acceleration = 0.9
+        	brake = False
+        	nitro = True
         else:
         	acceleration = 0.75
         	brake = False
@@ -82,7 +88,7 @@ class Agent3(KartAgent):
             "steer": x,
             "brake": brake,
             "drift": False,
-            "nitro": False,
+            "nitro": nitro,
             "rescue": False,
             "fire": use_fire,
         }
