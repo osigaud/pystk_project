@@ -22,8 +22,10 @@ class Agent2(KartAgent):
         return self.isEnd
 
     def choose_action(self, obs):
-        acceleration = random.random()
-        steering = random.random()
+        acceleration = 0
+        #random.random()
+        steering = -1 #au lieu de radom pour aller a gauche
+        #random.random()
         action = {
             "acceleration": acceleration,
             "steer": steering,
@@ -33,4 +35,6 @@ class Agent2(KartAgent):
             "rescue":bool(random.getrandbits(1)),
             "fire": bool(random.getrandbits(1)),
         }
+
+
         return action
