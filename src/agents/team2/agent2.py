@@ -35,6 +35,30 @@ class Agent2(KartAgent):
             "rescue":bool(random.getrandbits(1)),
             "fire": bool(random.getrandbits(1)),
         }
+        #if target_item_distance== 10:
+            if target_item_type in bad_type:
+                if target_item_angle >5: # obstacle a droite
+                    action["steer"]= - 0.5 # on tourne a gauche
+                    action["nitro"]=False
+                    action["acceleration"]= action["acceleration"] - 0.5 #val a determiner
+                elif target_item_angle ==0 : # obstacle a droite
+                    action["steer"]= - 0.5 # on tourne a gauche ou droite
+                    action["nitro"]=False
+                    action["acceleration"]= action["acceleration"] - 0.5 #val a determiner
+                elif target_item_angle <-5: # obstacle a gauche 
+                    action["steer"]= 0.5 # on tourne a droite
+                    action["nitro"]=False
+                    action["acceleration"]= action["acceleration"] - 0.5 #val a determiner
+
+            elif target_item_type in good_type:
+                if target_item_angle <-5: # a gauche 
+                    action["steer"]= - 0.5 # on tourne a gauche
+                    action["nitro"]=True
+                    action["acceleration"]= action["acceleration"] + 0.5 #val a determiner
+                elif target_item_angle >5: #a droite
+                    action["steer"]= 0.5 # on tourne a droite
+                    action["nitro"]=True
+                    action["acceleration"]= action["acceleration"] + 0.5 #val a determiner
 
 
         return action
