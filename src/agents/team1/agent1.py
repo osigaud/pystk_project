@@ -55,7 +55,6 @@ class AgentStraight(AgentBase):
 class AgentCenter(AgentStraight):
     def __init__(self, env, dist, ajust):
         super().__init__(env)
-        #self.base = base_agent
         self.dist = dist #écart max au centre de la piste qu'on accepte
         self.ajust = ajust #la valeur que l'on veut addi/soustr à notre steer, qui sert d'ajustement de la trajectoire
 
@@ -73,11 +72,13 @@ class AgentCenter(AgentStraight):
         return act 
     
     def choose_action(self, obs):
-            act = self.base.choose_action(obs)
+            act = super().choose_action(obs)
             act_corr = self.path_ajust(act, obs)
             return act_corr
 
 #AGENT FINAL :
 class Agent1(AgentCenter):
-    def __init__(self, env, path_lookahead=3):        
-        super().__init__(env, path_lookahead)
+    def __init__(self, env, path_lookahead=3): 
+        dist = 0.5
+        ajust = 0.1       
+        super().__init__(env, dist, ajust)
