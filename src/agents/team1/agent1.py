@@ -53,23 +53,32 @@ class AgentStraight(AgentBase):
 #Agent qui suit le centre de la piste
 #méthodes à rajouter ici
 class AgentCenter(AgentStraight):
+    #initialisation de l'agent center de base
     def __init__(self, env, dist, ajust):
         super().__init__(env)
         self.dist = dist #écart max au centre de la piste qu'on accepte
         self.ajust = ajust #la valeur que l'on veut addi/soustr à notre steer, qui sert d'ajustement de la trajectoire
 
-#initialisation de l'agent center de base
-
 
     def path_ajust(self, act, obs):
-        s = act["steer"] #recuper le steer actuel
-        center = obs["center_path_distance"] #variable donnant la distance au centre de la piste
-        if center < -self.dist: #si inferieur au seuil choisi
-            s=s+self.ajust #tourner à gauche
-        elif center > self.dist: #si superieur au seuil choisi
-            s=s-self.ajust #tourner à droite 
+        s = act["steer"]
+        center = obs["center_path_distance"]
+
+        # gros ecart -> gros virage
+        if center < -self.dist:
+            s = s + self.ajust
+        elif center > self.dist:
+            s = s - self.ajust
+
+        # petit ecart -> petit virage
+        elif center < -self.dist / 2:
+            s = s + self.ajust / 2
+        elif center > self.dist / 2:
+            s = s - self.ajust / 2
+
         act["steer"] = s
-        return act 
+        return act
+
     
     def choose_action(self, obs):
             act = super().choose_action(obs)
