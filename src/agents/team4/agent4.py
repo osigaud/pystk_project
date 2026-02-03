@@ -30,7 +30,7 @@ class Agent4(KartAgent):
     def choose_action(self, obs):
         
         steering = self.steering.steering_v2(obs)
-        acceleration = self.SpeedController.vitesse(steering)
+        acceleration = self.SpeedController.vitesse2(steering)
         distance = float(obs.get("distance_down_track", [0.0])[0])
         vel = obs.get("velocity", [0.0, 0.0, 0.0])
         speed = float(vel[2])
