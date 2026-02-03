@@ -160,12 +160,12 @@ class AgentTurn(AgentCenter):
                 return act
                     
         def choose_action(self, obs):
-        act = super().choose_action(obs)
-        react = self.analyse(obs)
-        act_corr = self.reaction(react, act, obs)
-        return act_corr
+            act = super().choose_action(obs)
+            react = self.analyse(obs)
+            act_corr = self.reaction(react, act, obs)
+            return act_corr
 
 #AGENT FINAL :
 class Agent1(AgentTurn):
     def __init__(self, env, path_lookahead=3): 
-        super().__init__(env, dist=0.5, ajust=0.25, ecartpetit=1, ecartgrand=3, msapetit=0.2, msagrand=0.7, longpetite=10, longgrande=40)
+        super().__init__(env, dist=0.5, ajust=0.25, ecartpetit=1, ecartgrand=3, msapetit=0.2, msagrand=0.7)
