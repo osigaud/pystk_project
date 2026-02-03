@@ -26,6 +26,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.
 from agents.team1.agent1 import Agent1
 from agents.team1.agent1 import AgentStraight
 from agents.team1.agent1 import AgentCenter
+from agents.team1.agent1 import AgentTurn
 
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
@@ -102,7 +103,7 @@ def create_race():
     names = []
 
     agents.append(AgentCenter(env, dist=0.5, ajust=0.1)) #CHANGEMENT DES VARIABLES ICI
-    agents.append(AgentStraight(env, path_lookahead=3)) 
+    agents.append(AgentTurn(env,  dist=0.5, ajust=0.1, ecartgrand = 3, ecartpetit = 1, msagrand = 0.7, msapetit = 0.2)) 
 
 
     #Pour pas que ça shuffle et qu'on puisse récupérer les données de notre agent plus facilement
