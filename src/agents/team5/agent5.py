@@ -7,7 +7,7 @@ class Agent5(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)
         self.path_lookahead = path_lookahead
-        self.name = "Donkey Modular"
+        self.name = "Donkey Bombs"
 
         # Réglages
         self.Kp = 4                 # Force du braquage (Plus haut = plus agressif)
