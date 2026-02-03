@@ -70,6 +70,5 @@ class Agent2(KartAgent):
             "nitro": False,
             "rescue": False,
             "fire": False,
->>>>>>> cda782b (Ajout de la fonction _calcul_angle dans le fichier agent2)
         }
         return action
