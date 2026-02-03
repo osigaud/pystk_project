@@ -168,6 +168,10 @@ class AgentTurn(AgentCenter):
 #AGENT FINAL :
 class Agent1(AgentCenter):
     def __init__(self, env, path_lookahead=3): 
+    	ecartgrand = 3
+    	ecartpetit = 1
+    	msagrand = 0.7
+    	msapetit = 0.2
         dist = 0.5
         ajust = 0.25      
         super().__init__(env, dist, ajust)
