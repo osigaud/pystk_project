@@ -7,5 +7,6 @@ class Steering:
         return x*0.7 #coefficient pour rendre l'agent moins nerveux
     
     def steering_v2(self,obs):
+        points = obs['paths_start'] #on récupère les noeuds
         
 
