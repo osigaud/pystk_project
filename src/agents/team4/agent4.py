@@ -4,6 +4,7 @@ import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 from .steering import Steering
+from .rescue import RescueManager
 
 
 class Agent4(KartAgent):
@@ -15,6 +16,7 @@ class Agent4(KartAgent):
         self.isEnd = False
         self.name = "The Winners"
         self.steering = Steering()
+        self.rescue = RescueManager()
 
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -26,6 +28,11 @@ class Agent4(KartAgent):
     def choose_action(self, obs):
         acceleration = 0.5
         steering = self.steering.steering_v2(obs)
+        distance = float(obs.get("distance_down_track", [0.0])[0])
+        vel = obs.get("velocity", [0.0, 0.0, 0.0])
+        speed = float(vel[2])
+        if(self.rescue.is_stuck(distance,speed)):
+            return self.rescue.sortir_du_mur(steering)
         action = {
             "acceleration": acceleration,
             "steer": steering,
