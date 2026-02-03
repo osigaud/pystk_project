@@ -27,6 +27,7 @@ from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 7
 NB_RACES = 10
+MAX_STEPS = 200
 
 # Get the current timestamp
 current_timestamp = datetime.now()
@@ -115,7 +116,7 @@ def single_race(env, agents, names, scores):
     done = False
     steps = 0
     positions = []
-    while not done and steps < 100:
+    while not done and steps < MAX_STEPS:
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
@@ -201,4 +202,4 @@ def output_html(output: Path, scores: Scores):
 
 if __name__ == "__main__":
     scores = main_loop()
-    output_html(Path("../../docs/results.html"), scores)
+    output_html(Path("../../docs/index.html"), scores)
