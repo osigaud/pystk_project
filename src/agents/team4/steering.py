@@ -14,5 +14,7 @@ class Steering:
         if len(points)>2:
             x = points[2][0] #deballage du décalage latéral en prenant le deuxième point sur la liste
             z = points[2][2] #deballage de la profondeur en prenant le deuxième point sur la liste
+            steer = math.atan2(x,z)
+            return steer
 
 
