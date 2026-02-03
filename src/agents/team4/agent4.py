@@ -5,6 +5,7 @@ from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 from .steering import Steering
 from .rescue import RescueManager
+from .speed import SpeedController
 
 
 class Agent4(KartAgent):
@@ -17,6 +18,7 @@ class Agent4(KartAgent):
         self.name = "The Winners"
         self.steering = Steering()
         self.rescue = RescueManager()
+        self.SpeedController=SpeedController()
 
     def reset(self):
         self.obs, _ = self.env.reset()
