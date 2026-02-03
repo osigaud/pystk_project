@@ -91,8 +91,6 @@ class AgentTurn(AgentCenter):
         super().__init__(env, dist, ajust)
         self.ecartpetit = ecartpetit #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
         self.ecartgrand = ecartgrand #seuil a partir du quel on considere l'ecart comme grand (virage serré)
-        self.longpetite = longpetite #seuil a partir du quel on considere le segment comme court
-        self.longgrande = longgrande #seuil a partir du quel on considere le segment comme long
         self.msapetit = msapetit
         self.msagrand = msagrand
         
@@ -103,7 +101,6 @@ class AgentTurn(AgentCenter):
        		segdirection = obs["paths_end"][i] - obs["paths_start"][i]
        		diff = segdirection - obs["front"]
        		ecart = math.sqrt(diff[0]**2 + diff[1]**2 + diff[2]**2)
-       		seglong = obs["paths_distance"][i][1] - obs["paths_distance"][i][0]
         		
         	if ecart >= self.ecartgrand:
         		s.append("virage serre")
