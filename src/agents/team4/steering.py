@@ -1,3 +1,5 @@
+import math
+
 class Steering:
     def steering(self,obs):
         points = obs['paths_start'] #on recupère les noeuds
@@ -8,5 +10,9 @@ class Steering:
     
     def steering_v2(self,obs):
         points = obs['paths_start'] #on récupère les noeuds
-        
+        x = 0.0
+        if len(points)>2:
+            x = points[2][0] #deballage du décalage latéral en prenant le deuxième point sur la liste
+            z = points[2][2] #deballage de la profondeur en prenant le deuxième point sur la liste
+
 
