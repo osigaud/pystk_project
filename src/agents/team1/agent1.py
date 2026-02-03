@@ -87,7 +87,7 @@ class AgentCenter(AgentStraight):
             
 #Agent qui adapte la vitesse en fonction des virages
 class AgentTurn(AgentCenter):
-    def __init__(self, env, dist, ajust, ecartpetit, ecartgrand, longpetite, longgrande, msapetit, msagrand):
+    def __init__(self, env, dist, ajust, ecartpetit, ecartgrand, msapetit, msagrand):
         super().__init__(env, dist, ajust)
         self.ecartpetit = ecartpetit #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
         self.ecartgrand = ecartgrand #seuil a partir du quel on considere l'ecart comme grand (virage serré)
@@ -123,50 +123,50 @@ class AgentTurn(AgentCenter):
        		return react
         		
     def reaction(self, react, act, obs):
-		msa = obs["max_steer_angle"]
+	msa = obs["max_steer_angle"]
 		
-		if react == "ligne droite":
-			act["acceleration"] = 1
+	if react == "ligne droite":
+		act["acceleration"] = 1
+		return act
+			
+	if react == "virage leger":
+			
+		if msa <= self.msapetit: 
+			accel = act["acceleration"]
+			accel = accel - 0.2
+			act["acceleration"] = accel
 			return act
-			
-		if react == "virage leger":
-			
-			if msa <= self.msapetit: 
-				accel = act["acceleration"]
-				accel = accel - 0.2
-				act["acceleration"] = accel
-				return act
-			elif self.msapetit < msa < self.msagrand:
-				return act
-			elif msa >= self.msagrand:
-				accel = act["acceleration"]
-				accel = accel + 0.4
-				act["acceleration"] = accel
-				return act
+		elif self.msapetit < msa < self.msagrand:
+			return act
+		elif msa >= self.msagrand:
+			accel = act["acceleration"]
+			accel = accel + 0.4
+			act["acceleration"] = accel
+			return act
 				
-		if react == "virage serre":
-			
-			if msa <= self.msapetit: 
-				accel = act["acceleration"]
-				accel = accel - 0.4
-				act["acceleration"] = accel
-				return act
-			elif self.msapetit < msa < self.msagrand:
-				return act
-			elif msa >= self.msagrand:
-				accel = act["acceleration"]
-				accel = accel + 0.2
-				act["acceleration"] = accel
-				return act
+	if react == "virage serre":
+		
+		if msa <= self.msapetit: 
+			accel = act["acceleration"]
+			accel = accel - 0.4
+			act["acceleration"] = accel
+			return act
+		elif self.msapetit < msa < self.msagrand:
+			return act
+		elif msa >= self.msagrand:
+			accel = act["acceleration"]
+			accel = accel + 0.2
+			act["acceleration"] = accel
+			return act
 				
     def choose_action(self, obs):
-		act = super().choose_action(obs)
-		react = self.analyse(obs)
-		act_corr = self.reaction(react, act, obs)
-		return act_corr
+	act = super().choose_action(obs)
+	react = self.analyse(obs)
+	act_corr = self.reaction(react, act, obs)
+	return act_corr
 
 #AGENT FINAL :
-class Agent1(AgentCenter):
+class Agent1(AgentTurn):
     def __init__(self, env, path_lookahead=3): 
     	ecartgrand = 3
     	ecartpetit = 1
