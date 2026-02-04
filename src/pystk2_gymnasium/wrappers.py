@@ -1,6 +1,7 @@
 """
 This module contains generic wrappers
 """
+
 from copy import copy
 from typing import Any, Callable, Dict, List, SupportsFloat, Tuple
 
@@ -16,7 +17,7 @@ from gymnasium.core import (
 )
 import numpy as np
 
-from pystk2_gymnasium.definitions import ActionObservationWrapper
+from pystk2_gymnasium.definitions import ActionObservationWrapper, AgentException
 
 
 class SpaceFlattener:
@@ -141,9 +142,11 @@ class FlattenerWrapper(ActionObservationWrapper):
             else:
                 continuous = np.concatenate(
                     [
-                        np.array([obs_action[key]])
-                        if isinstance(obs_action[key], float)
-                        else obs_action[key].flatten()
+                        (
+                            np.array([obs_action[key]])
+                            if isinstance(obs_action[key], float)
+                            else obs_action[key].flatten()
+                        )
                         for key in self.action_flattener.continuous_keys
                     ]
                 )
@@ -251,44 +254,51 @@ class MonoAgentWrapperAdapter(ActionObservationWrapper):
 
         # Perform some checks
         self.keys = set(self.action_space.keys())
-        assert self.keys == set(
-            self.observation_space.keys()
-        ), "Observation and action keys differ"
+        assert self.keys == set(self.observation_space.keys()), (
+            "Observation and action keys differ"
+        )
 
         # Setup the wrapped environment
         self.mono_envs = {}
         self.wrappers = {}
 
         for key in env.observation_space.keys():
-            mono_env = MultiMonoEnv(env, key)
-            self.mono_envs[key] = mono_env
-            wrapper = wrapper_factories[key](mono_env)
+            try:
+                mono_env = MultiMonoEnv(env, key)
+                self.mono_envs[key] = mono_env
+                wrapper = wrapper_factories[key](mono_env)
 
-            # Build up the list of action/observation wrappers
-            self.wrappers[key] = wrappers = []
-            while wrapper is not mono_env:
-                assert isinstance(
-                    wrapper,
-                    (
-                        gym.ObservationWrapper,
-                        gym.ActionWrapper,
-                        ActionObservationWrapper,
-                    ),
-                ), f"{type(wrapper)} is not an action/observation wrapper"
-                wrappers.append(wrapper)
-                wrapper = wrapper.env
+                # Build up the list of action/observation wrappers
+                self.wrappers[key] = wrappers = []
+                while wrapper is not mono_env:
+                    assert isinstance(
+                        wrapper,
+                        (
+                            gym.ObservationWrapper,
+                            gym.ActionWrapper,
+                            ActionObservationWrapper,
+                        ),
+                    ), f"{type(wrapper)} is not an action/observation wrapper"
+                    wrappers.append(wrapper)
+                    wrapper = wrapper.env
+            except Exception as e:
+                raise AgentException("Error when wrapping the environment", key) from e
 
         # Change the action/observation space
         observation_space = {
-            key: self.wrappers[key][0].observation_space
-            if len(self.wrappers[key]) > 0
-            else self.mono_envs[key].observation_space
+            key: (
+                self.wrappers[key][0].observation_space
+                if len(self.wrappers[key]) > 0
+                else self.mono_envs[key].observation_space
+            )
             for key in self.keys
         }
         action_space = {
-            key: self.wrappers[key][0].action_space
-            if len(self.wrappers[key]) > 0
-            else self.mono_envs[key].action_space
+            key: (
+                self.wrappers[key][0].action_space
+                if len(self.wrappers[key]) > 0
+                else self.mono_envs[key].action_space
+            )
             for key in self.keys
         }
 
@@ -304,26 +314,34 @@ class MonoAgentWrapperAdapter(ActionObservationWrapper):
     def action(self, actions: WrapperActType) -> ActType:
         new_action = {}
         for key in self.keys:
-            action = actions[key]
-            for wrapper in self.wrappers[key]:
-                if isinstance(wrapper, (gym.ActionWrapper, ActionObservationWrapper)):
-                    action = wrapper.action(action)
-            new_action[key] = action
+            try:
+                action = actions[key]
+                for wrapper in self.wrappers[key]:
+                    if isinstance(
+                        wrapper, (gym.ActionWrapper, ActionObservationWrapper)
+                    ):
+                        action = wrapper.action(action)
+                new_action[key] = action
+            except Exception as exc:
+                raise AgentException(str(exc), key) from exc
 
         return new_action
 
     def observation(self, observations: ObsType) -> WrapperObsType:
         new_observation = {}
         for key in self.keys:
-            observation = observations[key]
-            if self.keep_original:
-                new_observation[f"original/{key}"] = observation
+            try:
+                observation = observations[key]
+                if self.keep_original:
+                    new_observation[f"original/{key}"] = observation
 
-            for wrapper in reversed(self.wrappers[key]):
-                if isinstance(
-                    wrapper, (gym.ObservationWrapper, ActionObservationWrapper)
-                ):
-                    observation = wrapper.observation(observation)
-            new_observation[key] = observation
+                for wrapper in reversed(self.wrappers[key]):
+                    if isinstance(
+                        wrapper, (gym.ObservationWrapper, ActionObservationWrapper)
+                    ):
+                        observation = wrapper.observation(observation)
+                new_observation[key] = observation
+            except Exception as exc:
+                raise AgentException(str(exc), key) from exc
 
         return new_observation
