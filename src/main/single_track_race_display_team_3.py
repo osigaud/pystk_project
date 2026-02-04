@@ -26,6 +26,7 @@ from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 2
+MAX_STEPS = 10000
 NB_RACES = 1
 
 # Get the current timestamp
@@ -81,13 +82,14 @@ AgentSpec.__hash__ = agent_spec_hash
 
 # Create agents specifications.
 agents_specs = [
-    AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.OFF) for i in range(MAX_TEAMS)
+    AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.ON) for i in range(MAX_TEAMS)
 ]
 
 def create_race():
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="abyss", render_mode="human", num_kart=MAX_TEAMS)
+        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)
+
     else:
         env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
 
@@ -97,13 +99,13 @@ def create_race():
     names = []
 
     agents.append(Agent1(env, path_lookahead=3))
-    #agents.append(Agent2(env, path_lookahead=3))
+    # agents.append(Agent2(env, path_lookahead=3))
     agents.append(Agent3(env, path_lookahead=3))
-    #agents.append(Agent4(env, path_lookahead=3))
-    #agents.append(Agent5(env, path_lookahead=3))
-    #agents.append(Agent6(env, path_lookahead=3))
-    #agents.append(Agent7(env, path_lookahead=3))
-    #np.random.shuffle(agents)
+    # agents.append(Agent4(env, path_lookahead=3))
+    # agents.append(Agent5(env, path_lookahead=3))
+    # agents.append(Agent6(env, path_lookahead=3))
+    # agents.append(Agent7(env, path_lookahead=3))
+    np.random.shuffle(agents)
 
     for i in range(MAX_TEAMS):
         names.append(agents[i].name)
@@ -115,7 +117,7 @@ def single_race(env, agents, names, scores):
     done = False
     steps = 0
     positions = []
-    while not done and steps < 10000:
+    while not done and steps < MAX_STEPS:
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
@@ -196,8 +198,6 @@ def output_html(output: Path, scores: Scores):
 """
         )
         fp.write("""</body>""")
-
-
 
 if __name__ == "__main__":
     scores = main_loop()
