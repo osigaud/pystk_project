@@ -82,7 +82,7 @@ AgentSpec.__hash__ = agent_spec_hash
 
 # Create agents specifications.
 agents_specs = [
-    AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.OFF) for i in range(MAX_TEAMS)
+    AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.ON) for i in range(MAX_TEAMS)
 ]
 
 def create_race():
