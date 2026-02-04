@@ -3,6 +3,18 @@ import numpy as np
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 
+# imports nécessaires pour le bon fonctionnement de fichier yml
+from pathlib import Path
+from omegaconf import OmegaConf
+
+# cherche le dossier parent et ensuite concatener pour obtenir le chemin complet
+BASE_DIR = Path(__file__).resolve().parent
+CONFIG_PATH = BASE_DIR / "config.yml"
+
+# charge le fichier yml
+cfg = OmegaConf.load(CONFIG_PATH)
+
+
 class Agent3(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)
@@ -23,54 +35,59 @@ class Agent3(KartAgent):
     def choose_action(self, obs):
         target = obs["paths_end"][0] #return a vector [x,y,z]
         x = target[0] #Extracting the x
+
+        # items
         items_pos = obs["items_position"]
         items_type = obs["items_type"]
-        clost_dist = np.inf
+        closest_dist = np.inf
         bonus_x = None
-        for i in range(len(items_pos)):
-        	pos = items_pos[i]
-        	typ = items_type[i]
-        	if (typ == 2 or typ == 3 or typ == 0):
-        		dist_z = pos[2]
-        		dist_x = pos[0]
-        		if (0 < dist_z < 30 and abs(dist_x) < 4.0):
-        			if (dist_z < clost_dist):
-        				clost_dist = dist_z
-        				bonus_x = dist_x
+        
+        for pos, typ in zip(items_pos, items_type):
+            if typ in cfg.track_items.collectible_types:
+                dist_z = pos[2]
+                dist_x = pos[0]
+                if 0 < dist_z < cfg.track_items.detection_distance and abs(dist_x) < cfg.steering.max_track_offset:
+                    if dist_z < closest_dist:
+                        closest_dist = dist_z
+                        bonus_x = dist_x
+
         if bonus_x is not None:
         	x = bonus_x
+
+        # vitesse / accélération / nitro
         energy = obs["energy"][0]
         nitro = False
-        if (abs(x) > 0.5 and obs["distance_down_track"] > 5.0):
-        	acceleration = 0.15
-        	brake = True
-        elif (energy > 0.0 and abs(x) < 0.1):
-        	acceleration = 0.9
-        	brake = False
-        	nitro = True
+        if abs(x) > cfg.steering.sharp_turn_threshold and obs["distance_down_track"] > 5.0:
+            acceleration = cfg.acceleration.sharp_turn
+            brake = True
+        elif energy > cfg.nitro.min_energy and abs(x) < cfg.steering.straight_threshold:
+            acceleration = cfg.acceleration.boost
+            brake = False
+            nitro = True
         else:
-        	acceleration = 0.75
-        	brake = False
+            acceleration = cfg.acceleration.normal
+            brake = False
+
+        # anti-blocage
         speed = obs["velocity"][2]
-        if (speed < 0.20 and obs["distance_down_track"] > 5.0):
-        	self.time_blocked = self.time_blocked + 1
-        	if (self.time_blocked > 10):
-        		acceleration = 0.0
-        		brake = True
-        		x = -x
-        if (self.time_blocked == 18):
-        	self.time_blocked = 0
+        if speed < cfg.speed.slow_speed_threshold and obs["distance_down_track"] > 5.0:
+            self.time_blocked += 1
+            if self.time_blocked > cfg.speed.unblock_time:
+                acceleration = 0.0
+                brake = True
+                x = -x
+
+        if self.time_blocked >= cfg.speed.reset_block_time:
+            self.time_blocked = 0
+
+        # évitement items dangereux
         next_item = obs["items_position"][0]
         item_x_axis = next_item[0]
         item_z_axis = next_item[2]
         item = obs["items_type"][0]
-        if (item == 1 and item_z_axis < 15 and abs(item_x_axis) < 5.0):
-            if (item_x_axis > 0):
-                x = -0.35
-            else:
-                x = 0.35
-        boost=obs["attachment"]
-        use_fire=False;
+
+        if item == cfg.track_items.danger_type and item_z_axis < cfg.track_items.avoidance_distance and abs(item_x_axis) < cfg.track_items.avoidance_width:
+            x = -cfg.steering.avoidance_offset if item_x_axis > 0 else cfg.steering.avoidance_offset
 
         #code hakim fonctionne pas totalement(les attachements sactive juste avant de toucher une banane)
         #if boost !=None:
@@ -78,9 +95,11 @@ class Agent3(KartAgent):
         #        use_fire=True;
 
         #code dylan qui fonctionne mieux mais que je (hakim) comprend pas la logique
-        if boost !=None:
-            use_fire = False
-            if (obs["items_type"][0] == 0 and boost == 9): #extracting the next attachement on the track 
+        # utilisation des attachements
+        boost = obs["attachment"]
+        use_fire = False
+        if boost is not None:
+            if obs["items_type"][0] == cfg.fire.enemy_type and boost == cfg.fire.required_attachment:
                 use_fire = True
 
         action = {
