@@ -102,8 +102,9 @@ def create_race():
     agents = []
     names = []
 
-    agents.append(AgentCenter(env, dist=0.5, ajust=0.1)) #CHANGEMENT DES VARIABLES ICI
     agents.append(Agent1(env, path_lookahead=3)) 
+    agents.append(AgentCenter(env, dist=0.5, ajust=0.1)) #CHANGEMENT DES VARIABLES ICI
+    
 
 
     #Pour pas que ça shuffle et qu'on puisse récupérer les données de notre agent plus facilement
@@ -130,7 +131,7 @@ def single_race(env, agents, names, scores):
     done = False
     steps = 0
     positions = []
-    while not done and steps < 400: #Changer ici pour que la course dure + longtemps
+    while not done and steps < 1000: #Changer ici pour que la course dure + longtemps
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
