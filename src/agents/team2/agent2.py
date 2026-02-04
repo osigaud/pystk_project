@@ -10,7 +10,7 @@ class Agent2(KartAgent):
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
-        self.name = "DemoPilote " # Tu peux remettre "DemoPilote" ici
+        self.name = "DemoPilote " 
 
         self.stuck_steps = 0    
         self.recovery_steps = 0  
@@ -63,7 +63,7 @@ class Agent2(KartAgent):
             target_node = nodes_path[self.path_lookahead]
             angle_target = np.arctan2(target_node[0], target_node[2])
             steering = np.clip(angle_target * 2, -1, 1)
-            angle = angle_target # Pour l'affichage print plus bas
+            angle = angle_target 
         else:
             steering = 0
            
@@ -73,9 +73,9 @@ class Agent2(KartAgent):
             "acceleration": 0.7,
             "steer": steering,
             "brake": False, 
-            "drift": False,   # J'ai ajouté les virgules manquantes ici !
-            "nitro": False,   # Ici aussi
-            "rescue": False,  # Et ici
+            "drift": False,  
+            "nitro": False,  
+            "rescue": False, 
             "fire": False
         }
         
