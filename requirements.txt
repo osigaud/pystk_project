@@ -7,3 +7,4 @@ pyparsing
 pysupertuxkart2
 pytz
 requests
+omegaconf
