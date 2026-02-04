@@ -1,5 +1,9 @@
 """
-MultiAgent race
+Code repris du script single_track_race_display.py
+Avec tous les autres agents mais je veux les supprimer pour que ça garde que le nôtre (équipe 1)
+Pas d'écriture sur le HTML aussi
+
+Affichage des variables auxquelles on a accès pour la position etc.
 
 All initial agents are RandomAgent
 The simulation runs on the "black_forest" track with MAX_TEAMS karts.
@@ -11,22 +15,23 @@ from datetime import datetime
 from pathlib import Path
 from dataclasses import dataclass
 
+import time
+INTERVALLE = 1  # 1 seconde
+dernier_affichage = 0
+
 
 # Append the "src" folder to sys.path.
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "src")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src"))) #Changement du path ici pour que ce soit adapté
 
 from agents.team1.agent1 import Agent1
-from agents.team2.agent2 import Agent2
-from agents.team3.agent3 import Agent3
-from agents.team4.agent4 import Agent4
-from agents.team5.agent5 import Agent5
-from agents.team6.agent6 import Agent6
-from agents.team7.agent7 import Agent7
+from agents.team1.agent1 import AgentStraight
+from agents.team1.agent1 import AgentCenter
+from agents.team1.agent1 import AgentTurn
+
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 7
-MAX_STEPS = 1000
+MAX_TEAMS = 2
 NB_RACES = 1
 
 # Get the current timestamp
@@ -82,13 +87,13 @@ AgentSpec.__hash__ = agent_spec_hash
 
 # Create agents specifications.
 agents_specs = [
-    AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.ON) for i in range(MAX_TEAMS)
+    AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.OFF) for i in range(MAX_TEAMS)
 ]
 
 def create_race():
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)
+        env = STKRaceMultiEnv(agents=agents_specs, track="sandtrack", render_mode="human", num_kart=MAX_TEAMS) #track="xr591"
     else:
         env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
 
@@ -97,36 +102,50 @@ def create_race():
     agents = []
     names = []
 
-    agents.append(Agent1(env, path_lookahead=3))
-    agents.append(Agent2(env, path_lookahead=3))
-    agents.append(Agent3(env, path_lookahead=3))
-    agents.append(Agent4(env, path_lookahead=3))
-    agents.append(Agent5(env, path_lookahead=3))
-    agents.append(Agent6(env, path_lookahead=3))
-    agents.append(Agent7(env, path_lookahead=3))
-    np.random.shuffle(agents)
+    agents.append(Agent1(env, path_lookahead=3)) 
+    agents.append(AgentCenter(env, dist=0.5, ajust=0.1)) #CHANGEMENT DES VARIABLES ICI
+    
+
+
+    #Pour pas que ça shuffle et qu'on puisse récupérer les données de notre agent plus facilement
+    #np.random.shuffle(agents) 
 
     for i in range(MAX_TEAMS):
         names.append(agents[i].name)
-        agents_specs[i].name = agents[i].name
     return env, agents, names
 
+"""
+def affichage_variables(action, obs) :
+    #affichage des variables toutes les secondes
+    global dernier_affichage
+    maintenant = time.time()
+    if maintenant - dernier_affichage >= INTERVALLE:
+        dernier_affichage = maintenant
+        #print("Clés de obs : ", obs['0'].keys())
+        for i in range(len(obs["0"]["paths_start"])) : 
+            print(obs["0"]["paths_start"][i])
+"""
 
 def single_race(env, agents, names, scores):
     obs, _ = env.reset()
     done = False
     steps = 0
     positions = []
-    while not done and steps < MAX_STEPS:
+    while not done and steps < 1000: #Changer ici pour que la course dure + longtemps
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
             try:
                 actions[str] = agents[i].choose_action(obs[str])
+
             except Exception as e:
                 print(f"Team {i+1} error: {e}")
                 actions[str] = default_action
         obs, _, terminated, truncated, info = env.step(actions)
+
+        #affichage des variables du kart de l'équipe 1 (indice 0)
+        #affichage_variables(actions["0"], obs)
+
         #print(f"{info['infos']}")
         pos = np.zeros(MAX_TEAMS)
         dist = np.zeros(MAX_TEAMS)
@@ -199,6 +218,8 @@ def output_html(output: Path, scores: Scores):
         )
         fp.write("""</body>""")
 
+
+
 if __name__ == "__main__":
     scores = main_loop()
-    output_html(Path("../../docs/index.html"), scores)
+    #output_html(Path("../../docs/index.html"), scores)
