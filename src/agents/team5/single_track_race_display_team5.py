@@ -39,7 +39,7 @@ formatted_timestamp = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")
 class Scores:
     def __init__(self):
         self.dict = {}
-
+    
     def init(self, name):
         self.dict[name] = [[], []]
 
@@ -58,21 +58,21 @@ class Scores:
         for k in self.dict:
             fp.write(f"""<tr><td>{k}</td>""")
             fp.write(
-                f"""<td>{np.array(self.dict[k][0]).mean():.2f}</td>"""
-                f"""<td>{np.array(self.dict[k][1]).mean():.2f}</td>"""
-                "</tr>"
-            )
-
+                    f"""<td>{np.array(self.dict[k][0]).mean():.2f}</td>"""
+                    f"""<td>{np.array(self.dict[k][1]).mean():.2f}</td>"""
+                    "</tr>"
+                )
+            
 
 default_action = {
-    "acceleration": 0.0,
-    "steer": 0.0,
-    "brake": False, # bool(random.getrandbits(1)),
-    "drift": False, # bool(random.getrandbits(1)),
-    "nitro": False, # bool(random.getrandbits(1)),
-    "rescue":False, # bool(random.getrandbits(1)),
-    "fire": False, # bool(random.getrandbits(1)),
-}
+            "acceleration": 0.0,
+            "steer": 0.0,
+            "brake": False, # bool(random.getrandbits(1)),
+            "drift": False, # bool(random.getrandbits(1)),
+            "nitro": False, # bool(random.getrandbits(1)),
+            "rescue":False, # bool(random.getrandbits(1)),
+            "fire": False, # bool(random.getrandbits(1)),
+        }
 
 
 # Make AgentSpec hashable.
@@ -108,6 +108,7 @@ def create_race():
 
     for i in range(MAX_TEAMS):
         names.append(agents[i].name)
+        agents_specs[i].name = agents[i].name
     return env, agents, names
 
 
@@ -184,7 +185,7 @@ def output_html(output: Path, scores: Scores):
         )
 
         scores.display_html(fp)
-
+            
         fp.write(
             """<script>
   window.addEventListener('load', function () {
