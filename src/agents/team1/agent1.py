@@ -169,7 +169,6 @@ class AgentTurn(AgentCenter):
         act = super().choose_action(obs)
         react = self.analyse(obs)
         act_corr = self.reaction(react, act, obs)
-        print(act_corr)
         return act_corr
 
 
