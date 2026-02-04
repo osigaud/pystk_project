@@ -36,23 +36,23 @@ class Agent3(KartAgent):
         target = obs["paths_end"][0] #return a vector [x,y,z]
         x = target[0] #Extracting the x
 
-        # items
-        items_pos = obs["items_position"]
-        items_type = obs["items_type"]
-        closest_dist = np.inf
-        bonus_x = None
+        # # items
+        # items_pos = obs["items_position"]
+        # items_type = obs["items_type"]
+        # closest_dist = np.inf
+        # bonus_x = None
         
-        for pos, typ in zip(items_pos, items_type):
-            if typ in cfg.track_items.collectible_types:
-                dist_z = pos[2]
-                dist_x = pos[0]
-                if 0 < dist_z < cfg.track_items.detection_distance and abs(dist_x) < cfg.steering.max_track_offset:
-                    if dist_z < closest_dist:
-                        closest_dist = dist_z
-                        bonus_x = dist_x
+        # for pos, typ in zip(items_pos, items_type):
+        #     if typ in cfg.track_items.collectible_types:
+        #         dist_z = pos[2]
+        #         dist_x = pos[0]
+        #         if 0 < dist_z < cfg.track_items.detection_distance and abs(dist_x) < cfg.steering.max_track_offset:
+        #             if dist_z < closest_dist:
+        #                 closest_dist = dist_z
+        #                 bonus_x = dist_x
 
-        if bonus_x is not None:
-        	x = bonus_x
+        # if bonus_x is not None:
+        # 	x = bonus_x
 
         # vitesse / accélération / nitro
         energy = obs["energy"][0]
@@ -89,13 +89,6 @@ class Agent3(KartAgent):
         if item == cfg.track_items.danger_type and item_z_axis < cfg.track_items.avoidance_distance and abs(item_x_axis) < cfg.track_items.avoidance_width:
             x = -cfg.steering.avoidance_offset if item_x_axis > 0 else cfg.steering.avoidance_offset
 
-        #code hakim fonctionne pas totalement(les attachements sactive juste avant de toucher une banane)
-        #if boost !=None:
-        #    if (boost in [0,1,2,3]): # detecte les attachements 
-        #        use_fire=True;
-
-        #code dylan qui fonctionne mieux mais que je (hakim) comprend pas la logique
-        # utilisation des attachements
         boost = obs["attachment"]
         use_fire = False
         if boost is not None:
