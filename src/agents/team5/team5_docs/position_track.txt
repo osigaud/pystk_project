@@ -1,0 +1,61 @@
+import numpy as np
+import random
+
+
+from utils.track_utils import compute_curvature, compute_slope
+from agents.kart_agent import KartAgent
+
+
+class Agent5(KartAgent):
+    def __init__(self, env, path_lookahead=3):
+        super().__init__(env)
+        self.path_lookahead = path_lookahead
+        self.agent_positions = []
+        self.obs = None
+        self.isEnd = False
+        self.name = "Donkey Bombs" # replace with your chosen name
+
+    def reset(self):
+        self.obs, _ = self.env.reset()
+        self.agent_positions = []
+
+    def endOfTrack(self):
+        return self.isEnd
+
+    def position_track(self, obs, marge_milieu):
+        ''' retourne une valeur int pour savoir si on est au 
+        milieu de la piste (int = 0), à droite (int 1) ou à gauche (int = -1)
+        en ajoutant une marge de milieu qui sera une constante.
+        
+        Si l'agent dépasse la droite de la marge alors on envoie 2.
+        Si l'agent dépasse la gauche de la marge alors on envoie -2.
+        Ces infos supplémentaires nous peremettront de réduire sa vitesse si le kart dépasse la marge
+        jusqu'à revenir au centre.
+        '''
+        marge = marge_milieu
+        distance = obs["center_path_distance"]
+        if (distance > 0) :
+            if np.abs(distance) < marge:
+                return 1
+            return 2
+        elif (distance < 0):
+            if np.abs(distance) < marge:
+                return -1
+            return -2
+        else :
+            return 0
+
+    def choose_action(self, obs):
+        acceleration = random.random()
+        steering = 0 #random.random() #De -1 (Gauche) à 1 (Droite)
+        action = {
+            "acceleration": acceleration,
+            "steer": steering,
+            "brake": True, # bool(random.getrandbits(1)),
+            "drift": 0,#bool(random.getrandbits(1)),
+            "nitro": 0,#bool(random.getrandbits(1)),
+            "rescue":0,#bool(random.getrandbits(1)),
+            "fire": 0,#bool(random.getrandbits(1)),
+        }
+        print(self.position_track(obs, 0.3))
+        return action
