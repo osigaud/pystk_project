@@ -127,14 +127,12 @@ def single_race(env, agents, names, scores):
                 print(f"Team {i+1} error: {e}")
                 actions[str] = default_action
         obs, _, terminated, truncated, info = env.step(actions)
-        #print(f"{info['infos']}")
         pos = np.zeros(MAX_TEAMS)
         dist = np.zeros(MAX_TEAMS)
         for i in range(MAX_TEAMS):
             str = f"{i}"
             pos[i] = info['infos'][str]['position']
             dist[i] = info['infos'][str]['distance']
-        # print(f"{names}{dist}")
         steps = steps + 1
         done = terminated or truncated
         positions.append(pos)
@@ -158,8 +156,8 @@ def main_loop():
         env.close()
 
     print("final scores:")
-    scores.display()
-    scores.display_mean()
+    # scores.display()
+    # scores.display_mean()
     return scores
 
 
