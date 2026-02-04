@@ -10,3 +10,10 @@ wheels/
 .venv
 uv.lock
 pyproject.toml
+
+# Python
+.python-version
+/main.py
+
+# Docs communs
+/docs/

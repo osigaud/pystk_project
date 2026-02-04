@@ -1,0 +1,21 @@
+import math
+
+class Steering:
+    def steering(self,obs):
+        points = obs['paths_start'] #on recupère les noeuds
+        x = 0.0
+        if len(points)>2:
+            x = points[1][0] #deballage du décalage latéral en prenant le deuxième point sur la liste
+        return x*0.7 #coefficient pour rendre l'agent moins nerveux
+    
+    def steering_v2(self,obs):
+        points = obs['paths_start'] #on récupère les noeuds
+        if len(points)>2:
+            x = points[2][0] #deballage du décalage latéral en prenant le troisième point sur la liste
+            z = points[2][2] #deballage de la profondeur en prenant le troisième point sur la liste
+            steer = math.atan2(x,z) #calcul de l'angle de braquage avec math.atan2 qui gère le cas où z vaut 0 ainsi que le signe de x et z
+        else:
+            steer = 0.0
+        return steer
+
+

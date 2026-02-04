@@ -1,0 +1,19 @@
+# Fichier de configuration TastyCrousteam 
+# contient les paramètres et les variables utilisés dans le programme
+
+
+
+
+# distance à partir de laquelle on considère notre distance par rapport au centre trop élevée
+dist : 0.5
+
+# à quel point on ajuste la direction
+ajust : 0.25
+
+# seuil à partir duquel on considère l'écart entre le front du kart et la direction du segment
+ecartpetit : 1
+ecartgrand : 3
+
+# seuil à partir duquel on considère que la capacité à tourner le volant selon la vitesse(max_steer_angle)
+msapetit : 0.2
+msagrand : 0.7
