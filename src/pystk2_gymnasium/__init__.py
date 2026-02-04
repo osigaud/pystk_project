@@ -1,5 +1,9 @@
 from gymnasium.envs.registration import register, WrapperSpec
-from .definitions import ActionObservationWrapper, AgentSpec  # noqa: F401
+from .definitions import (  # noqa: F401
+    ActionObservationWrapper,
+    AgentSpec,
+    AgentException,
+)
 from .wrappers import (  # noqa: F401
     MonoAgentWrapperAdapter,
     FlattenMultiDiscreteActions,
@@ -10,10 +14,12 @@ from .stk_wrappers import (  # noqa: F401
     DiscreteActionsWrapper,
     PolarObservations,
 )
+from .vecenv import make_stkrace_vec  # noqa: F401
 
-# Version is setup automatically
-__version__ = "0.0.0"
-__version_tuple__ = (0, 0, 0)
+try:
+    from ._version import __version__
+except ImportError:
+    __version__ = "unknown"
 
 register(
     id="supertuxkart/full-v0",

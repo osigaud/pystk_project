@@ -19,6 +19,14 @@ from gymnasium.core import (
 CameraMode = pystk2.PlayerConfig.CameraMode
 
 
+class AgentException(Exception):
+    """Exception for a given agent"""
+
+    def __init__(self, message: str, key: str):
+        super().__init__(message)
+        self.key = key
+
+
 @dataclass
 class AgentSpec:
     #: The position of the controlled kart, defaults to None for random, 0 to
@@ -31,6 +39,10 @@ class AgentSpec:
     name: str = ""
     #: Camera mode (AUTO, ON, OFF). By default, only non-AI agents get a camera
     camera_mode: CameraMode = CameraMode.AUTO
+    #: Kart model name (empty string for default)
+    kart: str = ""
+    #: Kart color hue shift in [0, 1]. 0 uses the kart's default color.
+    color: float = 0.0
 
 
 class ActionObservationWrapper(Wrapper[ObsType, WrapperActType, ObsType, ActType]):
