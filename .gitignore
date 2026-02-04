@@ -1,5 +1,5 @@
 # Python-generated files
-__pycache__/
+*/__pycache__/
 *.py[oc]
 build/
 dist/
@@ -10,3 +10,5 @@ wheels/
 .venv
 uv.lock
 pyproject.toml
+
+docs/index.html
