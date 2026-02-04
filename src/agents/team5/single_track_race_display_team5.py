@@ -13,7 +13,7 @@ from dataclasses import dataclass
 
 
 # Append the "src" folder to sys.path.
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "src")))
 
 from agents.team1.agent1 import Agent1
 from agents.team2.agent2 import Agent2
