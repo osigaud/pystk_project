@@ -1,0 +1,33 @@
+agent:
+  name: "TEAM L'ÉCLAIR"
+  path_lookahead: 3
+
+steering:
+  max_track_offset: 4.0
+  sharp_turn_threshold: 0.5
+  straight_threshold: 0.1
+  avoidance_offset: 0.4
+
+track_items:
+  detection_distance: 30
+  avoidance_distance: 15
+  avoidance_width: 5.0
+  collectible_types: [0, 2, 3]
+  danger_type: 1
+
+speed:
+  slow_speed_threshold: 0.20
+  unblock_time: 10
+  reset_block_time: 18
+
+acceleration:
+  normal: 0.75
+  sharp_turn: 0.15
+  boost: 0.9
+
+nitro:
+  min_energy: 0.0
+
+fire:
+  enemy_type: 0
+  required_attachment: 9
