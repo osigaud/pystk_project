@@ -25,9 +25,9 @@ from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 7
+MAX_TEAMS = 6
 NB_RACES = 10
-MAX_STEPS = 200
+MAX_STEPS = 300
 
 # Get the current timestamp
 current_timestamp = datetime.now()
@@ -108,6 +108,7 @@ def create_race():
 
     for i in range(MAX_TEAMS):
         names.append(agents[i].name)
+        agents_specs[i].name = agents[i].name
     return env, agents, names
 
 
@@ -126,14 +127,12 @@ def single_race(env, agents, names, scores):
                 print(f"Team {i+1} error: {e}")
                 actions[str] = default_action
         obs, _, terminated, truncated, info = env.step(actions)
-        #print(f"{info['infos']}")
         pos = np.zeros(MAX_TEAMS)
         dist = np.zeros(MAX_TEAMS)
         for i in range(MAX_TEAMS):
             str = f"{i}"
             pos[i] = info['infos'][str]['position']
             dist[i] = info['infos'][str]['distance']
-        # print(f"{names}{dist}")
         steps = steps + 1
         done = terminated or truncated
         positions.append(pos)
@@ -157,8 +156,8 @@ def main_loop():
         env.close()
 
     print("final scores:")
-    scores.display()
-    scores.display_mean()
+    # scores.display()
+    # scores.display_mean()
     return scores
 
 
