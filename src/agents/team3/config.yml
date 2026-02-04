@@ -6,7 +6,7 @@ steering:
   max_track_offset: 4.0
   sharp_turn_threshold: 0.5
   straight_threshold: 0.1
-  avoidance_offset: 0.35
+  avoidance_offset: 0.4
 
 track_items:
   detection_distance: 30
