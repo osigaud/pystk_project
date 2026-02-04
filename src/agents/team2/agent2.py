@@ -33,15 +33,16 @@ class Agent2(KartAgent):
                 "rescue": False,
                 "fire": False,
             }
+		
+		
 
-
-        velocity = np.array(obs.get("velocity", [0, 0, 0])) 
+        velocity = np.array(obs["velocity"])) 
         speed = np.linalg.norm(velocity)
-        phase = obs.get("phase", 3) 
-        nodes_path = obs.get("paths_start", [])
+        phase = obs.get["phase"] 
+        nodes_path = obs["paths_start"]
 
 
-        if phase >= 2:  
+        if phase > 2:  
             if speed < 0.2:  
                 self.stuck_steps += 1
             else:
@@ -58,6 +59,9 @@ class Agent2(KartAgent):
             steering = np.clip(angle * 2, -1, 1)
         else:
             steering = 0
+            
+            
+        print(f"angle actuel: {angle: .3f} rad, {np.degrees(angle):.1f}")
         
         action = {
             "acceleration": 0.7,   
