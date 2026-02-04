@@ -108,6 +108,7 @@ def create_race():
 
     for i in range(MAX_TEAMS):
         names.append(agents[i].name)
+        agents_specs[i].name = agents[i].name
     return env, agents, names
 
 
