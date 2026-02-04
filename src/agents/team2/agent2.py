@@ -36,7 +36,7 @@ class Agent2(KartAgent):
 		
 		
 
-        velocity = np.array(obs["velocity"])) 
+        velocity = np.array(obs["velocity"]) 
         speed = np.linalg.norm(velocity)
         phase = obs.get["phase"] 
         nodes_path = obs["paths_start"]
@@ -51,8 +51,7 @@ class Agent2(KartAgent):
         if self.stuck_steps > 7:
             self.recovery_steps = 15 
             self.stuck_steps = 0
-           
-           
+
         if len(nodes_path) > self.path_lookahead:
             target_node = nodes_path[self.path_lookahead]
             angle = np.arctan2(target_node[0], target_node[2])
