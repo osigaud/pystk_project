@@ -1,9 +1,0 @@
-gymnasium
-matplotlib
-numpy
-pandas
-plotly
-pyparsing
-pysupertuxkart2
-pytz
-requests
