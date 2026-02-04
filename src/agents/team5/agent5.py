@@ -9,12 +9,12 @@ class Agent5(KartAgent):
         self.path_lookahead = path_lookahead
         self.name = "Donkey Bombs"
 
-        self.Kp = 4  # Force du braquage (Plus haut = plus agressif)
-        self.Kd = 0.6   # Amortisseur (Plus haut = plus stable, moins de tremblements)
+        self.Kp = 6  # Force du braquage (Plus haut = plus agressif)
+        self.Kd = 0.7   # Amortisseur (Plus haut = plus stable, moins de tremblements)
         
         #Constante de distance de regard du kart. 
         #Cela va nous permettre de séléctionner les noeuds du circuit à au moins 10 m devant nous afin de lisser la trajectoire
-        self.ahead_dist = 10.0  
+        self.ahead_dist = 9.0  
 
         self.last_error = 0.0   # Contient lerreur de l'angle précédent 
         self.stuck_counter = 0  # Compte le temps passé bloqué contre un mur si kart bloqué
@@ -121,6 +121,6 @@ class Agent5(KartAgent):
             "drift": False, 
             "nitro": True, 
             "rescue": False, 
-            "fire": False
+            "fire": bool(random.getrandbits(1))
         }
         return action
