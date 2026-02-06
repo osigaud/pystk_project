@@ -1,0 +1,18 @@
+Il faut dire tout ce qu'il y a de 
+nouveau au client à chaque fois
+(ne pas omettre de détails) 
+Il faut un document pour expliquer 
+exactement le comportement de la 
+voiture et la manière dont cette logique
+a été codée
+Envoyer le gitignore de notre groupe au 
+prof 
+Faire des commits avec des titres plus
+précis
+Il faut que tout le monde s'approprie 
+le code et que les taches soient
+réparties équitablement
+En théorie, à la fin du projet tout le 
+monde devrait avoir le même niveau
+C'est mieux d'avoir des commits un peu 
+trop atomiques que un peu trop généraux
