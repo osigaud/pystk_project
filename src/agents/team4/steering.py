@@ -17,7 +17,7 @@ class Steering:
 
             angle = math.atan2(2 * L * gx,l2) # Calcul de la formule issu de pure_pursuit et du modèle bicyclette
 
-            steer = angle * 4.5 # ajout d'un coefficient pour ramener sur notre referentiel
+            steer = angle * 6.0 # ajout d'un coefficient pour ramener sur notre referentiel
 
             return np.clip(steer,-1,1) # Ajout d'une sécurité pour garder le steer entre -1 et 1
         else:
