@@ -10,6 +10,8 @@ class Steering:
         l2 = gx**2 + gz**2
         rayon = l2/(2*gx)
 
+        L = 2.5 # On simule un empattement
+
         
 
 
