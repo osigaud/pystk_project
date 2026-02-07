@@ -12,7 +12,7 @@ class Steering:
 
         L = 2.5 # On simule un empattement
 
-        
+        tan_angle = L/rayon
 
 
 
