@@ -10,6 +10,6 @@ class Steering:
             steer = math.atan2(x,z) * 2 #calcul de l'angle de braquage avec math.atan2 qui gère le cas où z vaut 0 ainsi que le signe de x et z
         else:
             steer = 0.0
-        return np.clip(steer,-1,1)
+        return np.clip(steer,-1,1) #ajout de la sécurite np.clip pour garder le steer entre -1 et 1
 
 
