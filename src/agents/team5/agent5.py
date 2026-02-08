@@ -2,6 +2,10 @@ import numpy as np
 import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
+from agent5_MidPilot import Agent5Mid
+from agent5_BananaPilot import Agent5Banana
+from omegaconf import OmegaConf
+import os
 
 class Agent5(KartAgent):
     def __init__(self, env, path_lookahead=3):
@@ -9,163 +13,24 @@ class Agent5(KartAgent):
         self.path_lookahead = path_lookahead
         self.name = "Donkey Bombs"
 
-        self.Kp = 8  # Force du braquage (Plus haut = plus agressif)
-        self.Kd = 0.5   # Amortisseur (Plus haut = plus stable, moins de tremblements)
-        
-        #Constante de distance de regard du kart. 
-        #Cela va nous permettre de séléctionner les noeuds du circuit à au moins 10 m devant nous afin de lisser la trajectoire
-        self.ahead_dist = 9.0  
+        # On trouve le chemin de notre fichier actuel
+        current_dir = os.path.dirname(os.path.abspath(__file__))
 
-        self.last_error = 0.0   # Contient lerreur de l'angle précédent 
-        self.stuck_counter = 0  # Compte le temps passé bloqué contre un mur si kart bloqué
+        # On créer le chemin /src/agent/team5/config.yaml
+        config_path = os.path.join(current_dir, "config.yaml")
+
+        # On charge le fichier conf avec ce chemin
+        self.conf = OmegaConf.load(config_path)
+        
+        # On crée le Pilote qui suit la piste 
+        self.pilot = Agent5Mid(env, self.conf, path_lookahead)
+
+        # On l'enveloppe dans l'agent qui esquive les bananes
+        self.brain = Agent5Banana(env, self.pilot, self.conf, path_lookahead)
+
 
     def reset(self):
-        self.obs, _ = self.env.reset()
-        self.stuck_counter = 0
-        self.last_error = 0.0
-
-
-
-    def position_track(self, obs):
-        #La fonction analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à la distance d'au moins ahead_dist = 10 m
-        
-        paths = obs['paths_end']
-        target_vector = paths[-1]  # Par défaut on prend le noeud le plus loin pour éviter tout bug au démarrage
-
-        if len(paths) == 0:
-            return 0, self.ahead_dist  # par défaut si aucun noeud n'est donné dans la liste paths_end
-
-
-        # On cherche le premier point qui dépasse notre distance de visée
-        for p in paths:
-            if p[2] > self.ahead_dist: # On force le kart à prendre le point qui est à une distance ahead_dist de lui pour toujour regarder au loin 
-                target_vector = p
-                break
-
-        # On retourne l'écart latéral x et l'écart avant z
-        return target_vector[0], target_vector[2]
-
-
-
-    def compute_turning(self, x, z):
-
-        # La fonction calcule l'angle du volant en fonction des distances (x, z).
-        
-        # On évite de diviser par zéro si le point est trop proche.
-        if z < 0.5: 
-            z = 0.5
-        
-        # On imagine ici un triangle rectangle où x est le côté opposé et z le côté adjacent.
-        # On a le ratio tan(angle) = x / z
-        # Pour simplifier, on utilise directement le ratio x / z comme erreur.
-        # plus x est grand (loin du centre), plus l'angle est grand.
-        error_angle = x / z
-        
-        # La dérivée mesure la vitesse à laquelle on corrige l'erreur.
-        # Formule = (Erreur de maintenant) - (Erreur d'avant)
-        # Si on se rapproche vite du centre, cette valeur devient négative.
-        # Elle sert d'amortisseur : elle freine le volant pour éviter de dépasser le centre de la piste et de faire des zigzags.  
-        error_diff = error_angle - self.last_error
-        
-        # On sauvegarde l'erreur actuelle pour le calcul de la prochaine frame
-        self.last_error = error_angle
-        
-        # Steering = (Force brute vers la cible) + (Freinage pour pas dépasser)
-        # steering = (Ressort * Kp) + (Amortisseur * Kd)
-        steering = (error_angle * self.Kp) + (error_diff * self.Kd)
-        
-        # On limite entre -1 et 1
-        steering_normalise = np.clip(steering, -1, 1)
-        
-        return steering_normalise
-
-
-    def manage_speed(self, obs, steering):
-        # Gère l'accélération, le freinage et le système anti-blocage.
-        
-        velocity = obs['velocity']
-        speed = np.linalg.norm(velocity)  # Norme euclidienne du vecteur velocity
-        accel = 1.0
-        brake = False
-
-        # Si on tourne fort, on ralentit pour ne pas déraper
-        if abs(steering) > 0.3:
-            accel = 0.1
-
-        is_stuck = False
-        # Si on est au départ (>5m) et qu'on n'avance plus (<0.5)
-        if obs['distance_down_track'] > 5.0 and speed < 0.5:
-            self.stuck_counter += 1
-            if self.stuck_counter > 30: 
-                is_stuck = True # Bloqué depuis 0.5s
-        else:
-            self.stuck_counter = 0
-
-        # Si bloqué, on brake pour reculer
-        if is_stuck:
-            accel = 0.0
-            brake = True
-            steering = -steering # On inverse le volant pour se reculer
-
-        return accel, brake, steering
-
-    def avoidBananas(self, obs):
-        
-        items_pos = np.array(obs["items_position"])
-        items_type = obs["items_type"]
-        
-        if items_type is None or len(items_type) == 0:
-            return False, 0.0, 1.0, False
-        
-        index_bananas = [i for i, j in enumerate(items_type) if j == 1]
-        bananas = items_pos[index_bananas]
-    
-        if len(index_bananas) == 0:
-            return False, 0.0, 1.0, False
-        
-        
-        for b in bananas:
-            x = b[0]
-            z = b[2]
-            
-            if 0 < z < 8 and abs(x) < 1.4:
-                # Évitement
-                if x < 0:
-                    steering = 0.9
-                else :
-                    steering = -0.9
-                accel = 0.0
-                brake = False
-                
-                return True, steering, accel, brake
-        
-        return False, 0.0, 1.0, False
-
+        self.brain.reset()
 
     def choose_action(self, obs):
-        # Vérifier les bananes
-        has_banana, steer_avoid, accel_avoid, brake_avoid = self.avoidBananas(obs)
-        
-        # Si présence d'une banane on tourne vite fais
-        if has_banana:
-            steering = steer_avoid
-            accel = accel_avoid
-            brake = brake_avoid
-        # Sinon on conduit normalement
-        else:
-            # Calcul normal
-            target_x, target_z = self.position_track(obs)
-            steering = self.compute_turning(target_x, target_z)
-            accel, brake, steering = self.manage_speed(obs, steering)
-        
-        action = {
-            "acceleration": accel,
-            "steer": steering,
-            "brake": brake,
-            "drift": False,
-            "nitro": False,
-            "rescue": False,
-            "fire": bool(random.getrandbits(1))
-        }
-    
-        return action
+        return self.brain.choose_action(obs)
