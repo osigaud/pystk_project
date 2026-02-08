@@ -6,6 +6,7 @@ from agents.kart_agent import KartAgent
 from .steering import Steering
 from .rescue import RescueManager
 from .speed import SpeedController
+from .nitrodrift import NitroDrift
 
 
 class Agent4(KartAgent):
@@ -19,10 +20,13 @@ class Agent4(KartAgent):
         self.steering = Steering()
         self.rescue = RescueManager()
         self.SpeedController=SpeedController()
+        self.nitrodrift = NitroDrift()
+        self.drift_cd = 0
 
     def reset(self):
         self.obs, _ = self.env.reset()
         self.agent_positions = []
+        self.drift_cd = 0
 
     def endOfTrack(self):
         return self.isEnd
@@ -30,18 +34,35 @@ class Agent4(KartAgent):
     def choose_action(self, obs):
         
         steering = self.steering.manage_pure_pursuit(obs)
-        acceleration = self.SpeedController.vitesse2(steering)
         distance = float(obs.get("distance_down_track", [0.0])[0])
         vel = obs.get("velocity", [0.0, 0.0, 0.0])
         speed = float(vel[2])
+        energy = float(obs.get("energy", [0.0])[0])
+        if self.drift_cd > 0:
+            drift = False
+            self.drift_cd -= 1
+        else:
+            drift, steering = self.nitrodrift.drift(steering, distance)
+            if drift:
+                self.drift_cd = 12
+        brea = False
+        acceleration, brea = self.SpeedController.vitesse3(steering,distance)
+
+
+
+        nitro = self.nitrodrift.nitro(steering, energy)
+        if (drift == True):
+            nitro = False
+
+
         if(self.rescue.is_stuck(distance,speed)):
             return self.rescue.sortir_du_mur(steering)
         action = {
             "acceleration": acceleration,
             "steer": steering,
-            "brake": False,
-            "drift": False,
-            "nitro": False,
+            "brake": brea,
+            "drift": drift,
+            "nitro": nitro,
             "rescue":False,
             "fire": False,
         }
