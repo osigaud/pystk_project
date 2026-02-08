@@ -9,8 +9,8 @@ class Agent5(KartAgent):
         self.path_lookahead = path_lookahead
         self.name = "Donkey Bombs"
 
-        self.Kp = 6  # Force du braquage (Plus haut = plus agressif)
-        self.Kd = 0.7   # Amortisseur (Plus haut = plus stable, moins de tremblements)
+        self.Kp = 8  # Force du braquage (Plus haut = plus agressif)
+        self.Kd = 0.5   # Amortisseur (Plus haut = plus stable, moins de tremblements)
         
         #Constante de distance de regard du kart. 
         #Cela va nous permettre de séléctionner les noeuds du circuit à au moins 10 m devant nous afin de lisser la trajectoire
@@ -90,7 +90,7 @@ class Agent5(KartAgent):
 
         # Si on tourne fort, on ralentit pour ne pas déraper
         if abs(steering) > 0.3:
-            accel = 0.5
+            accel = 0.1
 
         is_stuck = False
         # Si on est au départ (>5m) et qu'on n'avance plus (<0.5)
@@ -109,18 +109,63 @@ class Agent5(KartAgent):
 
         return accel, brake, steering
 
-    def choose_action(self, obs):
-        target_x, target_z = self.position_track(obs)
-        steering = self.compute_turning(target_x, target_z)
-        accel, brake, steering = self.manage_speed(obs, steering)
+    def avoidBananas(self, obs):
+        
+        items_pos = np.array(obs["items_position"])
+        items_type = obs["items_type"]
+        
+        if items_type is None or len(items_type) == 0:
+            return False, 0.0, 1.0, False
+        
+        index_bananas = [i for i, j in enumerate(items_type) if j == 1]
+        bananas = items_pos[index_bananas]
+    
+        if len(index_bananas) == 0:
+            return False, 0.0, 1.0, False
+        
+        
+        for b in bananas:
+            x = b[0]
+            z = b[2]
+            
+            if 0 < z < 8 and abs(x) < 1.4:
+                # Évitement
+                if x < 0:
+                    steering = 0.9
+                else :
+                    steering = -0.9
+                accel = 0.0
+                brake = False
+                
+                return True, steering, accel, brake
+        
+        return False, 0.0, 1.0, False
 
+
+    def choose_action(self, obs):
+        # Vérifier les bananes
+        has_banana, steer_avoid, accel_avoid, brake_avoid = self.avoidBananas(obs)
+        
+        # Si présence d'une banane on tourne vite fais
+        if has_banana:
+            steering = steer_avoid
+            accel = accel_avoid
+            brake = brake_avoid
+        # Sinon on conduit normalement
+        else:
+            # Calcul normal
+            target_x, target_z = self.position_track(obs)
+            steering = self.compute_turning(target_x, target_z)
+            accel, brake, steering = self.manage_speed(obs, steering)
+        
         action = {
             "acceleration": accel,
             "steer": steering,
             "brake": brake,
-            "drift": False, 
-            "nitro": True, 
-            "rescue": False, 
+            "drift": False,
+            "nitro": False,
+            "rescue": False,
             "fire": bool(random.getrandbits(1))
         }
+    
         return action
