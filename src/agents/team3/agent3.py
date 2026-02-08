@@ -1,5 +1,5 @@
 from agents.kart_agent import KartAgent
-from agents.team3.AvoidItems import AvoidItems
+from agents.team3.FireItems import FireItems
 
 class Agent3(KartAgent):
     def __init__(self, env, path_lookahead=3):
@@ -20,5 +20,5 @@ class Agent3(KartAgent):
     
     def choose_action(self, obs):
 
-        action = AvoidItems.choose_action(self, obs)
+        action = FireItems.choose_action(self, obs)
         return action

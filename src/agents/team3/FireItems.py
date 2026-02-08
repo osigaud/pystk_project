@@ -6,14 +6,14 @@ from omegaconf import OmegaConf
 
 cfg = OmegaConf.load("../agents/team3/config.yml")
 
-from agents.team3.Pilot import Pilot
+from agents.team3.AvoidItems import AvoidItems
 
-class Drifter():
+class FireItems():
     
     def choose_action(self, obs):
-        action = Pilot.choose_action(self, obs)
+        action = AvoidItems.choose_action(self, obs)
 
-        action["drift"] = False 
+        
 
         
         return action

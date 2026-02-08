@@ -6,12 +6,12 @@ from omegaconf import OmegaConf
 
 cfg = OmegaConf.load("../agents/team3/config.yml")
 
-from agents.team3.Drifter import Drifter
+from agents.team3.Pilot import Pilot
 
 class TakeItems():
     
     def choose_action(self, obs):
-        action = Drifter.choose_action(self, obs)
+        action = Pilot.choose_action(self, obs)
 
         target = obs["paths_end"][0] #return a vector [x,y,z]
         x = target[0] #Extracting the x
