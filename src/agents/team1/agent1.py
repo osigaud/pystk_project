@@ -6,8 +6,11 @@ from omegaconf import OmegaConf
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 
+from pathlib import Path
+
 #chemin du fichier de configuration
-path_conf = 'configFIleTastyCrousteam.yaml'
+path_conf = Path(__file__).resolve().parent
+path_conf = str(path_conf) + '/configFIleTastyCrousteam.yaml'
 #importation du fichier de configuration
 conf = OmegaConf.load(path_conf)
 
@@ -18,6 +21,10 @@ ECARTPETIT = conf.ecartpetit
 ECARTGRAND = conf.ecartgrand
 MSAPETIT = conf.msapetit
 MSAGRAND = conf.msagrand
+
+#autres variables qu'on utilise dans le code 
+BONUS = [0, 2, 3]
+OBSTACLES = [1, 4]
 
 #Base d'Agent, mouvements aléatoires, initialisation des variables
 class AgentBase(KartAgent):
@@ -52,8 +59,8 @@ class AgentBase(KartAgent):
 
 #Agent qui roule tout droit
 class AgentStraight(AgentBase):
-    def __init__(self, env):
-        super().__init__(env)
+    def __init__(self, env, path_lookahead=3):
+        super().__init__(env, path_lookahead)
 
     def choose_action(self, obs):
         action = {
@@ -68,19 +75,18 @@ class AgentStraight(AgentBase):
         return action
 
 #Agent qui suit le centre de la piste
-#méthodes à rajouter ici
+
+#A CORRIGER : plein de zigzag, attendre mardi pour voir avec Wiam 
 class AgentCenter(AgentStraight):
-    #initialisation de l'agent center de base
-    def __init__(self, env):
-        super().__init__(env)
+    def __init__(self, env, path_lookahead=3):
+        super().__init__(env, path_lookahead)
         self.dist = DIST #écart max au centre de la piste qu'on accepte
         self.ajust = AJUST #la valeur que l'on veut addi/soustr à notre steer, qui sert d'ajustement de la trajectoire
 
-
     def path_ajust(self, act, obs):
         s = act["steer"]
-        center = obs["paths_end"][2][0]
-
+        center = obs["paths_end"][2]
+        """
         # gros ecart -> gros virage
         if center < -self.dist:
             s = s - self.ajust
@@ -92,10 +98,12 @@ class AgentCenter(AgentStraight):
             s = s - self.ajust / 2
         elif center > self.dist / 2:
             s = s + self.ajust / 2
-
-        act["steer"] = s
+        """
+        if (center[2] > 20 and abs(obs["center_path_distance"]) < 3) : 
+            act["steer"] = 0
+        else : 
+            act["steer"] = center[0]
         return act
-
     
     def choose_action(self, obs):
         act = super().choose_action(obs)
@@ -104,8 +112,8 @@ class AgentCenter(AgentStraight):
             
 #Agent qui adapte la vitesse en fonction des virages
 class AgentTurn(AgentCenter):
-    def __init__(self, env):
-        super().__init__(env)
+    def __init__(self, env, path_lookahead=3):
+        super().__init__(env, path_lookahead)
         self.ecartpetit = ECARTPETIT #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
         self.ecartgrand = ECARTGRAND #seuil a partir du quel on considere l'ecart comme grand (virage serré)
         self.msapetit = MSAPETIT
@@ -177,16 +185,52 @@ class AgentTurn(AgentCenter):
                 accel = accel + 0.3
                 act["acceleration"] = self.gap(accel)
                 return act
-
   
     def choose_action(self, obs):
         act = super().choose_action(obs)
         react = self.analyse(obs)
         act_corr = self.reaction(react, act, obs)
+        print("nextitem :", obs["items_position"][0])
         return act_corr
 
+#Agent qui analyse les obstacles et bonus sur la course et corrige sa trajectoire en conséquences
+class AgentObstacles(AgentCenter) : 
+    def __init__(self, env, path_lookahead=3) : 
+        super().__init__(env, path_lookahead)
+
+    def obs_next_item(self, obs, action) : 
+        nextitem = obs["items_type"][0]
+        vecitem = obs["items_position"][0]
+        if vecitem[2] < 8 and vecitem[2] > 2 : 
+            if nextitem in BONUS : 
+                return self.dirige_bonus(obs, action)
+            elif nextitem in OBSTACLES : 
+                return self.evite_obstacle(obs, action)
+        return action
+
+    def evite_obstacle(self, obs, action) : 
+        if (obs["attachment"] == 6 and obs["attachment_time_left"] > 2) : 
+            #6 : BUBBLEGUM_SHIELD
+            return action
+        vecitem = obs["items_position"][0] 
+        if vecitem[0] < 0.2 :
+            action["steer"] = action["steer"] + 0.3
+        return action
+
+    def dirige_bonus(self, obs, action) :
+        vecitem = obs["items_position"][0]
+        if abs(vecitem[0] - action["steer"]) < 0.2 :
+            return action
+        else : 
+            action["steer"] = vecitem[0]
+        return action
+        
+    def choose_action(self, obs) : 
+        action = super().choose_action(obs)
+        action_corr = self.obs_next_item(obs, action)
+        return action_corr
 
 #AGENT FINAL :
-class Agent1(AgentTurn):
+class Agent1(AgentCenter):
     def __init__(self, env, path_lookahead=3): 
         super().__init__(env)
