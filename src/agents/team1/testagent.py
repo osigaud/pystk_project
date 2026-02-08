@@ -97,7 +97,7 @@ def create_race():
     names = []
 
     agents.append(Agent1(env, path_lookahead=3)) 
-    agents.append(AgentCenter(env, dist=0.5, ajust=0.1)) #CHANGEMENT DES VARIABLES ICI
+    agents.append(AgentCenter(env)) #CHANGEMENT DES VARIABLES ICI
     
     #Pour pas que ça shuffle et qu'on puisse récupérer les données de notre agent plus facilement
     #np.random.shuffle(agents) 

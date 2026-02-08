@@ -1,9 +1,23 @@
 import numpy as np
 import random
 import math
+from omegaconf import OmegaConf
 
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
+
+#chemin du fichier de configuration
+path_conf = 'configFIleTastyCrousteam.yaml'
+#importation du fichier de configuration
+conf = OmegaConf.load(path_conf)
+
+#définition des variables qui viennent du fichier de configuration
+DIST = conf.dist
+AJUST = conf.ajust
+ECARTPETIT = conf.ecartpetit
+ECARTGRAND = conf.ecartgrand
+MSAPETIT = conf.msapetit
+MSAGRAND = conf.msagrand
 
 #Base d'Agent, mouvements aléatoires, initialisation des variables
 class AgentBase(KartAgent):
@@ -43,7 +57,7 @@ class AgentStraight(AgentBase):
 
     def choose_action(self, obs):
         action = {
-            "acceleration": 0.2, 
+            "acceleration": 0.7, 
             "steer": 0, 
             "brake": False, 
             "drift": False, 
@@ -57,45 +71,45 @@ class AgentStraight(AgentBase):
 #méthodes à rajouter ici
 class AgentCenter(AgentStraight):
     #initialisation de l'agent center de base
-    def __init__(self, env, dist, ajust):
+    def __init__(self, env):
         super().__init__(env)
-        self.dist = dist #écart max au centre de la piste qu'on accepte
-        self.ajust = ajust #la valeur que l'on veut addi/soustr à notre steer, qui sert d'ajustement de la trajectoire
+        self.dist = DIST #écart max au centre de la piste qu'on accepte
+        self.ajust = AJUST #la valeur que l'on veut addi/soustr à notre steer, qui sert d'ajustement de la trajectoire
 
 
     def path_ajust(self, act, obs):
         s = act["steer"]
-        center = obs["center_path_distance"]
+        center = obs["paths_end"][2][0]
 
         # gros ecart -> gros virage
         if center < -self.dist:
-            s = s + self.ajust
-        elif center > self.dist:
             s = s - self.ajust
+        elif center > self.dist:
+            s = s + self.ajust
 
         # petit ecart -> petit virage
         elif center < -self.dist / 2:
-            s = s + self.ajust / 2
-        elif center > self.dist / 2:
             s = s - self.ajust / 2
+        elif center > self.dist / 2:
+            s = s + self.ajust / 2
 
         act["steer"] = s
         return act
 
     
     def choose_action(self, obs):
-            act = super().choose_action(obs)
-            act_corr = self.path_ajust(act, obs)
-            return act_corr
+        act = super().choose_action(obs)
+        act_corr = self.path_ajust(act, obs)
+        return act_corr
             
 #Agent qui adapte la vitesse en fonction des virages
 class AgentTurn(AgentCenter):
-    def __init__(self, env, dist, ajust, ecartpetit, ecartgrand, msapetit, msagrand):
-        super().__init__(env, dist, ajust)
-        self.ecartpetit = ecartpetit #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
-        self.ecartgrand = ecartgrand #seuil a partir du quel on considere l'ecart comme grand (virage serré)
-        self.msapetit = msapetit
-        self.msagrand = msagrand
+    def __init__(self, env):
+        super().__init__(env)
+        self.ecartpetit = ECARTPETIT #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
+        self.ecartgrand = ECARTGRAND #seuil a partir du quel on considere l'ecart comme grand (virage serré)
+        self.msapetit = MSAPETIT
+        self.msagrand = MSAGRAND
         
     def analyse(self, obs):
         s = []
@@ -175,4 +189,4 @@ class AgentTurn(AgentCenter):
 #AGENT FINAL :
 class Agent1(AgentTurn):
     def __init__(self, env, path_lookahead=3): 
-        super().__init__(env, dist=0.5, ajust=0.2, ecartpetit=1, ecartgrand=3, msapetit=1, msagrand=3)
+        super().__init__(env)

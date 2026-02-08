@@ -1,9 +1,6 @@
 # Fichier de configuration TastyCrousteam 
 # contient les paramètres et les variables utilisés dans le programme
 
-
-
-
 # distance à partir de laquelle on considère notre distance par rapport au centre trop élevée
 dist : 0.5
 
