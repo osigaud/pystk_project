@@ -9,7 +9,6 @@ class Steering:
         self.gain = 6.0 # ajout d'un coefficient pour ramener sur notre referentiel
         self.banana_dodge = Banana()
     
-    
     def manage_pure_pursuit(self,obs):
         
         points = obs.get("paths_start",[])
@@ -21,6 +20,20 @@ class Steering:
         gz = target[2] # Recuperation de z, la profondeur
         
         danger, b_x = self.banana_dodge.banana_detection(obs)
+
+        if danger:
+
+            target = points[1]
+            gx = target[0] # Recuperation de x, le decalage lateral
+            gz = target[2] # Recuperation de z, la profondeur
+
+            esquive = 0.8
+
+            if b_x >= 0:
+                gx-=esquive
+            else:
+                gx+=esquive
+
         
         l2 = gx**2 + gz**2 # calcul de l'hypoténuse
             
@@ -28,8 +41,8 @@ class Steering:
             
         angle = math.atan2(2 * self.L * gx,l2) # Calcul de la formule issu de pure_pursuit et du modèle bicyclette
 
-        steer = angle * self.gain # ajout d'un coefficient pour ramener sur notre referentiel
-
+        steer = angle * self.gain # application du coefficient
+        
         return np.clip(steer,-1,1) # Ajout d'une sécurité pour garder le steer entre -1 et 1
         
 
