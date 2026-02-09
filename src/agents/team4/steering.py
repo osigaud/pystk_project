@@ -7,32 +7,32 @@ class Steering:
     def __init__(self):
         self.L = 2.5  # On simule un empattement
         self.gain = 6.0 # ajout d'un coefficient pour ramener sur notre referentiel
-        self.banana_dodge = Banana()
+        self.banana_dodge = Banana() # Integration de la classe Banana
     
     def manage_pure_pursuit(self,obs):
         
-        points = obs.get("paths_start",[])
+        points = obs.get("paths_start",[]) # On récupère les noeuds
         
-        if len(points) <= 2:return 0.0 
+        if len(points) <= 2 : return 0.0 # Si la liste ne contient pas assez de points on renvoie un steer de 0
         
         target = points[2] # Recuperation du troisième point
         gx = target[0] # Recuperation de x, le decalage lateral
         gz = target[2] # Recuperation de z, la profondeur
         
-        danger, b_x = self.banana_dodge.banana_detection(obs)
+        danger, b_x = self.banana_dodge.banana_detection(obs) # Appel de la fonction detection banane
 
         if danger:
 
-            target = points[1]
+            target = points[1] # Changement de référentiel pour plus de nervosite
             gx = target[0] # Recuperation de x, le decalage lateral
             gz = target[2] # Recuperation de z, la profondeur
 
-            esquive = 0.8
+            esquive = 0.8 # Variable d'esquive
 
             if b_x >= 0:
-                gx-=esquive
+                gx-=esquive # Si la banane est à notre droite on va à gauche
             else:
-                gx+=esquive
+                gx+=esquive # Si la banane est à notre gauche on va à droite
 
         
         l2 = gx**2 + gz**2 # calcul de l'hypoténuse
