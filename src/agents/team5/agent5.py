@@ -2,9 +2,9 @@ import numpy as np
 import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
-from agent5_MidPilot import Agent5Mid
-from agent5_BananaPilot import Agent5Banana
-from omegaconf import OmegaConf
+from .agent5_MidPilot import Agent5Mid
+from .agent5_BananaPilot import Agent5Banana
+from omegaconf import OmegaConf 
 import os
 
 class Agent5(KartAgent):
