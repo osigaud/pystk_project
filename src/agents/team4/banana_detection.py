@@ -9,6 +9,6 @@ class Banana:
             if items_type[i] == 1: #Si c'est une banane 
                 pos_x = items_pos[i][0] # On récupère le décalage latéral
                 pos_z = items_pos[i][2] # On récupère la profondeur
-                if -2.5 <= pos_x <= 2.5 and 0.1 <= pos_z <= 8.0:
+                if -2.5 <= pos_x <= 2.5 and 0.1 <= pos_z <= 8.0 and obs['distance_down_track'] >= 55.0:
                     return True, pos_x # Si la logique est respectée, on retourne Vrai ainsi que la position_x de la banane
         return False,0
