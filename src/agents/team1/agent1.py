@@ -233,4 +233,55 @@ class AgentObstacles(AgentCenter) :
 #AGENT FINAL :
 class Agent1(AgentCenter):
     def __init__(self, env, path_lookahead=3): 
-        super().__init__(env)
+        super().__init__(env,path_lookahead)
+
+        #Anti-block state   
+        self.last_distance = None
+        self.block_counter = 0
+        self.unblock_steps = 0
+
+    def is_bloqued(self, obs):
+        """Observer si il est bloque """
+        dist = obs["distance_down_track"][0]
+
+        if self.last_distance is None:
+            self.last_distance = dist
+            return False
+
+        #si la distance ne change pas -> bloque
+        if abs(dist - self.last_distance) < 0.01:
+            self.block_counter += 1
+        else:
+            self.block_counter = 0
+        
+        self.last_distance = 0
+
+        #Bloque dans 10 steps
+        return self.block_counter > 10
+
+    def unblock_action(self):
+        """Action utilisee pour debloquer le kart: reverse +slight steering"""
+        return {
+            "acceleration" : -0.6,                  # reculer
+            "steer" : random.choice([-0.4,0.4]),    # tourner pour se degager
+            "brake" : False,
+            "drift" : False,
+            "nitro" : False,
+            "rescue" : False,
+            "fire" : False,
+        }
+    
+    def choose_action(self, obs):
+        # 1. si on est en phase de debloquage
+        if self.unblock_steps > 0:
+            self.unblock_steps -= 1
+            return self.unblock_action()
+        
+        # 2. debloque
+        if self.is_bloqued(obs):
+            #print(" Agent bloque -> Recul automatique ")
+            self.unblock_steps = 15   # ~0.5s de recul
+            return self.unblock_action()
+
+        # 3. lancer normalement si il n'est pas bloque
+        return super().choose_action(obs)
