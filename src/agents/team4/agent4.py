@@ -42,15 +42,15 @@ class Agent4(KartAgent):
             drift = False
             self.drift_cd -= 1
         else:
-            drift, steering = self.nitrodrift.drift(steering, distance)
+            drift, steering = self.nitrodrift.manage_drift(steering, distance)
             if drift:
                 self.drift_cd = 12
         brea = False
-        acceleration, brea = self.SpeedController.vitesse3(steering,distance)
+        acceleration, brea = self.SpeedController.manage_speed(steering,distance)
 
 
 
-        nitro = self.nitrodrift.nitro(steering, energy)
+        nitro = self.nitrodrift.manage_nitro(steering, energy)
         if (drift == True):
             nitro = False
 
