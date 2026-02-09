@@ -14,3 +14,20 @@ ecartgrand : 3
 # seuil à partir duquel on considère que la capacité à tourner le volant selon la vitesse(max_steer_angle)
 msapetit : 0.2
 msagrand : 0.7
+
+#agent 
+nom d'équipe : TastyCrousteam
+
+#coordonnées 
+x : 0
+y : 1
+z : 2
+
+#acceleration
+base : 0.7
+min : 0.1
+max : 0.9
+
+#boost
+small : 0.2
+big : 0.3
