@@ -1,7 +1,6 @@
 import numpy as np
 import random
 
-from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 
 
@@ -12,8 +11,7 @@ class Agent2(KartAgent):
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
-        self.name = "Team2" # replace with your chosen name
-
+        self.name = "Team2"
         self.path_lookahead = path_lookahead
         self.stuck_steps = 0    
         self.recovery_steps = 0  
@@ -56,44 +54,39 @@ class Agent2(KartAgent):
                 "rescue": False,
                 "fire": False,
             }
-
-
-
-        velocity = np.array(obs["velocity"])
-        speed = np.linalg.norm(velocity)
-        phase = obs.get["phase"]
-        nodes_path = obs["paths_start"]
-
-
-        if phase > 2:  
+      velocity = np.array(obs["velocity"])
+      speed = np.linalg.norm(velocity)
+      phase = obs.get["phase"]
+      nodes_path = obs["paths_start"]
+      if phase > 2:  
             if speed < 0.2:  
                 self.stuck_steps += 1
             else:
                 self.stuck_steps = 0
-               
-        if self.stuck_steps > 7:
+      if self.stuck_steps > 7:
             self.recovery_steps = 15
             self.stuck_steps = 0
 
-        if len(nodes_path) > self.path_lookahead:
+      if len(nodes_path) > self.path_lookahead:
             target_node = nodes_path[self.path_lookahead]
             angle = np.arctan2(target_node[0], target_node[2])
             steering = np.clip(angle * 2, -1, 1)
-        else:
+      else:
             steering = 0
            
            
-        print(f"angle actuel: {angle: .3f} rad, {np.degrees(angle):.1f}")
+      #print(f"angle actuel: {angle: .3f} rad, {np.degrees(angle):.1f}")
        
 
-        action = {
+      action = {
             "acceleration": 0.7,
             "steer": steering,
             "brake": False, 
-            "drift": False
-            "nitro":False
-            "rescue":False
+            "drift": False,
+            "nitro":False,
+            "rescue":False,
             "fire": False
+            }
 
         #if target_item_distance== 10:
             #if obs['target_item_type'] in bad_type:
@@ -119,7 +112,4 @@ class Agent2(KartAgent):
                     #action["steer"]= 0.5 # on tourne a droite
                     #action["nitro"]=True
                     #action["acceleration"]= action["acceleration"] + 0.5 #val a determiner
-
-
-        }
-        return action
+      return action
