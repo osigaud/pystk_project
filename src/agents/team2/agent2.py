@@ -24,6 +24,42 @@ class Agent2(KartAgent):
     def endOfTrack(self):
         return self.isEnd
 
+   def anticipeVirage(self):
+
+        nodes_path = obs["paths_start"] #liste des neoud de la piste
+        nb_nodes = len(nodes_path)
+        path_lookahead = 5
+
+        virages = [] #liste resultat pour stocker les virages detectes
+
+        for i in range (nb_nodes - path_lookahead): #boucle pour le second (noeud loin=anticipation)
+
+            curr_node = nodes_path[i] #le premier noeud quon rgd (noeud proche)
+            lookahead_node = nodes_path[i+path_lookahead] #noeud loin
+            self.path_lookahead = node_i + 1 # car indice commence a 0
+
+            x1, z1 = current_node[0], current_node[2] #coordonnees pour angle
+            x2, z2 = lookahead_node[0], lookahead_node[2]
+
+            angle1 = np.arctan2(x1, z1)
+            angle2 = np.arctan2(x2, z2)
+
+            curvature = abs(angle2 - angle1)
+
+            if curvature > 0.1:  # seuil à ajuster
+                virages.append({ "index": i, "curvature": curvature })
+
+
+        print("Virages détectés :", virages)
+
+        return virage
+
+    
+
+
+
+
+
     def choose_action(self, obs):
         if self.recovery_steps > 0:
             self.recovery_steps -= 1
