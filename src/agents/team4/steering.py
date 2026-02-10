@@ -17,11 +17,11 @@ class Steering:
         
         target = points[2] # Recuperation du troisième point
         
-        # --- DETECTION BANANE ---
+        
         danger, b_x = self.banana_dodge.banana_detection(obs) # Appel de la fonction detection banane
 
         if danger:
-            # CAS 1 : DANGER IMMÉDIAT (Priorité absolue)
+            
             target = points[1] # Changement de référentiel pour plus de nervosite
             gx = target[0] # Recuperation de x, le decalage lateral
             gz = target[2] # Recuperation de z, la profondeur
@@ -33,8 +33,8 @@ class Steering:
             else:
                 gx+=esquive # Si la banane est à notre gauche on va à droite
 
-        else:
-            # CAS 2 : PAS DE DANGER -> ON CHASSE LES BONUS 
+        """else:
+            
             
             # On vérifie d'abord si la route est droite pour ne pas se tuer
             # (On utilise points[2] comme référence route)
@@ -72,10 +72,10 @@ class Steering:
             
             # Mise à jour des coordonnées pour le calcul final
             gx = target[0] # Recuperation de x, le decalage lateral (Route ou Bonus)
-            gz = target[2] # Recuperation de z, la profondeur (Route ou Bonus)
+            gz = target[2] # Recuperation de z, la profondeur (Route ou Bonus)"""
 
 
-        # --- CALCUL MATHÉMATIQUE  ---
+       
         
         l2 = gx**2 + gz**2 # calcul de l'hypoténuse
             
