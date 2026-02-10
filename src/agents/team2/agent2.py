@@ -24,7 +24,7 @@ class Agent2(KartAgent):
     def endOfTrack(self):
         return self.isEnd
 
-   def anticipeVirage(self):
+    def anticipeVirage(self):
 
         nodes_path = obs["paths_start"] #liste des neoud de la piste
         nb_nodes = len(nodes_path)
