@@ -21,6 +21,12 @@ from .definitions import AgentSpec
 logger = logging.getLogger("pystk2-gym")
 
 
+# config = pystk2.GraphicsConfig()
+# pystk2.init(config)
+# print(pystk2.list_karts())
+kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
+
+
 # Global cache: track_name -> PathCache
 _PATH_CACHE_REGISTRY: Dict[str, "PathCache"] = {}
 
@@ -609,7 +615,9 @@ class STKRaceEnv(BaseSTKRaceEnv):
         ].camera_mode = pystk2.PlayerConfig.CameraMode.ON
         self.config.players[self.kart_ix].name = self.agent.name
         if self.agent.kart:
-            self.config.players[self.kart_ix].kart = self.agent.kart
+            self.config.players[self.kart_ix].kart = kart_skin[self.kart_ix]
+        #
+        #    self.config.players[self.kart_ix].kart = self.agent.kart
         if self.agent.color > 0:
             self.config.players[self.kart_ix].color = self.agent.color
 
@@ -706,7 +714,9 @@ class STKRaceMultiEnv(BaseSTKRaceEnv):
                 ].controller = pystk2.PlayerConfig.Controller.PLAYER_CONTROL
             self.config.players[kart_ix].name = agent.name
             if agent.kart:
-                self.config.players[kart_ix].kart = agent.kart
+                self.config.players[kart_ix].kart = kart_skin[kart_ix]
+            #
+            #    self.config.players[kart_ix].kart = agent.kart
             if agent.color > 0:
                 self.config.players[kart_ix].color = agent.color
 
