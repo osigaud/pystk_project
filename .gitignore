@@ -1,0 +1,27 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+uv.lock
+pyproject.toml
+
+# Python
+.python-version
+/main.py
+
+# Docs communs
+/docs/
+
+src/agents/team1/docs/
+
+src/agents/__pycache__/
+src/agents/team1/__pycache__/
+src/agents/team4/__pycache__/
+src/pystk2_gymnasium/__pycache__/
+src/utils/__pycache__/
