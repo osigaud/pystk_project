@@ -111,7 +111,7 @@ class AgentCenter(AgentStraight):
         return act_corr
             
 #Agent qui adapte la vitesse en fonction des virages
-class AgentTurn(AgentCenter):
+class AgentSpeed(AgentCenter):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env, path_lookahead)
         self.ecartpetit = ECARTPETIT #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
@@ -230,7 +230,7 @@ class AgentObstacles(AgentCenter) :
         return action_corr
 
 #AGENT FINAL :
-class Agent1(AgentTurn):
+class Agent1(AgentSpeed):
     def __init__(self, env, path_lookahead=3): 
         super().__init__(env,path_lookahead)
 

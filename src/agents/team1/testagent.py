@@ -20,7 +20,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.
 from agents.team1.agent1 import Agent1
 from agents.team1.agent1 import AgentStraight
 from agents.team1.agent1 import AgentCenter
-from agents.team1.agent1 import AgentTurn
+from agents.team1.agent1 import AgentSpeed
 
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
