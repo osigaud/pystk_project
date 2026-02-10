@@ -16,8 +16,9 @@ class Steering:
         if len(points) <= 2 : return 0.0 # Si la liste ne contient pas assez de points on renvoie un steer de 0
         
         target = points[2] # Recuperation du troisième point
-        
-        
+        gx = target[0] # Recuperation de x, le decalage lateral
+        gz = target[2] # Recuperation de z, la profondeur 
+
         danger, b_x = self.banana_dodge.banana_detection(obs) # Appel de la fonction detection banane
 
         if danger:
