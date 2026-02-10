@@ -4,31 +4,31 @@ pilot:
   
   # Réglages du cerveau
   brain:
-    kp: 9.0  # Puissance du braquage.
+    kp: 8.0  # Puissance du braquage.
     # Augmenter si le kart ne tourne pas assez dans les virages serrés
     # Diminuer si le kart oscille trop violemment gauche/droite
     
-    kd: 0.7 # Stabilité.
+    kd: 0.75 # Stabilité.
     # Augmenter si le volant tremble trop en ligne droite
     # Diminuer si la direction semble "molle" ou réagit en retard
 
   # Navigation et Vision
   navigation:
-    lookahead_meters: 9.3  # Distance de visée (en mètres, Le kart regarde ce point pour décider où tourner)
-    min_dist_safety: 1.5   # Distance minimale de sécurité
+    lookahead_meters: 9.7  # Distance de visée (en mètres, Le kart regarde ce point pour décider où tourner)
+    min_dist_safety: 1   # Distance minimale de sécurité
 
   # Gestion de la vitesse
   speed_control:
     default_accel: 1.0       # Accélération en ligne droite (0.0 à 1.0)
-    cornering_accel: 0.15       # Accélération dans les virages serrés
-    steering_threshold: 0.3  # A partir de quel angle de volant considère-t-on qu'on est dans un virage ?
+    cornering_accel: 0.6     # Accélération dans les virages serrés
+    steering_threshold: 0.4  # A partir de quel angle de volant considère-t-on qu'on est dans un virage ?
 
 
 # PARAMÈTRES DE LA BANANE (Agent5Banana)
 banana:
   detection:
-    max_distance: 7.5    # Distance max pour repérer une banane (Anticipation).
-    safety_width: 1.5    # Largeur de sécurité latérale.
+    max_distance: 9.5    # Distance max pour repérer une banane (Anticipation).
+    safety_width: 1.3    # Largeur de sécurité latérale.
 
   avoidance:
     steering_force: 0.9  # Force du coup de volant pour esquiver (0.0 à 1.0).
