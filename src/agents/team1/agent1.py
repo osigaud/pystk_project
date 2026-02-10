@@ -190,7 +190,6 @@ class AgentTurn(AgentCenter):
         act = super().choose_action(obs)
         react = self.analyse(obs)
         act_corr = self.reaction(react, act, obs)
-        print("nextitem :", obs["items_position"][0])
         return act_corr
 
 #Agent qui analyse les obstacles et bonus sur la course et corrige sa trajectoire en conséquences
@@ -231,7 +230,7 @@ class AgentObstacles(AgentCenter) :
         return action_corr
 
 #AGENT FINAL :
-class Agent1(AgentCenter):
+class Agent1(AgentTurn):
     def __init__(self, env, path_lookahead=3): 
         super().__init__(env,path_lookahead)
 
@@ -239,49 +238,53 @@ class Agent1(AgentCenter):
         self.last_distance = None
         self.block_counter = 0
         self.unblock_steps = 0
+        self.recule = False
 
     def is_bloqued(self, obs):
         """Observer si il est bloque """
         dist = obs["distance_down_track"][0]
 
-        if self.last_distance is None:
+        if self.last_distance is None :
             self.last_distance = dist
-            return False
+        
+        #print("saute ? : ", obs["jumping"])
 
-        #si la distance ne change pas -> bloque
-        if abs(dist - self.last_distance) < 0.01:
+        if abs(dist - self.last_distance) < 0.05 and dist > 5 and (obs["jumping"] == 0) :
             self.block_counter += 1
+            #print("block_counter : ", self.block_counter)
         else:
             self.block_counter = 0
-        
-        self.last_distance = 0
+            self.last_distance = dist
 
-        #Bloque dans 10 steps
-        return self.block_counter > 10
-
-    def unblock_action(self):
+    def unblock_action(self, act):
         """Action utilisee pour debloquer le kart: reverse +slight steering"""
-        return {
-            "acceleration" : -0.6,                  # reculer
-            "steer" : random.choice([-0.4,0.4]),    # tourner pour se degager
-            "brake" : False,
-            "drift" : False,
-            "nitro" : False,
-            "rescue" : False,
-            "fire" : False,
-        }
+        if self.unblock_steps > 0 : 
+            self.unblock_steps -= 1
+            return {
+                "acceleration" : 0,                  # reculer
+                "steer" : 0, #random.choice([-0.4,0.4]),    # tourner pour se degager
+                "brake" : True,
+                "drift" : False,
+                "nitro" : False,
+                "rescue" : False,
+                "fire" : False,
+            }
+        else : 
+            self.recule = False
+            return act
     
     def choose_action(self, obs):
-        # 1. si on est en phase de debloquage
-        if self.unblock_steps > 0:
-            self.unblock_steps -= 1
-            return self.unblock_action()
-        
-        # 2. debloque
-        if self.is_bloqued(obs):
-            #print(" Agent bloque -> Recul automatique ")
-            self.unblock_steps = 15   # ~0.5s de recul
-            return self.unblock_action()
+        self.is_bloqued(obs)     
 
-        # 3. lancer normalement si il n'est pas bloque
-        return super().choose_action(obs)
+        #print("saute ? : ", obs["jumping"])
+
+        action = super().choose_action(obs)   
+                
+        if self.block_counter > 13 :
+            self.recule = True
+            self.unblock_steps = 10
+        
+        if self.recule : 
+            action = self.unblock_action(action)
+
+        return action
