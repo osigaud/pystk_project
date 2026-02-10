@@ -23,7 +23,22 @@ class Agent2(KartAgent):
 
     def endOfTrack(self):
         return self.isEnd
-
+        
+    
+    def coorection_centrePiste(self, obs):
+        """
+        Calcule la correction nécessaire pour rester au centre de la piste.
+        """
+        #center_path contient le vecteur vers le centre de la route
+        center_path = obs.get('path_start', np.array([0, 0, 0])) #si il y a 'path_start' alors center_path='center_path' sinon center_path est un vecteur par défaut mit a [0,0,0] jusqu'à qu'il retrouve le centre 
+        
+        dist_depuis_center = center_path[0] #center_path[0] c'es' le point X qui représente le décalage (gauche/droite) par rapport au centre
+        
+        correction = dist_depuis_center * 0.5 #On calcule une correction proportionnelle à la distance 0.5 est un bon compromit => dose la force du coup de volant (pas trop mou, pas trop violent)
+        
+        return np.clip(correction, -1.0, 1.0) #np.clip (=barrière de sécurité) sécurise pour que le res ne depasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
+    
+  
     def anticipeVirage(self):
 
         nodes_path = obs["paths_start"] #liste des neoud de la piste
@@ -105,9 +120,18 @@ class Agent2(KartAgent):
            
         # print(f"angle actuel: {angle:.3f} rad, {np.degrees(angle):.1f} deg") permet d afficher les angles à chaque frame 
 
+        # CALCUL DE LA CORRECTION POUR RESTER AU CENTRE DE LA PISTE
+        correction_piste = self.coorection_centrePiste(obs) # APPEL DE LA FONCTION DE MAINTIEN SUR PISTE
+
+        # COMBINAISON DE LA DIRECTION DU CHEMIN ET DE LA CORRECTION DE PISTE
+        final_steering = np.clip(steering + correction_piste, -1, 1) # ADDITION DES DEUX FORCES
+
+        # ADAPTATION DE L'ACCELERATION SELON LE VIRAGE POUR NE PAS SORTIR DE LA PISTE
+        acceleration = 0.8 if abs(final_steering) < 0.3 else 0.4 # RALENTIR SI ON TOURNE FORT
+
         action = {
-            "acceleration": 0.7,
-            "steer": steering,
+            "acceleration": acceleration,
+            "steer": final_steering,
             "brake": False, 
             "drift": False,  
             "nitro": False,  
