@@ -64,7 +64,7 @@ class AgentStraight(AgentBase):
 
     def choose_action(self, obs):
         action = {
-            "acceleration": 0.7, 
+            "acceleration": 1, 
             "steer": 0, 
             "brake": False, 
             "drift": False, 
@@ -125,12 +125,11 @@ class AgentSpeed(AgentCenter):
        	for i in range(nbsegments):
        		segdirection = obs["paths_end"][i] - obs["paths_start"][i]
        		diff = segdirection - obs["front"]
-       		ecart = math.sqrt(diff[0]**2 + diff[1]**2 + diff[2]**2)
+       		ecart = float(np.linalg.norm(diff))
+       		dist = abs(obs["paths_distance"][i][0] - obs["paths_distance"][0][0])
         		
-        	if ecart >= self.ecartgrand:
+        	if ecart >= self.ecartgrand and dist < 10:
         		s.append("virage serre")
-       		elif self.ecartgrand > ecart > self.ecartpetit:
-       			s.append("virage leger")
        		elif ecart <= self.ecartpetit:
        			s.append("ligne droite") 
         	
@@ -138,15 +137,12 @@ class AgentSpeed(AgentCenter):
        	if "virage serre" in s: 
        		react = "virage serre"
        		return react
-        elif "virage leger" in s: 
-        	react = "virage leger"
-        	return react
        	else: 
        		return react
 
     def gap(self, acceleration) : 
         if acceleration >= 1 : 
-            return 0.9
+            return 1
         if acceleration <= 0 : 
             return 0.1
         return acceleration
@@ -155,36 +151,31 @@ class AgentSpeed(AgentCenter):
         msa = obs["max_steer_angle"]
             
         if react == "ligne droite":
-            act["acceleration"] = 0.7
+            act["acceleration"] = 1
+            
+            segdirection = obs["paths_end"][0] - obs["paths_start"][0]
+            if segdirection[1] > 0.05:
+            	act["acceleration"] = self.gap(act["acceleration"] + 0.2)
+            	
             return act
-                
-        if react == "virage leger":
-            if msa <= self.msapetit: 
-                accel = act["acceleration"]
-                accel = accel + 0.2
-                act["acceleration"] = self.gap(accel)
-                return act
-            elif self.msapetit < msa < self.msagrand:
-                return act
-            elif msa >= self.msagrand:
-                accel = act["acceleration"]
-                accel = accel - 0.2
-                act["acceleration"] = self.gap(accel)
-                return act
                     
         if react == "virage serre":
             if msa <= self.msapetit: 
                 accel = act["acceleration"]
-                accel = accel - 0.3
+                accel = accel - 0.45
                 act["acceleration"] = self.gap(accel)
-                return act
             elif self.msapetit < msa < self.msagrand:
-                return act
+            	return act
             elif msa >= self.msagrand:
                 accel = act["acceleration"]
-                accel = accel + 0.3
+                accel = accel + 0.5
                 act["acceleration"] = self.gap(accel)
-                return act
+                
+            segdirection = obs["paths_end"][0] - obs["paths_start"][0]
+            if segdirection[1] > 0.05:
+            	act["acceleration"] = self.gap(act["acceleration"] + 0.2)
+            	
+            return act
   
     def choose_action(self, obs):
         act = super().choose_action(obs)
