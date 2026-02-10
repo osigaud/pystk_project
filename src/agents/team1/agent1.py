@@ -59,12 +59,15 @@ class AgentBase(KartAgent):
 
 #Agent qui roule tout droit
 class AgentStraight(AgentBase):
+    #variables à définir dans le fichier de configuration : 
+    #   - accélération par défaut
+    #   - steer par défaut
     def __init__(self, env, path_lookahead=3):
         super().__init__(env, path_lookahead)
 
     def choose_action(self, obs):
         action = {
-            "acceleration": 1, 
+            "acceleration": 0.7, 
             "steer": 0, 
             "brake": False, 
             "drift": False, 
@@ -75,8 +78,6 @@ class AgentStraight(AgentBase):
         return action
 
 #Agent qui suit le centre de la piste
-
-#A CORRIGER : plein de zigzag, attendre mardi pour voir avec Wiam 
 class AgentCenter(AgentStraight):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env, path_lookahead)
@@ -185,34 +186,56 @@ class AgentSpeed(AgentCenter):
 
 #Agent qui analyse les obstacles et bonus sur la course et corrige sa trajectoire en conséquences
 class AgentObstacles(AgentCenter) : 
+    #test sur black_forest pour les obstacles, minigolf pour les item (ou olivermath)
+    #CORRECTION : doit regarder les n prochains items et regarder s'il y a un obstacle en priorité pour l'éviter, puis s'il y a un obstacle.
     def __init__(self, env, path_lookahead=3) : 
         super().__init__(env, path_lookahead)
 
     def obs_next_item(self, obs, action) : 
+        """Observe à quel point le prochain item est proche, appelle la méthode en fonction de son type"""
         nextitem = obs["items_type"][0]
         vecitem = obs["items_position"][0]
-        if vecitem[2] < 8 and vecitem[2] > 2 : 
+
+        #définir ici les distances min et max pour se diriger vers l'item
+        #aussi faire en sorte que si on est au dessus de l'item (coordonnée y), on essaie pas de s'y diriger
+        #ne pas chercher à se diriger vers un nitro si notre nitro est déjà full
+
+        if vecitem[2] < 17 and vecitem[2] > 3 and abs(vecitem[1]) < 10 : 
             if nextitem in BONUS : 
                 return self.dirige_bonus(obs, action)
             elif nextitem in OBSTACLES : 
-                return self.evite_obstacle(obs, action)
+                return action
+                    #return self.evite_obstacle(obs, action)
         return action
 
     def evite_obstacle(self, obs, action) : 
+        """Evite le prochain item, sauf si on a un shield équipé"""
+        """NE MARCHE PAS ! la méthode n'est jamais appelée par notre agent en attendant de la réparer"""
         if (obs["attachment"] == 6 and obs["attachment_time_left"] > 2) : 
             #6 : BUBBLEGUM_SHIELD
+            print("j'évite pas car j'ai un shield")
             return action
+
         vecitem = obs["items_position"][0] 
-        if vecitem[0] < 0.2 :
-            action["steer"] = action["steer"] + 0.3
+        if abs(vecitem[0]) < 1.5 :
+            action["steer"] = action["steer"] + 0.5
         return action
 
     def dirige_bonus(self, obs, action) :
+        """Dirige vers le prochain item"""
         vecitem = obs["items_position"][0]
-        if abs(vecitem[0] - action["steer"]) < 0.2 :
-            return action
-        else : 
-            action["steer"] = vecitem[0]
+
+        #si le prochain bonus ne nous rapproche pas du prochain noeud, ignorer le bonus
+        nextnoeud = obs["paths_end"][0] #peut-être remplacer par path_lookahead ? optimisation possible ici je pense
+        #vérifier la documentation pour numpy.ndarray ici j'ai un doute
+        ecart = nextnoeud - vecitem 
+        if ecart[2] < nextnoeud[2] and ecart[2] > 0 : 
+
+            if abs(vecitem[0] - action["steer"]) < 0.2 :
+                return action
+            else : 
+                action["steer"] = vecitem[0]
+                return action
         return action
         
     def choose_action(self, obs) : 
@@ -221,7 +244,13 @@ class AgentObstacles(AgentCenter) :
         return action_corr
 
 #AGENT FINAL :
-class Agent1(AgentSpeed):
+#+ méthodes pour éviter le blocage
+#corriger le fait qu'on recule lorsqu'on est stun
+class Agent1(AgentObstacles):
+    #variables à définir dans le fichier de configuration : 
+    #   - le seuil où dist-self.last_distance est considéré assez petit pour dire qu'on est bloqué
+    #   - le seuil de block_counter à partir duquel on recule
+    #   - le nombre d'unblock_steps par défaut
     def __init__(self, env, path_lookahead=3): 
         super().__init__(env,path_lookahead)
 
@@ -231,18 +260,15 @@ class Agent1(AgentSpeed):
         self.unblock_steps = 0
         self.recule = False
 
-    def is_bloqued(self, obs):
-        """Observer si il est bloque """
+    def is_blocked(self, obs):
+        """Observer si il est bloqué"""
         dist = obs["distance_down_track"][0]
 
         if self.last_distance is None :
             self.last_distance = dist
         
-        #print("saute ? : ", obs["jumping"])
-
-        if abs(dist - self.last_distance) < 0.05 and dist > 5 and (obs["jumping"] == 0) :
+        if abs(dist - self.last_distance) < 0.1 and dist > 5 and (obs["jumping"] == 0) :
             self.block_counter += 1
-            #print("block_counter : ", self.block_counter)
         else:
             self.block_counter = 0
             self.last_distance = dist
@@ -252,8 +278,8 @@ class Agent1(AgentSpeed):
         if self.unblock_steps > 0 : 
             self.unblock_steps -= 1
             return {
-                "acceleration" : 0,                  # reculer
-                "steer" : 0, #random.choice([-0.4,0.4]),    # tourner pour se degager
+                "acceleration" : 0, 
+                "steer" : 0, 
                 "brake" : True,
                 "drift" : False,
                 "nitro" : False,
@@ -265,15 +291,13 @@ class Agent1(AgentSpeed):
             return act
     
     def choose_action(self, obs):
-        self.is_bloqued(obs)     
-
-        #print("saute ? : ", obs["jumping"])
+        self.is_blocked(obs)
 
         action = super().choose_action(obs)   
                 
-        if self.block_counter > 13 :
+        if self.block_counter > 10 :
             self.recule = True
-            self.unblock_steps = 10
+            self.unblock_steps = 4
         
         if self.recule : 
             action = self.unblock_action(action)

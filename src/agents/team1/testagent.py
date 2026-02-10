@@ -1,5 +1,6 @@
 """
 Code repris du script single_track_race_display.py
+Render de l'Agent1 seul, possibilité de le comparer aux autres
 Pas d'écriture sur le HTML aussi
 """
 
@@ -8,11 +9,6 @@ import numpy as np
 from datetime import datetime
 from pathlib import Path
 from dataclasses import dataclass
-
-import time
-INTERVALLE = 1  # 1 seconde
-dernier_affichage = 0
-
 
 # Append the "src" folder to sys.path.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src"))) #Changement du path ici pour que ce soit adapté
@@ -25,7 +21,7 @@ from agents.team1.agent1 import AgentSpeed
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 2
+MAX_TEAMS = 1
 NB_RACES = 1
 
 # Get the current timestamp
@@ -87,7 +83,7 @@ agents_specs = [
 def create_race():
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="gran_paradiso_island", render_mode="human", num_kart=MAX_TEAMS) #track="xr591"
+        env = STKRaceMultiEnv(agents=agents_specs, track="minigolf", render_mode="human", num_kart=MAX_TEAMS) #track="xr591"
     else:
         env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
 
@@ -96,10 +92,10 @@ def create_race():
     agents = []
     names = []
 
-    agents.append(Agent1(env, path_lookahead=3)) 
-    agents.append(AgentCenter(env)) #CHANGEMENT DES VARIABLES ICI
+    agents.append(Agent1(env, path_lookahead=3))
+    #agents.append(AgentCenter(env, path_lookahead=3)) 
     
-    #Pour pas que ça shuffle et qu'on puisse récupérer les données de notre agent plus facilement
+    #Pour pas que ça mélange la liste d'agents et qu'on puisse récupérer les données de notre agent plus facilement
     #np.random.shuffle(agents) 
 
     for i in range(MAX_TEAMS):
@@ -111,7 +107,7 @@ def single_race(env, agents, names, scores):
     done = False
     steps = 0
     positions = []
-    while not done and steps < 1000: #Changer ici pour que la course dure + longtemps
+    while not done and steps < 1500: #Changer ici pour que la course dure + longtemps
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
