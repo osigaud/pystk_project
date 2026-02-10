@@ -14,8 +14,8 @@ pilot:
 
   # Navigation et Vision
   navigation:
-    lookahead_meters: 9.7  # Distance de visée (en mètres, Le kart regarde ce point pour décider où tourner)
-    min_dist_safety: 1   # Distance minimale de sécurité
+    lookahead_meters: 9.7   # Distance de visée (en mètres, Le kart regarde ce point pour décider où tourner)
+    min_dist_safety: 1      # Distance minimale de sécurité
 
   # Gestion de la vitesse
   speed_control:
