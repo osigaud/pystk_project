@@ -14,7 +14,9 @@ class Pilot():
         target = np.array(obs["paths_start"][self.path_lookahead])
         x = target[0]
         z = target[2]
+
         steer = (x / z) * 1.5
+        
         items_pos = np.array(obs["items_position"])
         items_type = np.array(obs["items_type"])
         if len(items_pos) > 0:

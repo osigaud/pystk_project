@@ -13,6 +13,5 @@ class TakeItems():
     def choose_action(self, obs):
         action = Pilot.choose_action(self, obs)
 
-
         
         return action
