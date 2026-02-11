@@ -27,7 +27,7 @@ from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 5
 NB_RACES = 10
-MAX_STEPS = 1000
+MAX_STEPS = 850
 
 # Get the current timestamp
 current_timestamp = datetime.now()
