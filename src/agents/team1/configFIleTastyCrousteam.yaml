@@ -8,8 +8,8 @@ dist : 0.5
 ajust : 0.25
 
 # seuil à partir duquel on considère l'écart entre le front du kart et la direction du segment
-ecartpetit : 3
-ecartgrand : 3.5
+ecartpetit : 2.9
+ecartgrand : 3
 
 # seuil à partir duquel on considère que la capacité à tourner le volant selon la vitesse(max_steer_angle)
 msapetit : 0.2

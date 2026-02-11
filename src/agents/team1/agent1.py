@@ -67,7 +67,7 @@ class AgentStraight(AgentBase):
 
     def choose_action(self, obs):
         action = {
-            "acceleration": 0.7, 
+            "acceleration": 1, 
             "steer": 0, 
             "brake": False, 
             "drift": False, 
