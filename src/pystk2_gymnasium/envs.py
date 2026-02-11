@@ -26,7 +26,6 @@ logger = logging.getLogger("pystk2-gym")
 # print(pystk2.list_karts())
 kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
 
-
 # Global cache: track_name -> PathCache
 _PATH_CACHE_REGISTRY: Dict[str, "PathCache"] = {}
 
