@@ -12,6 +12,7 @@ class Agent5(KartAgent):
         super().__init__(env)
         self.path_lookahead = path_lookahead
         self.name = "Donkey Bombs"
+        self.isEnd = False
 
         # On trouve le chemin de notre fichier actuel
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -28,6 +29,8 @@ class Agent5(KartAgent):
         # On l'enveloppe dans l'agent qui esquive les bananes
         self.brain = Agent5Banana(env, self.pilot, self.conf, path_lookahead)
 
+    def endOfTrack(self):
+        return self.isEnd
 
     def reset(self):
         self.brain.reset()

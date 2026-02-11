@@ -27,7 +27,7 @@ from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 7
 NB_RACES = 10
-MAX_STEPS = 300
+MAX_STEPS = 1000
 
 # Get the current timestamp
 current_timestamp = datetime.now()
@@ -117,6 +117,7 @@ def single_race(env, agents, names, scores):
     obs, _ = env.reset()
     done = False
     steps = 0
+    nb_finished = 0
     positions = []
     while not done and steps < MAX_STEPS:
         actions = {}
@@ -124,6 +125,8 @@ def single_race(env, agents, names, scores):
             str = f"{i}"
             try:
                 actions[str] = agents[i].choose_action(obs[str])
+                if agents[i].endOfTrack():
+                    nb_finished += 1
             except Exception as e:
                 print(f"Team {i+1} error: {e}")
                 actions[str] = default_action
@@ -135,12 +138,13 @@ def single_race(env, agents, names, scores):
             pos[i] = info['infos'][str]['position']
             dist[i] = info['infos'][str]['distance']
         steps = steps + 1
-        done = terminated or truncated
+        done = terminated or truncated or nb_finished==5
         positions.append(pos)
     avg_pos = np.array(positions).mean(axis=0)
     std_pos = np.array(positions).std(axis=0)
     for i in range(MAX_TEAMS):
         scores.append(names[i], avg_pos[i], std_pos[i])
+    print("race duration:", steps)
 
 def main_loop():
     scores = Scores()
