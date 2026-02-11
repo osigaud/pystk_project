@@ -186,62 +186,60 @@ class AgentSpeed(AgentCenter):
 
 #Agent qui analyse les obstacles et bonus sur la course et corrige sa trajectoire en conséquences
 class AgentObstacles(AgentCenter) : 
-    #test sur black_forest pour les obstacles, minigolf pour les item (ou olivermath)
-    #CORRECTION : doit regarder les n prochains items et regarder s'il y a un obstacle en priorité pour l'éviter, puis s'il y a un obstacle.
-    def __init__(self, env, path_lookahead=3) : 
-        super().__init__(env, path_lookahead)
 
-    def obs_next_item(self, obs, action) : 
-        """Observe à quel point le prochain item est proche, appelle la méthode en fonction de son type"""
-        nextitem = obs["items_type"][0]
-        vecitem = obs["items_position"][0]
+    def observation_next_item(self, obs, action) : 
+        """
+        Observe à quel point le prochain item est proche, appelle la méthode adaptée en fonction de son type
+        """
+        nextitem_type = obs["items_type"][0]
+        nextitem_vector = obs["items_position"][0]
 
-        #définir ici les distances min et max pour se diriger vers l'item
-        #aussi faire en sorte que si on est au dessus de l'item (coordonnée y), on essaie pas de s'y diriger
-        #ne pas chercher à se diriger vers un nitro si notre nitro est déjà full
-
-        if vecitem[2] < 17 and vecitem[2] > 3 and abs(vecitem[1]) < 10 : 
-            if nextitem in BONUS : 
+        if nextitem_vector[2] < 17 and nextitem_vector[2] > 3 and abs(nextitem_vector[1]) < 10 : 
+            if nextitem_type in BONUS : 
                 return self.dirige_bonus(obs, action)
-            elif nextitem in OBSTACLES : 
-                return action
-                    #return self.evite_obstacle(obs, action)
+            elif nextitem_type in OBSTACLES : 
+                return self.evite_obstacle(obs, action)
         return action
 
+    #Corrections à apporter sur cette méthode
     def evite_obstacle(self, obs, action) : 
-        """Evite le prochain item, sauf si on a un shield équipé"""
-        """NE MARCHE PAS ! la méthode n'est jamais appelée par notre agent en attendant de la réparer"""
-        if (obs["attachment"] == 6 and obs["attachment_time_left"] > 2) : 
-            #6 : BUBBLEGUM_SHIELD
-            print("j'évite pas car j'ai un shield")
-            return action
+        """
+        Evite le prochain item, sauf si on a un shield équipé
+        NE MARCHE PAS ! la méthode n'est jamais appelée par notre agent en attendant de la réparer
+        """
+        #if (obs["attachment"] == 6 and obs["attachment_time_left"] > 2) : 
+        #    #6 : BUBBLEGUM_SHIELD
+        #    print("j'évite pas car j'ai un shield")
+        #    return action
 
-        vecitem = obs["items_position"][0] 
-        if abs(vecitem[0]) < 1.5 :
-            action["steer"] = action["steer"] + 0.5
+        #vecitem = obs["items_position"][0] 
+        #if abs(vecitem[0]) < 1.5 :
+        #    action["steer"] = action["steer"] + 0.5
         return action
 
     def dirige_bonus(self, obs, action) :
-        """Dirige vers le prochain item"""
-        vecitem = obs["items_position"][0]
-
-        #si le prochain bonus ne nous rapproche pas du prochain noeud, ignorer le bonus
-        nextnoeud = obs["paths_end"][0] #peut-être remplacer par path_lookahead ? optimisation possible ici je pense
-        #vérifier la documentation pour numpy.ndarray ici j'ai un doute
-        ecart = nextnoeud - vecitem 
-        if ecart[2] < nextnoeud[2] and ecart[2] > 0 : 
-
-            if abs(vecitem[0] - action["steer"]) < 0.2 :
+        """
+        Dirige vers le prochain item, qui est un bonus
+        """
+        item_vector = obs["items_position"][0]
+        next_node = obs["paths_end"][0]
+        node_item_gap_vector = next_node - item_vector
+        if node_item_gap_vector[2] < next_node[2] and node_item_gap_vector[2] > 0 : 
+            if abs(item_vector[0] - action["steer"]) < 0.2 :
                 return action
             else : 
-                action["steer"] = vecitem[0]
+                action["steer"] = item_vector[0]
                 return action
         return action
         
     def choose_action(self, obs) : 
+        """
+        Renvoie le dictionnaire d'action de notre agent, corrigé après avoir pris en compte les obstacles
+        et bonus devant
+        """
         action = super().choose_action(obs)
-        action_corr = self.obs_next_item(obs, action)
-        return action_corr
+        action_corrigee = self.observation_next_item(obs, action)
+        return action_corrigee
 
 #AGENT FINAL :
 #+ méthodes pour éviter le blocage
