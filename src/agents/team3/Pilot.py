@@ -48,7 +48,7 @@ class Pilot():
                 brake = True
                 steer = -steer
         if (self.time_blocked == 20):
-            self.time_blocked = 0 
+            self.time_blocked = 0
 
         action = {
             "acceleration": acceleration,
