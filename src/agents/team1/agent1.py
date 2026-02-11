@@ -1,9 +1,30 @@
 import numpy as np
 import random
 import math
+from omegaconf import OmegaConf
 
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
+
+from pathlib import Path
+
+#chemin du fichier de configuration
+path_conf = Path(__file__).resolve().parent
+path_conf = str(path_conf) + '/configFIleTastyCrousteam.yaml'
+#importation du fichier de configuration
+conf = OmegaConf.load(path_conf)
+
+#définition des variables qui viennent du fichier de configuration
+DIST = conf.dist
+AJUST = conf.ajust
+ECARTPETIT = conf.ecartpetit
+ECARTGRAND = conf.ecartgrand
+MSAPETIT = conf.msapetit
+MSAGRAND = conf.msagrand
+
+#autres variables qu'on utilise dans le code 
+BONUS = [0, 2, 3]
+OBSTACLES = [1, 4]
 
 #Base d'Agent, mouvements aléatoires, initialisation des variables
 class AgentBase(KartAgent):
@@ -38,12 +59,15 @@ class AgentBase(KartAgent):
 
 #Agent qui roule tout droit
 class AgentStraight(AgentBase):
-    def __init__(self, env):
-        super().__init__(env)
+    #variables à définir dans le fichier de configuration : 
+    #   - accélération par défaut
+    #   - steer par défaut
+    def __init__(self, env, path_lookahead=3):
+        super().__init__(env, path_lookahead)
 
     def choose_action(self, obs):
         action = {
-            "acceleration": 0.2, 
+            "acceleration": 1, 
             "steer": 0, 
             "brake": False, 
             "drift": False, 
@@ -54,48 +78,47 @@ class AgentStraight(AgentBase):
         return action
 
 #Agent qui suit le centre de la piste
-#méthodes à rajouter ici
 class AgentCenter(AgentStraight):
-    #initialisation de l'agent center de base
-    def __init__(self, env, dist, ajust):
-        super().__init__(env)
-        self.dist = dist #écart max au centre de la piste qu'on accepte
-        self.ajust = ajust #la valeur que l'on veut addi/soustr à notre steer, qui sert d'ajustement de la trajectoire
-
+    def __init__(self, env, path_lookahead=3):
+        super().__init__(env, path_lookahead)
+        self.dist = DIST #écart max au centre de la piste qu'on accepte
+        self.ajust = AJUST #la valeur que l'on veut addi/soustr à notre steer, qui sert d'ajustement de la trajectoire
 
     def path_ajust(self, act, obs):
         s = act["steer"]
-        center = obs["center_path_distance"]
-
+        center = obs["paths_end"][2]
+        """
         # gros ecart -> gros virage
         if center < -self.dist:
-            s = s + self.ajust
-        elif center > self.dist:
             s = s - self.ajust
+        elif center > self.dist:
+            s = s + self.ajust
 
         # petit ecart -> petit virage
         elif center < -self.dist / 2:
-            s = s + self.ajust / 2
-        elif center > self.dist / 2:
             s = s - self.ajust / 2
-
-        act["steer"] = s
+        elif center > self.dist / 2:
+            s = s + self.ajust / 2
+        """
+        if (center[2] > 20 and abs(obs["center_path_distance"]) < 3) : 
+            act["steer"] = 0
+        else : 
+            act["steer"] = center[0]
         return act
-
     
     def choose_action(self, obs):
-            act = super().choose_action(obs)
-            act_corr = self.path_ajust(act, obs)
-            return act_corr
+        act = super().choose_action(obs)
+        act_corr = self.path_ajust(act, obs)
+        return act_corr
             
 #Agent qui adapte la vitesse en fonction des virages
-class AgentTurn(AgentCenter):
-    def __init__(self, env, dist, ajust, ecartpetit, ecartgrand, msapetit, msagrand):
-        super().__init__(env, dist, ajust)
-        self.ecartpetit = ecartpetit #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
-        self.ecartgrand = ecartgrand #seuil a partir du quel on considere l'ecart comme grand (virage serré)
-        self.msapetit = msapetit
-        self.msagrand = msagrand
+class AgentSpeed(AgentCenter):
+    def __init__(self, env, path_lookahead=3):
+        super().__init__(env, path_lookahead)
+        self.ecartpetit = ECARTPETIT #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
+        self.ecartgrand = ECARTGRAND #seuil a partir du quel on considere l'ecart comme grand (virage serré)
+        self.msapetit = MSAPETIT
+        self.msagrand = MSAGRAND
         
     def analyse(self, obs):
         s = []
@@ -103,12 +126,11 @@ class AgentTurn(AgentCenter):
        	for i in range(nbsegments):
        		segdirection = obs["paths_end"][i] - obs["paths_start"][i]
        		diff = segdirection - obs["front"]
-       		ecart = math.sqrt(diff[0]**2 + diff[1]**2 + diff[2]**2)
+       		ecart = float(np.linalg.norm(diff))
+       		dist = abs(obs["paths_distance"][i][0] - obs["paths_distance"][0][0])
         		
-        	if ecart >= self.ecartgrand:
+        	if ecart >= self.ecartgrand and dist < 10:
         		s.append("virage serre")
-       		elif self.ecartgrand > ecart > self.ecartpetit:
-       			s.append("virage leger")
        		elif ecart <= self.ecartpetit:
        			s.append("ligne droite") 
         	
@@ -116,15 +138,12 @@ class AgentTurn(AgentCenter):
        	if "virage serre" in s: 
        		react = "virage serre"
        		return react
-        elif "virage leger" in s: 
-        	react = "virage leger"
-        	return react
        	else: 
        		return react
 
     def gap(self, acceleration) : 
         if acceleration >= 1 : 
-            return 0.9
+            return 1
         if acceleration <= 0 : 
             return 0.1
         return acceleration
@@ -133,37 +152,31 @@ class AgentTurn(AgentCenter):
         msa = obs["max_steer_angle"]
             
         if react == "ligne droite":
-            act["acceleration"] = 0.7
+            act["acceleration"] = 1
+            
+            segdirection = obs["paths_end"][0] - obs["paths_start"][0]
+            if segdirection[1] > 0.05:
+            	act["acceleration"] = self.gap(act["acceleration"] + 0.2)
+            	
             return act
-                
-        if react == "virage leger":
-            if msa <= self.msapetit: 
-                accel = act["acceleration"]
-                accel = accel + 0.2
-                act["acceleration"] = self.gap(accel)
-                return act
-            elif self.msapetit < msa < self.msagrand:
-                return act
-            elif msa >= self.msagrand:
-                accel = act["acceleration"]
-                accel = accel - 0.2
-                act["acceleration"] = self.gap(accel)
-                return act
                     
         if react == "virage serre":
             if msa <= self.msapetit: 
                 accel = act["acceleration"]
-                accel = accel - 0.3
+                accel = accel - 0.45
                 act["acceleration"] = self.gap(accel)
-                return act
             elif self.msapetit < msa < self.msagrand:
-                return act
+            	return act
             elif msa >= self.msagrand:
                 accel = act["acceleration"]
-                accel = accel + 0.3
+                accel = accel + 0.5
                 act["acceleration"] = self.gap(accel)
-                return act
-
+                
+            segdirection = obs["paths_end"][0] - obs["paths_start"][0]
+            if segdirection[1] > 0.05:
+            	act["acceleration"] = self.gap(act["acceleration"] + 0.2)
+            	
+            return act
   
     def choose_action(self, obs):
         act = super().choose_action(obs)
@@ -171,8 +184,122 @@ class AgentTurn(AgentCenter):
         act_corr = self.reaction(react, act, obs)
         return act_corr
 
+#Agent qui analyse les obstacles et bonus sur la course et corrige sa trajectoire en conséquences
+class AgentObstacles(AgentCenter) : 
+    #test sur black_forest pour les obstacles, minigolf pour les item (ou olivermath)
+    #CORRECTION : doit regarder les n prochains items et regarder s'il y a un obstacle en priorité pour l'éviter, puis s'il y a un obstacle.
+    def __init__(self, env, path_lookahead=3) : 
+        super().__init__(env, path_lookahead)
+
+    def obs_next_item(self, obs, action) : 
+        """Observe à quel point le prochain item est proche, appelle la méthode en fonction de son type"""
+        nextitem = obs["items_type"][0]
+        vecitem = obs["items_position"][0]
+
+        #définir ici les distances min et max pour se diriger vers l'item
+        #aussi faire en sorte que si on est au dessus de l'item (coordonnée y), on essaie pas de s'y diriger
+        #ne pas chercher à se diriger vers un nitro si notre nitro est déjà full
+
+        if vecitem[2] < 17 and vecitem[2] > 3 and abs(vecitem[1]) < 10 : 
+            if nextitem in BONUS : 
+                return self.dirige_bonus(obs, action)
+            elif nextitem in OBSTACLES : 
+                return action
+                    #return self.evite_obstacle(obs, action)
+        return action
+
+    def evite_obstacle(self, obs, action) : 
+        """Evite le prochain item, sauf si on a un shield équipé"""
+        """NE MARCHE PAS ! la méthode n'est jamais appelée par notre agent en attendant de la réparer"""
+        if (obs["attachment"] == 6 and obs["attachment_time_left"] > 2) : 
+            #6 : BUBBLEGUM_SHIELD
+            print("j'évite pas car j'ai un shield")
+            return action
+
+        vecitem = obs["items_position"][0] 
+        if abs(vecitem[0]) < 1.5 :
+            action["steer"] = action["steer"] + 0.5
+        return action
+
+    def dirige_bonus(self, obs, action) :
+        """Dirige vers le prochain item"""
+        vecitem = obs["items_position"][0]
+
+        #si le prochain bonus ne nous rapproche pas du prochain noeud, ignorer le bonus
+        nextnoeud = obs["paths_end"][0] #peut-être remplacer par path_lookahead ? optimisation possible ici je pense
+        #vérifier la documentation pour numpy.ndarray ici j'ai un doute
+        ecart = nextnoeud - vecitem 
+        if ecart[2] < nextnoeud[2] and ecart[2] > 0 : 
+
+            if abs(vecitem[0] - action["steer"]) < 0.2 :
+                return action
+            else : 
+                action["steer"] = vecitem[0]
+                return action
+        return action
+        
+    def choose_action(self, obs) : 
+        action = super().choose_action(obs)
+        action_corr = self.obs_next_item(obs, action)
+        return action_corr
 
 #AGENT FINAL :
-class Agent1(AgentTurn):
+#+ méthodes pour éviter le blocage
+#corriger le fait qu'on recule lorsqu'on est stun
+class Agent1(AgentObstacles):
+    #variables à définir dans le fichier de configuration : 
+    #   - le seuil où dist-self.last_distance est considéré assez petit pour dire qu'on est bloqué
+    #   - le seuil de block_counter à partir duquel on recule
+    #   - le nombre d'unblock_steps par défaut
     def __init__(self, env, path_lookahead=3): 
-        super().__init__(env, dist=0.5, ajust=0.2, ecartpetit=1, ecartgrand=3, msapetit=1, msagrand=3)
+        super().__init__(env,path_lookahead)
+
+        #Anti-block state   
+        self.last_distance = None
+        self.block_counter = 0
+        self.unblock_steps = 0
+        self.recule = False
+
+    def is_blocked(self, obs):
+        """Observer si il est bloqué"""
+        dist = obs["distance_down_track"][0]
+
+        if self.last_distance is None :
+            self.last_distance = dist
+        
+        if abs(dist - self.last_distance) < 0.1 and dist > 5 and (obs["jumping"] == 0) :
+            self.block_counter += 1
+        else:
+            self.block_counter = 0
+            self.last_distance = dist
+
+    def unblock_action(self, act):
+        """Action utilisee pour debloquer le kart: reverse +slight steering"""
+        if self.unblock_steps > 0 : 
+            self.unblock_steps -= 1
+            return {
+                "acceleration" : 0, 
+                "steer" : 0, 
+                "brake" : True,
+                "drift" : False,
+                "nitro" : False,
+                "rescue" : False,
+                "fire" : False,
+            }
+        else : 
+            self.recule = False
+            return act
+    
+    def choose_action(self, obs):
+        self.is_blocked(obs)
+
+        action = super().choose_action(obs)   
+                
+        if self.block_counter > 10 :
+            self.recule = True
+            self.unblock_steps = 4
+        
+        if self.recule : 
+            action = self.unblock_action(action)
+
+        return action
