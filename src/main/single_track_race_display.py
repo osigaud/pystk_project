@@ -126,6 +126,7 @@ def single_race(env, agents, names, scores):
     distances = []
     while not done and steps < MAX_STEPS:
         actions = {}
+        env.world_update()
         for i in range(MAX_TEAMS):
             str = f"{i}"
             try:
@@ -133,11 +134,17 @@ def single_race(env, agents, names, scores):
             except Exception as e:
                 print(f"Team {i+1} error: {e}")
                 actions[str] = default_action
-        obs, _, terminated, _, info = env.step(actions)
-        kart = env.world.karts[i]
-        if kart.has_finished_race:
-            print(f"{names[i]} has finished race !")
-            nb_finished += 1
+
+            # check if agents have finished the race
+            kart = env.world.karts[i]
+            if kart.has_finished_race and not agents[i].isEnd:
+                print(f"{names[i]} has finished race !")
+                nb_finished += 1
+                agents[i].isEnd = True
+
+        obs, _, _, _, info = env.step(actions)
+
+        # prepare data to display leaderboard
         pos = np.zeros(MAX_TEAMS)
         dist = np.zeros(MAX_TEAMS)
         for i in range(MAX_TEAMS):
@@ -154,9 +161,8 @@ def single_race(env, agents, names, scores):
     dist_std = np.array(distances).std(axis=0)
     for i in range(MAX_TEAMS):
         scores.append(names[i], pos_avg[i], pos_std[i], dist_avg[i], dist_std[i])
-    print("steps:", steps)
-    for i in range(MAX_TEAMS):
-        print(f"{names[i]}: distance parcourue : {dist[i]}")
+        agents[i].isEnd = False
+    print("race duration:", steps)
 
 def main_loop():
     scores = Scores()
@@ -173,8 +179,6 @@ def main_loop():
         env.close()
 
     print("final scores:")
-    # scores.display()
-    # scores.display_mean()
     return scores
 
 
