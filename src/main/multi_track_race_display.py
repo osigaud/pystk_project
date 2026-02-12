@@ -39,20 +39,19 @@ class Scores:
         self.dict = {}
     
     def init(self, name):
-        self.dict[name] = [[], [], [], []]
+        self.dict[name] = [[], [], []]
 
-    def append(self, name, pos, pos_std, dist, dist_std):
+    def append(self, name, pos, pos_std, steps):
         self.dict[name][0].append(pos)
         self.dict[name][1].append(pos_std)
-        self.dict[name][2].append(dist)
-        self.dict[name][3].append(dist_std)
+        self.dict[name][2].append(steps)
 
     def display(self):
         print(self.dict)
 
     def display_mean(self):
         for k in self.dict:
-            print(f"{k}: {np.array(self.dict[k][0]).mean()}, {np.array(self.dict[k][1]).mean()}, {np.array(self.dict[k][2]).mean()}, {np.array(self.dict[k][3]).mean()}")
+            print(f"{k}: {np.array(self.dict[k][0]).mean()}, {np.array(self.dict[k][1]).mean()}, {np.array(self.dict[k][2]).mean()}, {np.array(self.dict[k][2]).std()}")
 
     def display_html(self, fp):
         for k in self.dict:
@@ -61,7 +60,7 @@ class Scores:
                     f"""<td>{np.array(self.dict[k][0]).mean():.2f}</td>"""
                     f"""<td>{np.array(self.dict[k][1]).mean():.2f}</td>"""
                     f"""<td>{np.array(self.dict[k][2]).mean():.2f}</td>"""
-                    f"""<td>{np.array(self.dict[k][3]).mean():.2f}</td>"""
+                    f"""<td>{np.array(self.dict[k][2]).std():.2f}</td>"""
                     "</tr>"
                 )
             
@@ -119,7 +118,8 @@ def single_race(env, agents, names, scores):
     steps = 0
     nb_finished = 0
     positions = []
-    distances = []
+    for i in range(MAX_TEAMS):
+        agents[i].steps = MAX_STEPS
     while not done and steps < MAX_STEPS:
         actions = {}
         env.world_update()
@@ -137,26 +137,22 @@ def single_race(env, agents, names, scores):
                 print(f"{names[i]} has finished the race at step {steps}")
                 nb_finished += 1
                 agents[i].isEnd = True
+                agents[i].steps = steps
 
         obs, _, _, _, info = env.step(actions)
 
         # prepare data to display leaderboard
         pos = np.zeros(MAX_TEAMS)
-        dist = np.zeros(MAX_TEAMS)
         for i in range(MAX_TEAMS):
             str = f"{i}"
             pos[i] = info['infos'][str]['position']
-            dist[i] = info['infos'][str]['distance']
         steps = steps + 1
         done = (nb_finished == 5)
         positions.append(pos)
-        distances.append(dist)
     pos_avg = np.array(positions).mean(axis=0)
     pos_std = np.array(positions).std(axis=0)
-    dist_avg = np.array(distances).mean(axis=0)
-    dist_std = np.array(distances).std(axis=0)
     for i in range(MAX_TEAMS):
-        scores.append(names[i], pos_avg[i], pos_std[i], dist_avg[i], dist_std[i])
+        scores.append(names[i], pos_avg[i], pos_std[i], agents[i].steps)
         agents[i].isEnd = False
     print("race duration:", steps)
 
@@ -194,7 +190,7 @@ def output_html(output: Path, scores: Scores):
       <th class="no-sort">Name</th>
       <th id="position">Avg. position</th>
       <th class="no-sort">±</th>
-      <th id="position">Avg. distance</th>
+      <th id="position">Avg. steps</th>
       <th class="no-sort">±</th>
     </tr>
   </thead>
