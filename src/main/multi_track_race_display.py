@@ -20,13 +20,11 @@ from agents.team2.agent2 import Agent2
 from agents.team3.agent3 import Agent3
 from agents.team4.agent4 import Agent4
 from agents.team5.agent5 import Agent5
-from agents.team6.agent6 import Agent6
-from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 7
-NB_RACES = 4
+MAX_TEAMS = 5
+NB_RACES = 10
 MAX_STEPS = 2000
 
 # Get the current timestamp
@@ -106,8 +104,6 @@ def create_race():
     agents.append(Agent3(env, path_lookahead=3))
     agents.append(Agent4(env, path_lookahead=3))
     agents.append(Agent5(env, path_lookahead=3))
-    agents.append(Agent6(env, path_lookahead=3))
-    agents.append(Agent7(env, path_lookahead=3))
     np.random.shuffle(agents)
 
     for i in range(MAX_TEAMS):
@@ -138,7 +134,7 @@ def single_race(env, agents, names, scores):
             # check if agents have finished the race
             kart = env.world.karts[i]
             if kart.has_finished_race and not agents[i].isEnd:
-                print(f"{names[i]} has finished race !")
+                print(f"{names[i]} has finished the race at step {steps}")
                 nb_finished += 1
                 agents[i].isEnd = True
 
