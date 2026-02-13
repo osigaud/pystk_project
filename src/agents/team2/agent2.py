@@ -142,7 +142,7 @@ class Agent2(KartAgent):
         # print(f"angle actuel: {angle:.3f} rad, {np.degrees(angle):.1f} deg") permet d afficher les angles à chaque frame 
 
         # CALCUL DE LA CORRECTION POUR RESTER AU CENTRE DE LA PISTE
-        correction_piste = self.coorection_centrePiste(obs) # APPEL DE LA FONCTION DE MAINTIEN SUR PISTE
+        correction_piste = self.correction_centrePiste(obs) # APPEL DE LA FONCTION DE MAINTIEN SUR PISTE
 
         # COMBINAISON DE LA DIRECTION DU CHEMIN ET DE LA CORRECTION DE PISTE
         final_steering = np.clip(steering + correction_piste, -1, 1) # ADDITION DES DEUX FORCES
