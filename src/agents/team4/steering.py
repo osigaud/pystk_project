@@ -1,13 +1,11 @@
 import math
 import numpy as np
-from .banana_detection import Banana
 
 class Steering:
     
     def __init__(self):
         self.L = 2.5  # On simule un empattement
         self.gain = 6.0 # ajout d'un coefficient pour ramener sur notre referentiel
-        self.banana_dodge = Banana() # Integration de la classe Banana
     
     def manage_pure_pursuit(self,obs):
         
