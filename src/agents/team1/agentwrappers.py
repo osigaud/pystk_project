@@ -238,14 +238,17 @@ class AgentRescue(AgentObstacles) :
         Incrémente self.block_counter si le kart n'a pas bougé
         """
         distance_down_track = obs["distance_down_track"][0]
+        attachment = obs["attachment"]
         if self.last_distance is None :
             self.last_distance = distance_down_track
 
-        if abs(distance_down_track - self.last_distance) < 0.1 and distance_down_track > 5 and (obs["jumping"] == 0) :
+        if abs(distance_down_track - self.last_distance) < 0.1 and distance_down_track > 5 and (obs["jumping"] == 0) and not (attachment == 2) :
             self.block_counter += 1
         else:
             self.block_counter = 0
             self.last_distance = distance_down_track
+
+        print("penalty : ", (attachment==2), "   block_counter : ", self.block_counter)
 
     def unblock_action(self, act):
         """
@@ -275,7 +278,7 @@ class AgentRescue(AgentObstacles) :
         self.is_blocked(obs)
         action = super().choose_action(obs)   
                 
-        if self.block_counter > 10 :
+        if self.block_counter > 18 :
             self.is_braking = True
             self.unblock_steps = 4
         if self.is_braking : 
