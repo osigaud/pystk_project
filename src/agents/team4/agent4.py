@@ -28,8 +28,6 @@ class Agent4(KartAgent):
         self.dodge_timer = 10
         self.last_banana_z = float("inf")
         
-        
-
     def reset(self):
         self.obs, _ = self.env.reset()
         self.agent_positions = []
@@ -43,8 +41,9 @@ class Agent4(KartAgent):
 
     def choose_action(self, obs):
         
-        points = obs.get("paths_start",[])
-        if len(points) <= 2:
+        points = obs.get("paths_start",[]) # On récupère la liste des points
+        
+        if len(points) <= 2: # Si la longueur de la liste est inferieur à 2, on accèlère à fond (ligne d'arrivée proche)
             return {
                 "acceleration": 1.0,
                 "steer": 0.0,
@@ -55,21 +54,23 @@ class Agent4(KartAgent):
                 "fire": False,
             }
         
-        target = points[2]
-        gx = target[0]
-        gz = target[2]
+        target = points[2] # On récupère le deuxième point de la liste
+        gx = target[0] # On récupère x, le décalage latéral
+        gz = target[2] # On récupère z, la profondeur
 
-        danger, b_x, b_z = self.banana_dodge.banana_detection(obs)
+        danger, b_x, b_z = self.banana_dodge.banana_detection(obs) # Appel de la fonction de detection
 
         if danger:
 
-            print("Danger "+str(b_x))
+            print("Danger "+str(b_x)) # Pour Debug, A retirer apres Test
 
+            # Si la banane est à notre droite on va à gauche et vice-versa
             if b_x >=0:
                 new_side = -1
             else:
                 new_side = 1
 
+            # Utilisation d'un compteur pour maintenir le cap d'esquive sur x frames
             if self.dodge_timer == 0:
                 self.dodge_timer = 10
                 self.dodge_side = new_side
@@ -83,11 +84,11 @@ class Agent4(KartAgent):
         if self.dodge_timer >0:
             self.dodge_timer -= 1
 
-            esquive = 2.0
+            esquive = 2.0 # Constante permettant l'esquive
 
             gx += esquive * self.dodge_side
 
-            steering = self.steering.manage_pure_pursuit(gx,gz,4.0)
+            steering = self.steering.manage_pure_pursuit(gx,gz,4.0) # Appel à la fonction pure_pursuit avec un gain moindre pour baisser la nervosité
 
             return {
                 "acceleration": 0.8,
@@ -99,11 +100,7 @@ class Agent4(KartAgent):
                 "fire": False,
             }
 
-
-        
-        
-        
-        steering = self.steering.manage_pure_pursuit(gx,gz,6.0)
+        steering = self.steering.manage_pure_pursuit(gx,gz,6.0) # Appel à la fonction pure_pursuit en condition normale (pas de danger detecté)
         distance = float(obs.get("distance_down_track", [0.0])[0])
         vel = obs.get("velocity", [0.0, 0.0, 0.0])
         speed = float(vel[2])
@@ -127,6 +124,7 @@ class Agent4(KartAgent):
 
         if(self.rescue.is_stuck(distance,speed)):
             return self.rescue.sortir_du_mur(steering)
+        
         action = {
             "acceleration": acceleration,
             "steer": steering,
