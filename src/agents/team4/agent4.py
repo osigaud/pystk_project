@@ -25,7 +25,7 @@ class Agent4(KartAgent):
         self.drift_cd = 0
         self.banana_dodge = Banana()
         self.dodge_side = 0
-        self.dodge_timer = 10
+        self.dodge_timer = 0
         self.last_banana_z = float("inf")
         
     def reset(self):
