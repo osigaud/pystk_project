@@ -7,6 +7,7 @@ from .steering import Steering
 from .rescue import RescueManager
 from .speed import SpeedController
 from .nitrodrift import NitroDrift
+from .banana_detection import Banana
 
 
 class Agent4(KartAgent):
@@ -22,11 +23,18 @@ class Agent4(KartAgent):
         self.SpeedController=SpeedController()
         self.nitrodrift = NitroDrift()
         self.drift_cd = 0
+        self.banana_dodge = Banana()
+        self.dodge_side = 0
+        self.dodge_timer = 10
+        self.last_banana_z = float("inf")
 
     def reset(self):
         self.obs, _ = self.env.reset()
         self.agent_positions = []
         self.drift_cd = 0
+        self.dodge_timer = 0
+        self.dodge_side = 0
+        self.last_banana_z = float("inf")
 
     def endOfTrack(self):
         return self.isEnd
