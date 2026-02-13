@@ -81,26 +81,21 @@ class Agent4(KartAgent):
                     self.dodge_timer = 10
                     self.last_banana_z = b_z
         
+        is_dodging = False
+        
         if self.dodge_timer >0:
-            self.dodge_timer -= 1
+            self.dodge_timer -= 1 # On decremente le compteur
+            is_dodging = True # Variable representant l'etat "est en train d'esquiver"
 
             esquive = 2.0 # Constante permettant l'esquive
 
-            gx += esquive * self.dodge_side
+            gx += esquive * self.dodge_side # On ajoute l'esquive à x
 
             steering = self.steering.manage_pure_pursuit(gx,gz,4.0) # Appel à la fonction pure_pursuit avec un gain moindre pour baisser la nervosité
 
-            return {
-                "acceleration": 0.8,
-                "steer": steering,
-                "brake": False,
-                "drift": False,
-                "nitro": False,
-                "rescue":False,
-                "fire": False,
-            }
-
-        steering = self.steering.manage_pure_pursuit(gx,gz,6.0) # Appel à la fonction pure_pursuit en condition normale (pas de danger detecté)
+        else:
+            steering = self.steering.manage_pure_pursuit(gx,gz,6.0) # Appel à la fonction pure_pursuit en condition normale (pas de danger detecté)
+        
         distance = float(obs.get("distance_down_track", [0.0])[0])
         vel = obs.get("velocity", [0.0, 0.0, 0.0])
         speed = float(vel[2])
@@ -124,6 +119,12 @@ class Agent4(KartAgent):
 
         if(self.rescue.is_stuck(distance,speed)):
             return self.rescue.sortir_du_mur(steering)
+        
+        if is_dodging: # Si on est en train d'esquiver
+            acceleration = 0.8  # Baisse Accel
+            drift = False       # Pas de drift
+            nitro = False       # Pas de nitro
+            brea = False        # Pas de break
         
         action = {
             "acceleration": acceleration,
