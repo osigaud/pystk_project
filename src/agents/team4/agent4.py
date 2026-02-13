@@ -27,7 +27,7 @@ class Agent4(KartAgent):
         self.dodge_side = 0
         self.dodge_timer = 10
         self.last_banana_z = float("inf")
-        self.const_esquive = 2.0
+        
         
 
     def reset(self):
@@ -83,9 +83,11 @@ class Agent4(KartAgent):
         if self.dodge_timer >0:
             self.dodge_timer -= 1
 
-            gx += self.const_esquive * self.dodge_side
+            esquive = 2.0
 
-            steering = self.steering.manage_pure_pursuit(gx,gx,4.0)
+            gx += esquive * self.dodge_side
+
+            steering = self.steering.manage_pure_pursuit(gx,gz,4.0)
 
             return {
                 "acceleration": 0.8,
