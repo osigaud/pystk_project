@@ -25,21 +25,21 @@ class Agent2(KartAgent):
         return self.isEnd
         
     
-    def coorection_centrePiste(self, obs):
+    def correction_centrePiste(self, obs):
         """
         Calcule la correction nécessaire pour rester au centre de la piste.
         """
         #center_path contient le vecteur vers le centre de la route
-        center_path = obs.get('path_start', np.array([0, 0, 0])) #si il y a 'path_start' alors center_path='center_path' sinon center_path est un vecteur par défaut mit a [0,0,0] jusqu'à qu'il retrouve le centre 
+        center_path = obs.get('path_start', np.array([0, 0, 0])) #si il y a 'path_start' alors center_path='path_start' sinon center_path est un vecteur par défaut mit a [0,0,0] jusqu'à qu'il retrouve le centre 
         
-        dist_depuis_center = center_path[0] #center_path[0] c'es' le point X qui représente le décalage (gauche/droite) par rapport au centre
+        dist_depuis_center = center_path[0] #center_path[0] c'est le point X qui représente le décalage (gauche/droite) par rapport au centre
         
         correction = dist_depuis_center * 0.5 #On calcule une correction proportionnelle à la distance 0.5 est un bon compromit => dose la force du coup de volant (pas trop mou, pas trop violent)
         
-        return np.clip(correction, -1.0, 1.0) #np.clip (=barrière de sécurité) sécurise pour que le res ne depasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
+        return np.clip(correction, -1.0, 1.0) #np.clip (=barrière de sécurité) sécurise pour que le res ne dépasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
     
 
-    def anticipeVirage(self,obs):
+    def detectVirage(self,obs):
 
         nodes_path = obs["paths_start"] #liste des neoud de la piste
         nb_nodes = len(nodes_path)
@@ -49,7 +49,7 @@ class Agent2(KartAgent):
 
         for i in range (nb_nodes - path_lookahead): #boucle pour le second (noeud loin=anticipation)
 
-            curr_node = nodes_path[i] #le premier noeud quon rgd (noeud proche)
+            curr_node = nodes_path[i] #le premier noeud qu'on rgd (noeud proche)
             lookahead_node = nodes_path[i+path_lookahead] #noeud loin
 
             x1, z1 = curr_node[0], curr_node[2] #coordonnees pour angle
@@ -71,7 +71,7 @@ class Agent2(KartAgent):
     def adapteAcceleration(self,obs):
         #le but va etre d'adpater l'acclération dans diverses situations dont notamment 
         #les virages serrés, les lignes droites ou une legere curvature 
-        liste_virage=self.anticipeVirage(obs)
+        liste_virage=self.detectVirage(obs)
         acceleration = 0.90
         if len(liste_virage) < 1 :  # s'il n'y a pas de virage 
             acceleration = 1.0  # conduite normale on pourrait augmenter légèrement l'accélération -> à décider 
