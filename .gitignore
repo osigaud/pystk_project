@@ -27,3 +27,4 @@ src/pystk2_gymnasium/__pycache__/
 src/utils/__pycache__/
 src/agents/team1/testagent.py
 src/agents/team1/multi_testagent.py
+src/agents/team1/optuna_optimization.py
