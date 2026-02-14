@@ -75,13 +75,13 @@ class Agent4(KartAgent):
 
             # Utilisation d'un compteur pour maintenir le cap d'esquive sur x frames
             if self.dodge_timer == 0:
-                self.dodge_timer = 10
+                self.dodge_timer = 4
                 self.dodge_side = new_side
                 self.last_banana_z = b_z
             else:
                 if new_side != self.dodge_side and b_z < self.last_banana_z:
                     self.dodge_side = new_side
-                    self.dodge_timer = 10
+                    self.dodge_timer = 4
                     self.last_banana_z = b_z
         
         is_dodging = False
@@ -90,14 +90,12 @@ class Agent4(KartAgent):
             self.dodge_timer -= 1 # On decremente le compteur
             is_dodging = True # Variable representant l'etat "est en train d'esquiver"
 
-            esquive = 2.0 # Constante permettant l'esquive
+            esquive = 3.0 # Constante permettant l'esquive
 
             gx += esquive * self.dodge_side # On ajoute l'esquive à x
 
-            steering = self.steering.manage_pure_pursuit(gx,gz,4.0) # Appel à la fonction pure_pursuit avec un gain moindre pour baisser la nervosité
-
-        else:
-            steering = self.steering.manage_pure_pursuit(gx,gz,6.0) # Appel à la fonction pure_pursuit en condition normale (pas de danger detecté)
+            
+        steering = self.steering.manage_pure_pursuit(gx,gz,6.0) # Appel à la fonction pure_pursuit en condition normale (pas de danger detecté)
         
         epsilon = 0.05
         
