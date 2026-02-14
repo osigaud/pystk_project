@@ -13,7 +13,7 @@ class Banana:
             if items_type[i] == 1: #Si c'est une banane 
                 pos_x = items_pos[i][0] # On récupère le décalage latéral
                 pos_z = items_pos[i][2] # On récupère la profondeur
-                if -2.5 <= pos_x <= 2.5 and 0.0 <= pos_z <= 17.0:
+                if -2.5 <= pos_x <= 2.5 and 0.0 <= pos_z <= 20.0:
                     if pos_z < clo_banana_z: # Si la banane trouvée est plus proche que celle déjà trouvée
                         clo_banana_z = pos_z
                         clo_banana_x = pos_x
