@@ -15,8 +15,8 @@ path_conf = str(path_conf) + '/configFIleTastyCrousteam.yaml'
 conf = OmegaConf.load(path_conf)
 
 #définition des variables qui viennent du fichier de configuration
-DIST = conf.dist
-AJUST = conf.ajust
+DIST = 0.673833673012193
+AJUST = 0.6386812473361506
 ECARTPETIT = conf.ecartpetit
 ECARTGRAND = conf.ecartgrand
 MSAPETIT = conf.msapetit
@@ -63,32 +63,28 @@ class AgentInit(KartAgent):
 class AgentCenter(AgentInit):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env, path_lookahead)
-        self.dist = DIST #écart max au centre de la piste qu'on accepte
-        self.ajust = AJUST #la valeur que l'on veut addi/soustr à notre steer, qui sert d'ajustement de la trajectoire
+        self.dist = DIST 
+        self.ajust = AJUST 
 
     def path_ajust(self, act, obs):
-        s = act["steer"]
+        """
+        Paramètres : obs, act (dict)
+        Renvoie : act (dict), dictionnaire des actions du kart corrigé pour suivre le centre de la piste
+        """
+        steer = act["steer"]
         center = obs["paths_end"][2]
-        """
-        # gros ecart -> gros virage
-        if center < -self.dist:
-            s = s - self.ajust
-        elif center > self.dist:
-            s = s + self.ajust
-
-        # petit ecart -> petit virage
-        elif center < -self.dist / 2:
-            s = s - self.ajust / 2
-        elif center > self.dist / 2:
-            s = s + self.ajust / 2
-        """
         if (center[2] > 20 and abs(obs["center_path_distance"]) < 3) : 
-            act["steer"] = 0
-        else : 
-            act["steer"] = center[0]
+            steer = 0
+        elif abs(center[0]) > self.dist : 
+            steer += self.ajust * center[0]
+        act["steer"] = np.clip(steer, -1, 1)
         return act
     
     def choose_action(self, obs):
+        """
+        Paramètres : obs
+        Renvoie : act (dict), le dictionnaire d'action après correction
+        """
         act = super().choose_action(obs)
         act_corr = self.path_ajust(act, obs)
         return act_corr
@@ -225,8 +221,8 @@ class AgentObstacles(AgentCenter) :
 
 class AgentRescue(AgentObstacles) : 
     #Prendre le cas en compte où on est étourdi par un item dans is_blocked
-    def __init__(self, env, path_lookahead=3): 
-        super().__init__(env, path_lookahead)  
+    def __init__(self, env, dist=0.5, ajust=0.25, path_lookahead=3): 
+        super().__init__(env, dist, ajust, path_lookahead)  
         self.last_distance = None
         self.block_counter = 0
         self.unblock_steps = 0
@@ -247,8 +243,6 @@ class AgentRescue(AgentObstacles) :
         else:
             self.block_counter = 0
             self.last_distance = distance_down_track
-
-        print("penalty : ", (attachment==2), "   block_counter : ", self.block_counter)
 
     def unblock_action(self, act):
         """
