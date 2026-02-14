@@ -65,7 +65,7 @@ class Agent4(KartAgent):
 
         if danger:
 
-            print("Danger "+str(b_x)) # Pour Debug, A retirer apres Test
+            #print("Danger "+str(b_x)) # Pour Debug, A retirer apres Test
 
             # Si la banane est à notre droite on va à gauche et vice-versa
             if b_x >=0:
@@ -103,9 +103,11 @@ class Agent4(KartAgent):
         
         road_straight = abs(points[2][0]) < 0.8
 
+        # Pour eviter les vibrations, si on est sur une ligne droite, on met le steering à 0
         if road_straight and abs(steering) <= epsilon:
             steering = 0.0
         
+        # Au depart on avance tout droit pour eviter de se cogner contre les adversaires
         if obs['distance_down_track'] <= 2:
             steering = 0.0
 
@@ -133,17 +135,17 @@ class Agent4(KartAgent):
         
         
         brake = False
-        acceleration, brake = self.SpeedController.manage_speed(steering,obs)
+        acceleration, brake = self.SpeedController.manage_speed(steering,obs) # Appel à la fonction gerer_vitesse
         #print("speed_out:", self.SpeedController.manage_speed(steering, obs))
         
         nitro = False
-        nitro = self.nitro.manage_nitro(steering,energy,obs)
+        nitro = self.nitro.manage_nitro(steering,energy,obs) # Appel à la fonction gerer_nitro
         """if (drift == True):
             nitro = False"""
 
 
-        if(self.rescue.is_stuck(distance,speed)):
-            return self.rescue.sortir_du_mur(steering)
+        if(self.rescue.is_stuck(distance,speed)): # Si on est bloque, on appelle la fonction rescue
+            return self.rescue.sortir_du_mur(steering) 
         
         if is_dodging: # Si on est en train d'esquiver
             
