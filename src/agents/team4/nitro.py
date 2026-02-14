@@ -1,6 +1,6 @@
 class Nitro:
     
-    def manage_nitro(self, steer, energy,obs):
+    def manage_nitro(self,steer,energy,obs):
         points = obs['paths_start']
         
 
