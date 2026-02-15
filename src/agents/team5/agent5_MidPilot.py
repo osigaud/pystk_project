@@ -89,21 +89,25 @@ class Agent5Mid(KartAgent):
         if abs(steering) > self.conf.pilot.speed_control.steering_threshold:
             accel = self.conf.pilot.speed_control.cornering_accel
 
-        #is_stuck = False
+        is_stuck = False
         # Si on est au départ (>5m) et qu'on n'avance plus (<0.5)
-        #if obs['distance_down_track'] > self.conf.pilot.rescue.active_after_meters and speed < self.conf.pilot.rescue.stuck_speed_limit:
-        #    self.stuck_counter += 1
-        #    if self.stuck_counter > self.conf.pilot.rescue.stuck_frames_limit:
-        #        is_stuck = True # Bloqué depuis 0.5s
-        #else:
-        #    self.stuck_counter = 0
-        #
+        if obs['distance_down_track'] > self.conf.pilot.rescue.active_after_meters and speed < self.conf.pilot.rescue.stuck_speed_limit:
+            self.stuck_counter += 1
+            if self.stuck_counter > self.conf.pilot.rescue.stuck_frames_limit:
+                is_stuck = True # Bloqué depuis 0.5s
+                self.stuck_counter = 0  # On reset le stuck_counter pour le réutiliser afin de compter le temps qu'on passe à se débloquer
+        else:
+            self.stuck_counter = 0
+        
         # Si bloqué, on brake pour reculer
-        #if is_stuck:
-        #    accel = 0.0
-        #    brake = True
-        #    steering = -steering # On inverse le volant pour se reculer
-        #
+        if is_stuck:
+            while self.stuck_counter < 20 :
+                self.stuck_counter += 1
+                accel = 0.0
+                brake = True
+                steering = -steering # On inverse le volant pour se reculer
+
+
         return accel, brake, steering
 
     def choose_action(self, obs):
