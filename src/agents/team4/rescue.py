@@ -4,7 +4,7 @@ class RescueManager:
         self.times_blocked = 0
         self.recovery_steer = None
         self.recovery_cd = 0
-        self.recovery_timer = 12   # nombre de frames à garder le même sens
+        self.recovery_timer = 12   #nombre de frames à garder le même sens
         self.switch_side = False
 
     def is_stuck(self, distance, speed):
@@ -26,23 +26,20 @@ class RescueManager:
         return self.times_blocked >= 7
 
     def sortir_du_mur(self, current_steer):
-        # Si on est déjà en recovery on continue dans le même sens
+    
         if self.recovery_cd > 0:
-            self.recovery_cd -= 1
+            self.recovery_cd -= 1 #Si on est déjà en recovery on continue dans le même sens
 
         else:
-            # Choix du sens uniquement quand le cooldown est fini
-            base_steer = -1.0 if current_steer > 0 else 1.0
+            base_steer = -1.0 if current_steer > 0 else 1.0  #Choix du sens uniquement quand le cooldown est fini
             
             if self.recovery_steer is None:
-                # premier blocage → comportement normal
-                self.recovery_steer = base_steer
+                self.recovery_steer = base_steer #premier blocage donc comportement normal
             else:
-                # blocage persistant → on tente l'autre côté
-                self.recovery_steer = -self.recovery_steer
+                self.recovery_steer = -self.recovery_steer #blocage persistant donc on tente l'autre côté
             
-            # on relance le cooldown
-            self.recovery_cd = self.recovery_timer
+            
+            self.recovery_cd = self.recovery_timer #on relance le cooldown
         
         return {
             "acceleration": 0.0,
