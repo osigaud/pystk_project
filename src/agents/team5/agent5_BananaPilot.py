@@ -23,9 +23,9 @@ class Agent5Banana(KartAgent):
         items_type = obs["items_type"]
 
         if items_type is None or len(items_type) == 0:
-            return False, 0.0, 1.0 #Il n'y a pas d'item sur la map, le wrappern ne prend pas le controle
+            return False, 0.0, 1.0 #Il n'y a pas d'item sur la map, le wrapper ne prend pas le controle
 
-        index_bananas = [i for i, j in enumerate(items_type) if j == 1]
+        index_bananas = [i for i, j in enumerate(items_type) if (j == 1 or j == 4 or j == 5)]  # Trouvés dans le code source du jeu
         bananas = items_pos[index_bananas]
 
         if len(index_bananas) == 0:
