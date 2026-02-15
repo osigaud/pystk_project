@@ -18,6 +18,7 @@ class Agent5Banana(KartAgent):
     def detect_banana(self, obs):
         '''La fonction detecte la banane la plus proche et devant le kart, décide si on doit l'éviter et par quel coté on doit l'éviter.
         Cette fonction renvoie : si le wrapper prend le contrôle de l'agent ou pas, un float correspondant au steering, un float correspondant à l'acceleration'''
+
         items_pos = np.array(obs["items_position"])
         items_type = obs["items_type"]
 
@@ -54,6 +55,10 @@ class Agent5Banana(KartAgent):
             return {
                 "acceleration": accel,
                 "steer": steer,
-                "drift": False, "nitro": False, "rescue": False, "fire": False
+                "drift": False, 
+                "nitro": False, 
+                "rescue": False,
+                "brake" : False, 
+                "fire": False
             }
         return self.pilot.choose_action(obs)
