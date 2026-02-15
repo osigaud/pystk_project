@@ -4,7 +4,7 @@ class RescueManager:
         self.times_blocked = 0
         self.recovery_steer = None
         self.recovery_cd = 0
-        self.recovery_timer = 12   #nombre de frames à garder le même sens
+        self.recovery_timer = 10   #nombre de frames à garder le même sens
         self.switch_side = False
 
     def is_stuck(self, distance, speed):
