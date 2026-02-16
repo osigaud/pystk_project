@@ -9,6 +9,17 @@ class Agent5Drift(KartAgent):
         self.pilot = pilot_agent
         self.name = "Donkey Drift"
 
+        self.far_lookahead = self.conf.drift.far_lookahead
+        self.near_lookahead = self.conf.drift.near_lookahead
+        self.far_x_trigger = self.conf.drift.far_target_threshold
+        self.steer_trigger = self.conf.drift.steer_trigger
+        self.confirm_limit = self.conf.drift.confirmation_frames
+        self.min_speed = self.conf.drift.min_speed
+        self.exit_x_limit = self.conf.drift.exit_target_threshold
+        self.max_dist_center = self.conf.drift.max_dist_center
+        self.cooldown_limit = self.conf.drift.cooldown_frames
+        self.drift_accel = self.conf.drift.drift_accel
+
         self.is_drifting = False      # État actuel du drift
         self.cooldown_timer = 0       # Pause forcée entre deux drifts pour stabiliser le kart
         self.turn_confirm_counter = 0 # Compteur pour valider que le virage est bien une épingle
@@ -30,23 +41,18 @@ class Agent5Drift(KartAgent):
             return action
 
         # On regarde très loin pour détecter l'entrée d'une épingle avant d'y être
-        # Cela permet d'anticiper le déclenchement du dérapage
-        far_lookahead = 18.0
         far_target_x = paths[-1][0]
         for p in paths:
-            if p[2] > far_lookahead:
+            if p[2] > self.far_lookahead:
                 far_target_x = p[0]
                 break
 
         # On regarde plus près pour anticiper la sortie du virage
-        # Cela permet de couper le drift au bon moment pour reprendre du grip
-        near_lookahead = 10.0
         near_target_x = paths[-1][0]
         for p in paths:
-            if p[2] > near_lookahead:
+            if p[2] > self.near_lookahead:
                 near_target_x = p[0]
                 break
-
 
         # On interdit de redrifter immédiatement après un drift pour éviter les saccades
         if self.cooldown_timer > 0:
@@ -57,14 +63,14 @@ class Agent5Drift(KartAgent):
         # CAS : ON NE DRIFT PAS ENCORE
         elif not self.is_drifting:
             # On vérifie si la piste au loin est très décalée ou si le pilote braque déjà fort.
-            if abs(far_target_x) > 4.5 or abs(action['steer']) > 0.92:
+            if abs(far_target_x) > self.far_x_trigger or abs(action['steer']) > self.steer_trigger:
                 self.turn_confirm_counter += 1 # On incrémente le compteur de confirmation
             else:
                 self.turn_confirm_counter = 0 # Reset si l'intention de tourner disparaît
 
             # On ne drift uniquement que si le kart est dans une situation de drift favorable pendant x frames
-            if self.turn_confirm_counter >= 5:
-                if speed > 10.0: # On ne drift pas si on va trop lentement
+            if self.turn_confirm_counter >= self.confirm_limit:
+                if speed > self.min_speed:
                     self.is_drifting = True
                 self.turn_confirm_counter = 0
 
@@ -72,19 +78,16 @@ class Agent5Drift(KartAgent):
         else:
             # On arrête si la piste devient droite OU si le kart s'éloigne trop du centre
             dist_to_center = abs(paths[0][0])
-            if abs(near_target_x) < 1.0 or dist_to_center > 7.5:
+            if abs(near_target_x) < self.exit_x_limit or dist_to_center > self.max_dist_center:
                 self.is_drifting = False
-                self.cooldown_timer = 15 # On force une pause pour stabiliser la trajectoire
+                self.cooldown_timer = self.cooldown_limit # Pause pour stabiliser la trajectoire
 
-    
-        # Si le mode drift est actif, on écrase les commandes du pilote de base.
         if self.is_drifting:
             action['drift'] = True
             action['steer'] = 1.0 if far_target_x > 0 else -1.0
-            action['acceleration'] = 0.6
+            action['acceleration'] = self.drift_accel
             action['nitro'] = False
         else:
-            # Si on ne drift pas, on s'assure que le bouton drift est relâché
             action['drift'] = False
 
         return action
