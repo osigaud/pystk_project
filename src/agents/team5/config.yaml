@@ -4,11 +4,11 @@ pilot:
   
   # Réglages du cerveau
   brain:
-    kp: 8.0  # Puissance du braquage.
+    kp: 8.17  # Puissance du braquage.
     # Augmenter si le kart ne tourne pas assez dans les virages serrés
     # Diminuer si le kart oscille trop violemment gauche/droite
     
-    kd: 0.85 # Stabilité.
+    kd: 0.88 # Stabilité.
     # Augmenter si le volant tremble trop en ligne droite
     # Diminuer si la direction semble "molle" ou réagit en retard
 
@@ -20,7 +20,7 @@ pilot:
   # Gestion de la vitesse
   speed_control:
     default_accel: 1.0       # Accélération en ligne droite (0.0 à 1.0)
-    cornering_accel: 0.6     # Accélération dans les virages serrés
+    cornering_accel: 0.88     # Accélération dans les virages serrés
     steering_threshold: 0.4  # A partir de quel angle de volant considère-t-on qu'on est dans un virage ?
   
   rescue:
@@ -33,9 +33,16 @@ pilot:
 # PARAMÈTRES DE LA BANANE (Agent5Banana)
 banana:
   detection:
-    max_distance: 9.5    # Distance max pour repérer une banane (Anticipation).
-    safety_width: 1.5    # Largeur de sécurité latérale.
+    max_distance: 9.3    # Distance max pour repérer une banane (Anticipation).
+    safety_width: 1.44    # Largeur de sécurité latérale.
 
   avoidance:
     steering_force: 0.9  # Force du coup de volant pour esquiver (0.0 à 1.0).
     acceleration: 0      # accélération pendant l'esquive.
+
+# PARAMÈTRES DU NITRO (Agent5Nitro)
+nitro:
+  detection:
+    steering_threshold_nitro: 0.4 # A partir de quel angle on peut utiliser le nitro.
+    min_acceleration: 0.8         # A partir de quel vitesse on peut utiliser le nitro.
+    min_energy: 0                 # A partir de combien d'energie on peut utiliser le nitro. 
