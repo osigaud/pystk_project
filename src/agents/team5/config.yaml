@@ -4,11 +4,11 @@ pilot:
   
   # Réglages du cerveau
   brain:
-    kp: 8.17  # Puissance du braquage.
+    kp: 9.17  # Puissance du braquage.
     # Augmenter si le kart ne tourne pas assez dans les virages serrés
     # Diminuer si le kart oscille trop violemment gauche/droite
     
-    kd: 0.88 # Stabilité.
+    kd: 4.88 # Stabilité.
     # Augmenter si le volant tremble trop en ligne droite
     # Diminuer si la direction semble "molle" ou réagit en retard
 
@@ -16,6 +16,9 @@ pilot:
   navigation:
     lookahead_meters: 9.7   # Distance de visée (en mètres, Le kart regarde ce point pour décider où tourner)
     min_dist_safety: 1      # Distance minimale de sécurité
+    
+    lookahead_far: 28.0    # Le point qu'on regarde au loin pour savoir si ça tourne
+    apex_offset: 0.65
 
   # Gestion de la vitesse
   speed_control:
@@ -46,3 +49,36 @@ nitro:
     steering_threshold_nitro: 0.4 # A partir de quel angle on peut utiliser le nitro.
     min_acceleration: 0.8         # A partir de quel vitesse on peut utiliser le nitro.
     min_energy: 0                 # A partir de combien d'energie on peut utiliser le nitro. 
+    
+    
+# PARAMÈTRES DU DRIFT (Agent5Drift)
+drift:
+  # Vision et Anticipation
+  far_lookahead: 18.0        # Distance de détection lointaine (mètres)
+  # C'est l'oeil qui cherche l'épingle au loin pour préparer le drift
+  
+  near_lookahead: 10.0       # Distance de visée courte (mètres)
+  # Sert à détecter si la piste devant le kart redevient droite pour arrêter le drift
+
+  far_target_threshold: 4.5  # Seuil de décalage latéral de la piste au loin
+  # Augmenter si le kart drift trop souvent dans des virages légers
+  
+  steer_trigger: 0.92        # Seuil d'angle du volant (0.0 à 1.0)
+  # Si le pilote braque plus fort que ce seuil, on considère que c'est une épingle
+  
+  confirmation_frames: 5     # Nombre de frames de validation
+  # Le virage doit être détecté pendant X frames avant de lancer le drift
+
+  min_speed: 10.0            # Vitesse minimale pour autoriser le drift (m/s)
+  # Empêche le kart de drifter s'il est trop lent
+  
+  max_dist_center: 7.5       # Sécurité bord de piste (mètres)
+  # Si le kart s'éloigne plus que cette distance du centre, on coupe le drift pour ne pas sortir
+
+  exit_target_threshold: 1.0 # Seuil de redressement de la piste
+  # Si le décalage latéral est inférieur à ce seuil par rapport au point qui se trouve à near_lookahead, on considère le virage fini
+  
+  cooldown_frames: 15        # Temps de repos forcé après un drift
+  # Empêche le kart de recommencer à drifter immédiatement
+
+  drift_accel: 0.6           # Accélération maintenue pendant le drift
