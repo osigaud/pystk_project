@@ -20,8 +20,14 @@ class Agent5Mid(KartAgent):
 
         self.last_error = 0.0   # Contient l'erreur de l'angle précédent 
         self.stuck_counter = 0  # Compte le temps passé bloqué contre un mur si kart bloqué
-
         self.is_rescuing = False
+
+        self.lookahead_factor = self.conf.pilot.navigation.lookahead_speed_factor
+        self.lookahead_max = self.conf.pilot.navigation.lookahead_max
+        self.hairpin_threshold = self.conf.pilot.speed_control.hairpin_threshold
+        self.hairpin_accel = self.conf.pilot.speed_control.hairpin_accel
+        self.hairpin_brake_speed = self.conf.pilot.speed_control.hairpin_brake_speed
+        self.rescue_duration = self.conf.pilot.rescue.rescue_duration
 
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -40,10 +46,10 @@ class Agent5Mid(KartAgent):
         speed = np.linalg.norm(obs['velocity'])
 
         # Plus on va vite, plus on regarde loin
-        lookahead = self.ahead_dist + (speed * 0.22)
+        lookahead = self.ahead_dist + (speed * self.lookahead_factor)
 
         # On plafonne la visée
-        lookahead = min(lookahead, 18.0)
+        lookahead = min(lookahead, self.lookahead_max)
 
         target_vector = paths[-1]  # Par défaut on prend le noeud le plus loin pour éviter tout bug
 
@@ -88,8 +94,8 @@ class Agent5Mid(KartAgent):
 
         if self.is_rescuing:
             self.stuck_counter += 1
-            # On recule pendant 25 frames
-            if self.stuck_counter < 25:
+            # On recule pendant X frames
+            if self.stuck_counter < self.rescue_duration:
                 accel = 0.0
                 brake = True
                 steering = -steering # On inverse le volant pour s'extraire
@@ -107,11 +113,11 @@ class Agent5Mid(KartAgent):
             accel = self.conf.pilot.speed_control.cornering_accel
 
         # Si le volant est braqué à fond
-        if abs(steering) > 0.92:
+        if abs(steering) > self.hairpin_threshold:
             # On réduit fortement l'accélération pour permettre au kart de pivoter sur lui-même.
-            accel = 0.6
+            accel = self.hairpin_accel
             # Si on arrive trop vite dans l'épingle, on force un coup de frein.
-            if speed > 15.0:
+            if speed > self.hairpin_brake_speed:
                 brake = True
 
 

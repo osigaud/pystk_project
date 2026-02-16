@@ -19,17 +19,29 @@ pilot:
     
     lookahead_far: 28.0    # Le point qu'on regarde au loin pour savoir si ça tourne
     apex_offset: 0.65
+    
+    lookahead_speed_factor: 0.22 # Facteur d'anticipation lié à la vitesse
+    # Plus cette valeur est haute, plus le kart regarde loin quand il prend de la vitesse
+    # Augmenter pour anticiper les virages plus tôt
+    # Diminuer si le kart commence à tourner trop tôt
+    
+    lookahead_max: 18.0 # Plafond maximal de la visée (mètres)
+    # Limite la distance de regard pour ne pas que le kart voie trop loin
 
   # Gestion de la vitesse
   speed_control:
     default_accel: 1.0       # Accélération en ligne droite (0.0 à 1.0)
     cornering_accel: 0.88     # Accélération dans les virages serrés
     steering_threshold: 0.4  # A partir de quel angle de volant considère-t-on qu'on est dans un virage ?
+    hairpin_threshold: 0.92   # Seuil pour détecter l'épingle
+    hairpin_accel: 0.6        # Accélération en épingle
+    hairpin_brake_speed: 15.0  # Vitesse au dessus de laquelle on freine
   
   rescue:
     stuck_frames_limit : 5   # Nombre de frames à partir duquel on se dit être bloqué
-    active_after_meters : 5  # Distance par rapport au début de la course (5m)
-    stuck_speed_limit : 0.5  # Vitesse à partir de laquelle on se dit être bloqué.
+    active_after_meters : 5  # Distance par rapport au début de la course
+    stuck_speed_limit : 0.5  # Vitesse à partir de laquelle on se dit être bloqué
+    rescue_duration: 25      # Temps passé à reculer (frames)
 
 
 
