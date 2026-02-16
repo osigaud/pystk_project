@@ -5,6 +5,7 @@ from agents.kart_agent import KartAgent
 from .agent5_MidPilot import Agent5Mid
 from .agent5_BananaPilot import Agent5Banana
 #from .agent5_Rescue import Agent5Rescue
+from .agent5_NitroPilot import Agent5Nitro
 from omegaconf import OmegaConf 
 import os
 
@@ -26,9 +27,11 @@ class Agent5(KartAgent):
         
         # On crée le Pilote qui suit la piste 
         self.pilot = Agent5Mid(env, self.conf, path_lookahead)
+        # Enveloppement de l'agent de base dans l'agent de gestion du nitro
+        self.nitro = Agent5Nitro(env, self.pilot, self.conf, path_lookahead)
 
         # On l'enveloppe dans l'agent qui esquive les bananes
-        self.brain = Agent5Banana(env, self.pilot, self.conf, path_lookahead)
+        self.brain = Agent5Banana(env, self.nitro, self.conf, path_lookahead)
 
         #self.rescue = Agent5Rescue(env, self.brain, self.conf, path_lookahead)
 
