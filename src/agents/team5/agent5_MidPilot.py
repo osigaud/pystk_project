@@ -20,6 +20,7 @@ class Agent5Mid(KartAgent):
 
         self.last_error = 0.0   # Contient l'erreur de l'angle précédent 
         self.stuck_counter = 0  # Compte le temps passé bloqué contre un mur si kart bloqué
+        self.last_distance = 0.0
         self.is_rescuing = False
 
         self.lookahead_factor = self.conf.pilot.navigation.lookahead_speed_factor
@@ -86,27 +87,51 @@ class Agent5Mid(KartAgent):
         # On limite entre -1 et 1
         steering_normalise = np.clip(steering, -1, 1)
 
-        return steering_normalise
+        return steering_normalise, z
 
-    def manage_speed(self, obs, steering):
+    def manage_speed(self, obs, steering, z):
+        dist_now = obs['distance_down_track']
         velocity = obs['velocity']
         speed = np.linalg.norm(velocity)
 
-        if self.is_rescuing:
+        # On commence par la vitesse d'accélération par défaut configurée.
+        accel = self.conf.pilot.speed_control.default_accel
+        brake = False
+
+        if self.is_rescuing :
             self.stuck_counter += 1
             # On recule pendant X frames
-            if self.stuck_counter < self.rescue_duration:
+            if self.stuck_counter < self.rescue_duration :
                 accel = 0.0
                 brake = True
                 steering = -steering # On inverse le volant pour s'extraire
                 return accel, brake, steering
             else:
+                # Reset des paramètres maintenant que notre mission "rescue" a été accomplie
                 self.is_rescuing = False
                 self.stuck_counter = 0
+                self.last_distance = dist_now
+        
+        # Structure conditionnel nous permettant d'activer is_rescuing :
+        # On commence par vérifier si on a dépassé la ligne de départ
+        elif dist_now > self.conf.pilot.rescue.active_after_meters :
 
-        # On commence par la vitesse d'accélération par défaut configurée.
-        accel = self.conf.pilot.speed_control.default_accel
-        brake = False
+            # On calcule de combien on a avancé depuis la frame précédente
+            # On utilise une petite marge (ex : 0.01) car même bloqué, le kart peut trembler et donc causer de "légers déplacements"
+            if abs(dist_now - self.last_distance) < self.conf.pilot.rescue.stuck_diff_dist_epsilon :
+                self.stuck_counter += 1
+            else:
+                self.stuck_counter = 0
+
+            # Mise à jour de la mémoire pour la prochaine frame 
+            self.last_distance = dist_now 
+
+            if self.stuck_counter > self.conf.pilot.rescue.stuck_frames_limit:
+                self.is_rescuing = True
+                self.stuck_counter = 0
+        else:
+            # Si on roule, on reset le compteur de blocage.
+            self.stuck_counter = 0
 
         # Virage standard : on ralentit un peu si le volant dépasse un certain seuil.
         if abs(steering) > self.conf.pilot.speed_control.steering_threshold:
@@ -120,24 +145,12 @@ class Agent5Mid(KartAgent):
             if speed > self.hairpin_brake_speed:
                 brake = True
 
-
-        # Si on ne bouge plus alors qu'on devrait avancer, on incrémente le compteur
-        if obs['distance_down_track'] > self.conf.pilot.rescue.active_after_meters and speed < self.conf.pilot.rescue.stuck_speed_limit:
-            self.stuck_counter += 1
-            # Si on est bloqué trop longtemps, on active le mode marche arrière
-            if self.stuck_counter > self.conf.pilot.rescue.stuck_frames_limit:
-                self.is_rescuing = True
-                self.stuck_counter = 0
-        else:
-            # Si on roule, on reset le compteur de blocage.
-            self.stuck_counter = 0
-
         return accel, brake, steering
 
     def choose_action(self, obs):
         target_x, target_z = self.position_track(obs)
-        steering = self.compute_turning(target_x, target_z)
-        accel, brake, steering = self.manage_speed(obs, steering)
+        steering, z = self.compute_turning(target_x, target_z)
+        accel, brake, steering = self.manage_speed(obs, steering, z)
 
         action = {
             "acceleration": accel,
