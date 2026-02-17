@@ -1,4 +1,3 @@
-from .agent_straight import AgentStraight
 from .agent_base import AgentInit
 
 class AgentCenter(AgentInit):
