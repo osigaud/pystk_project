@@ -7,6 +7,7 @@ from .agent5_MidPilot import Agent5Mid
 from .agent5_BananaPilot import Agent5Banana
 #from .agent5_Rescue import Agent5Rescue
 from .agent5_NitroPilot import Agent5Nitro
+from .agent5_ItemPilot import Agent5Item
 from omegaconf import OmegaConf 
 import os
 
@@ -37,6 +38,9 @@ class Agent5(KartAgent):
 
         # On l'enveloppe dans l'agent qui esquive les bananes
         self.brain = Agent5Banana(env, self.drift, self.conf, path_lookahead)
+        
+        # On crée le pilot qui gère les items
+        self.item = Agent5Item(env, self.brain, self.conf, path_lookahead)
 
         #self.rescue = Agent5Rescue(env, self.brain, self.conf, path_lookahead)
 
