@@ -41,18 +41,20 @@ class Scores:
         self.dict = {}
     
     def init(self, name):
-        self.dict[name] = [[], []]
+        self.dict[name] = [[], [], [], []]
 
-    def append(self, name, pos, std):
+    def append(self, name, pos, pos_std, dist, dist_std):
         self.dict[name][0].append(pos)
-        self.dict[name][1].append(std)
+        self.dict[name][1].append(pos_std)
+        self.dict[name][2].append(dist)
+        self.dict[name][3].append(dist_std)
 
     def display(self):
         print(self.dict)
 
     def display_mean(self):
         for k in self.dict:
-            print(f"{k}: {np.array(self.dict[k][0]).mean()}, {np.array(self.dict[k][1]).mean()}")
+            print(f"{k}: {np.array(self.dict[k][0]).mean()}, {np.array(self.dict[k][1]).mean()}, {np.array(self.dict[k][2]).mean()}, {np.array(self.dict[k][3]).mean()}")
 
     def display_html(self, fp):
         for k in self.dict:
@@ -60,6 +62,8 @@ class Scores:
             fp.write(
                     f"""<td>{np.array(self.dict[k][0]).mean():.2f}</td>"""
                     f"""<td>{np.array(self.dict[k][1]).mean():.2f}</td>"""
+                    f"""<td>{np.array(self.dict[k][2]).mean():.2f}</td>"""
+                    f"""<td>{np.array(self.dict[k][3]).mean():.2f}</td>"""
                     "</tr>"
                 )
             
@@ -117,9 +121,12 @@ def single_race(env, agents, names, scores):
     obs, _ = env.reset()
     done = False
     steps = 0
+    nb_finished = 0
     positions = []
+    distances = []
     while not done and steps < MAX_STEPS:
         actions = {}
+        env.world_update()
         for i in range(MAX_TEAMS):
             str = f"{i}"
             try:
@@ -127,7 +134,17 @@ def single_race(env, agents, names, scores):
             except Exception as e:
                 print(f"Team {i+1} error: {e}")
                 actions[str] = default_action
-        obs, _, terminated, truncated, info = env.step(actions)
+
+            # check if agents have finished the race
+            kart = env.world.karts[i]
+            if kart.has_finished_race and not agents[i].isEnd:
+                print(f"{names[i]} has finished race !")
+                nb_finished += 1
+                agents[i].isEnd = True
+
+        obs, _, _, _, info = env.step(actions)
+
+        # prepare data to display leaderboard
         pos = np.zeros(MAX_TEAMS)
         dist = np.zeros(MAX_TEAMS)
         for i in range(MAX_TEAMS):
@@ -135,12 +152,17 @@ def single_race(env, agents, names, scores):
             pos[i] = info['infos'][str]['position']
             dist[i] = info['infos'][str]['distance']
         steps = steps + 1
-        done = terminated or truncated
+        done = (nb_finished == 5)
         positions.append(pos)
-    avg_pos = np.array(positions).mean(axis=0)
-    std_pos = np.array(positions).std(axis=0)
+        distances.append(dist)
+    pos_avg = np.array(positions).mean(axis=0)
+    pos_std = np.array(positions).std(axis=0)
+    dist_avg = np.array(distances).mean(axis=0)
+    dist_std = np.array(distances).std(axis=0)
     for i in range(MAX_TEAMS):
-        scores.append(names[i], avg_pos[i], std_pos[i])
+        scores.append(names[i], pos_avg[i], pos_std[i], dist_avg[i], dist_std[i])
+        agents[i].isEnd = False
+    print("race duration:", steps)
 
 def main_loop():
     scores = Scores()
@@ -157,8 +179,6 @@ def main_loop():
         env.close()
 
     print("final scores:")
-    # scores.display()
-    # scores.display_mean()
     return scores
 
 
@@ -177,6 +197,8 @@ def output_html(output: Path, scores: Scores):
     <tr>
       <th class="no-sort">Name</th>
       <th id="position">Avg. position</th>
+      <th class="no-sort">±</th>
+      <th id="position">Avg. distance</th>
       <th class="no-sort">±</th>
     </tr>
   </thead>
