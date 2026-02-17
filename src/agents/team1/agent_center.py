@@ -1,5 +1,5 @@
 from .agent_straight import AgentStraight
-from .agent_init import AgentInit
+from .agent_base import AgentInit
 
 class AgentCenter(AgentInit):
     def __init__(self, env, path_lookahead=3):
