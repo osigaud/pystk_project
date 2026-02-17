@@ -145,17 +145,11 @@ class Agent2(KartAgent):
         correction_piste = self.correction_centrePiste(obs) # APPEL DE LA FONCTION DE MAINTIEN SUR PISTE
 
         # COMBINAISON DE LA DIRECTION DU CHEMIN ET DE LA CORRECTION DE PISTE
-        final_steering = np.clip(steering + correction_piste, -1, 1) # ADDITION DES DEUX FORCES
+        final_steering = np.clip(steering + correction_piste, -1, 1) 
 
         # ADAPTATION DE L'ACCELERATION SELON LE VIRAGE POUR NE PAS SORTIR DE LA PISTE
-        #acceleration = 0.8 if abs(final_steering) < 0.3 else 0.4 # RALENTIR SI ON TOURNE FORT
         acceleration = self.adapteAcceleration(obs)
-        # on determinera le drift plus tard
-        #if abs(final_steering) > 0.9:
-        #    drift = True
-        #else :
-        #    drift = False
-            
+        
         action = {
             "acceleration": acceleration,
             "steer": final_steering,
@@ -166,29 +160,5 @@ class Agent2(KartAgent):
             "fire": False
         }
         
-        # if target_item_distance == 10:
-        #     if obs['target_item_type'] in bad_type:
-        #         if target_item_angle > 5: # obstacle a droite
-        #             action["steer"] = -0.5 
-        #             action["nitro"] = False
-        #             action["acceleration"] -= 0.5 
-        #         elif target_item_angle == 0: 
-        #             action["steer"] = -0.5 
-        #             action["nitro"] = False
-        #             action["acceleration"] -= 0.5 
-        #         elif target_item_angle < -5: # obstacle a gauche 
-        #             action["steer"] = 0.5 
-        #             action["nitro"] = False
-        #             action["acceleration"] -= 0.5 
-        #
-        #     elif target_item_type in good_type:
-        #         if target_item_angle < -5: # a gauche 
-        #             action["steer"] = -0.5 
-        #             action["nitro"] = True
-        #             action["acceleration"] += 0.5 
-        #         elif target_item_angle > 5: # a droite
-        #             action["steer"] = 0.5 
-        #             action["nitro"] = True
-        #             action["acceleration"] += 0.5 
 
         return action
