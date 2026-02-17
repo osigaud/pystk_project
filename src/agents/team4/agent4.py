@@ -1,6 +1,3 @@
-import numpy as np
-import random
-
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 from .steering import Steering
@@ -81,12 +78,7 @@ class Agent4(KartAgent):
                 self.dodge_timer = 4
                 self.dodge_side = new_side
                 self.last_banana_z = b_z
-            else:
-                if new_side != self.dodge_side and b_z < self.last_banana_z:
-                    self.dodge_side = new_side
-                    self.dodge_timer = 4
-                    self.last_banana_z = b_z
-        
+            
         is_dodging = False
         
         if self.dodge_timer >0:
@@ -98,7 +90,7 @@ class Agent4(KartAgent):
             gx += esquive * self.dodge_side # On ajoute l'esquive à x
 
             
-        steering = self.steering.manage_pure_pursuit(gx,gz,6.0) # Appel à la fonction pure_pursuit en condition normale (pas de danger detecté)
+        steering = self.steering.manage_pure_pursuit(gx,gz,7.0) # Appel à la fonction pure_pursuit en condition normale (pas de danger detecté)
         
         epsilon = 0.05
         
@@ -108,10 +100,6 @@ class Agent4(KartAgent):
         if road_straight and abs(steering) <= epsilon:
             steering = 0.0
         
-        # Au depart on avance tout droit pour eviter de se cogner contre les adversaires
-        if obs['distance_down_track'] <= 2:
-            steering = 0.0
-
         distance = float(obs.get("distance_down_track", [0.0])[0])
         vel = obs.get("velocity", [0.0, 0.0, 0.0])
         speed = float(vel[2])
@@ -142,10 +130,15 @@ class Agent4(KartAgent):
         if (drift == True):
             nitro = False
 
-
-        if(self.rescue.is_stuck(distance,speed)): # Si on est bloque, on appelle la fonction rescue
-            return self.rescue.sortir_du_mur(steering) 
         
+        if(self.rescue.is_stuck(distance,speed)): # Si on est bloque, on appelle la fonction rescue
+            return self.rescue.sortir_du_mur(steering)
+
+        # Au depart on avance tout droit pour eviter de se cogner contre les adversaires
+        if obs['distance_down_track'] <= 2:
+            steering = 0.0
+            acceleration = 1.0
+             
         if is_dodging: # Si on est en train d'esquiver
             
             drift = False       # Pas de drift
