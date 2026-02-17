@@ -63,6 +63,9 @@ class AgentItems(AgentRescue) :
 
             case 9 : 
             #PARACHUTE : à compléter
+                premier_kart = obs["karts_position"][0]
+                if premier_kart[2] > 0:
+                    action["fire"] = 1
                 return action
 
         return action
