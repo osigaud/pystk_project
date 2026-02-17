@@ -75,7 +75,7 @@ class Agent2(KartAgent):
         #le but va etre d'adpater l'acclération dans diverses situations dont notamment 
         #les virages serrés, les lignes droites ou une legere curvature 
         liste_virage=self.detectVirage(obs)
-        acceleration= 0.90
+        acceleration= 1.0
         if len(liste_virage) < 1 :  # s'il n'y a pas de virage 
             acceleration = config.acceleration.sans_virage  # conduite normale on pourrait augmenter légèrement l'accélération -> à décider 
         else : 
@@ -122,12 +122,12 @@ class Agent2(KartAgent):
             if item_type in GOOD_ITEM_IDS:
                 if dist < best_good_dist:
                     best_good_dist = dist
-                angle = np.arctan2(pos[0], pos[2])
-                steering_adjustment = float(np.clip(angle * 1.5, -0.5, 0.5))
+                    angle = np.arctan2(pos[0], pos[2])
+                    steering_adjustment = float(np.clip(angle * 1.5, -0.5, 0.5))
             else:
                 # éviter les bad items proches
                 if dist < dist_min_evite:
-                    angle_evite = -0.8 if pos[0] > 0 else 0.8
+                    angle_evite = -0.6 if pos[0] > 0 else 0.6
 
         if abs(angle_evite) > 0:
             return angle_evite
@@ -183,23 +183,12 @@ class Agent2(KartAgent):
         # Calcul de la correctio pour rester au centre de la piste
         correction_piste = self.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
 
-        final_steering = np.clip(steering + correction_piste, -1, 1) 
-
         # ADAPTATION DE L'ACCELERATION SELON LE VIRAGE POUR NE PAS SORTIR DE LA PISTE
         acceleration = self.adapteAcceleration(obs)
         
-
         item_steering = self.reaction_items(obs)
-        # combinaison de la direction du chemin et de la correction de la piste
 
-        if abs(item_steering) > 0.6:
-            final_steering = item_steering
-        else:
-            final_steering = (
-             0.6*steering + 0.3*correction_piste + 0.2*item_steering
-        )
-
-        final_steering = np.clip(final_steering, -1, 1)
+        final_steering = np.clip(item_steering+ correction_piste+ steering, -1, 1)
 
         action = {
             "acceleration": acceleration,
