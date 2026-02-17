@@ -20,14 +20,12 @@ from agents.team2.agent2 import Agent2
 from agents.team3.agent3 import Agent3
 from agents.team4.agent4 import Agent4
 from agents.team5.agent5 import Agent5
-from agents.team6.agent6 import Agent6
-from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 7
+MAX_TEAMS = 5
 NB_RACES = 10
-MAX_STEPS = 1000
+MAX_STEPS = 2000
 
 # Get the current timestamp
 current_timestamp = datetime.now()
@@ -41,18 +39,19 @@ class Scores:
         self.dict = {}
     
     def init(self, name):
-        self.dict[name] = [[], []]
+        self.dict[name] = [[], [], []]
 
-    def append(self, name, pos, std):
+    def append(self, name, pos, pos_std, steps):
         self.dict[name][0].append(pos)
-        self.dict[name][1].append(std)
+        self.dict[name][1].append(pos_std)
+        self.dict[name][2].append(steps)
 
     def display(self):
         print(self.dict)
 
     def display_mean(self):
         for k in self.dict:
-            print(f"{k}: {np.array(self.dict[k][0]).mean()}, {np.array(self.dict[k][1]).mean()}")
+            print(f"{k}: {np.array(self.dict[k][0]).mean()}, {np.array(self.dict[k][1]).mean()}, {np.array(self.dict[k][2]).mean()}, {np.array(self.dict[k][2]).std()}")
 
     def display_html(self, fp):
         for k in self.dict:
@@ -60,6 +59,8 @@ class Scores:
             fp.write(
                     f"""<td>{np.array(self.dict[k][0]).mean():.2f}</td>"""
                     f"""<td>{np.array(self.dict[k][1]).mean():.2f}</td>"""
+                    f"""<td>{np.array(self.dict[k][2]).mean():.2f}</td>"""
+                    f"""<td>{np.array(self.dict[k][2]).std():.2f}</td>"""
                     "</tr>"
                 )
             
@@ -102,8 +103,6 @@ def create_race():
     agents.append(Agent3(env, path_lookahead=3))
     agents.append(Agent4(env, path_lookahead=3))
     agents.append(Agent5(env, path_lookahead=3))
-    agents.append(Agent6(env, path_lookahead=3))
-    agents.append(Agent7(env, path_lookahead=3))
     np.random.shuffle(agents)
 
     for i in range(MAX_TEAMS):
@@ -119,31 +118,42 @@ def single_race(env, agents, names, scores):
     steps = 0
     nb_finished = 0
     positions = []
+    for i in range(MAX_TEAMS):
+        agents[i].steps = MAX_STEPS
     while not done and steps < MAX_STEPS:
         actions = {}
+        env.world_update()
         for i in range(MAX_TEAMS):
             str = f"{i}"
             try:
                 actions[str] = agents[i].choose_action(obs[str])
-                if agents[i].endOfTrack():
-                    nb_finished += 1
             except Exception as e:
                 print(f"Team {i+1} error: {e}")
                 actions[str] = default_action
-        obs, _, terminated, truncated, info = env.step(actions)
+
+            # check if agents have finished the race
+            kart = env.world.karts[i]
+            if kart.has_finished_race and not agents[i].isEnd:
+                print(f"{names[i]} has finished the race at step {steps}")
+                nb_finished += 1
+                agents[i].isEnd = True
+                agents[i].steps = steps
+
+        obs, _, _, _, info = env.step(actions)
+
+        # prepare data to display leaderboard
         pos = np.zeros(MAX_TEAMS)
-        dist = np.zeros(MAX_TEAMS)
         for i in range(MAX_TEAMS):
             str = f"{i}"
             pos[i] = info['infos'][str]['position']
-            dist[i] = info['infos'][str]['distance']
         steps = steps + 1
-        done = terminated or truncated or nb_finished==5
+        done = (nb_finished == 5)
         positions.append(pos)
-    avg_pos = np.array(positions).mean(axis=0)
-    std_pos = np.array(positions).std(axis=0)
+    pos_avg = np.array(positions).mean(axis=0)
+    pos_std = np.array(positions).std(axis=0)
     for i in range(MAX_TEAMS):
-        scores.append(names[i], avg_pos[i], std_pos[i])
+        scores.append(names[i], pos_avg[i], pos_std[i], agents[i].steps)
+        agents[i].isEnd = False
     print("race duration:", steps)
 
 def main_loop():
@@ -161,8 +171,6 @@ def main_loop():
         env.close()
 
     print("final scores:")
-    # scores.display()
-    # scores.display_mean()
     return scores
 
 
@@ -181,6 +189,8 @@ def output_html(output: Path, scores: Scores):
     <tr>
       <th class="no-sort">Name</th>
       <th id="position">Avg. position</th>
+      <th class="no-sort">±</th>
+      <th id="position">Avg. steps</th>
       <th class="no-sort">±</th>
     </tr>
   </thead>
@@ -202,8 +212,7 @@ def output_html(output: Path, scores: Scores):
         )
         fp.write("""</body>""")
 
-
-
+        
 if __name__ == "__main__":
     scores = main_loop()
     output_html(Path("../../docs/index.html"), scores)
