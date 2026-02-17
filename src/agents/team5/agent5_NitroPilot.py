@@ -11,18 +11,27 @@ class Agent5Nitro(KartAgent):
         self.pilot = pilot_agent
         self.name = "Donkey Bombs Nitro"
         self.conf = conf
+        self.using_nitro = False
 
     def reset(self):
         self.pilot.reset()
+        self.using_nitro = False
 
     def detect_nitro(self, obs):
-
+        
         # On récupère l'action du pilot pour analyser le steer
         action_pilot = self.pilot.choose_action(obs)
 
         steer = action_pilot["steer"]
         accel = action_pilot["acceleration"]
+        energy = obs["energy"]
 
+        if self.using_nitro: # Si on utilise le Nitro et que l’énergie est supérieure à 0, on va tout utiliser.
+            if energy > 0:
+                return True, steer, accel, True
+            else:
+                self.using_nitro = False
+                return False, steer, accel, False
         # Vérifier si la valeur absolue du steer est inférieure au seuil configuré
         if abs(steer) < self.conf.nitro.detection.steering_threshold_nitro:
 
@@ -31,8 +40,9 @@ class Agent5Nitro(KartAgent):
             # 2. Le frein n'est pas activé par le pilot
             # 3. Le dérapage (drift) n'est pas activé par le pilot
             # 4. L'energie est superieur a min_energie
-            if accel > self.conf.nitro.detection.min_acceleration and not action_pilot["brake"] and not action_pilot["drift"] and (obs["energy"] > self.conf.nitro.detection.min_energy) :
-                
+            if accel > self.conf.nitro.detection.min_acceleration and not action_pilot["brake"] and not action_pilot["drift"] and (energy > self.conf.nitro.detection.min_energy) :
+
+                self.using_nitro = True
                 return True, steer, accel, True
 
         return False, steer, accel, False
