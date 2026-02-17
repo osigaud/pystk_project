@@ -84,15 +84,15 @@ class Agent2(KartAgent):
             #print (curvature) # permet d afficher la variation des angles pour determiner les courbures 
             if curvature > config.virages.drift:
                 #drift = True
-                acceleration = acceleration - 0.30
+                acceleration = acceleration - 0.27
             elif curvature > config.virages.serrer.i1 and curvature <=config.virages.serrer.i2: # virage serré 
-                acceleration= acceleration - 0.25
+                acceleration= acceleration - 0.10
                 #drift = False 
             elif curvature > config.virages.moyen.i1 and curvature <= config.virages.moyen.i2:  #virage moyen 
-                acceleration = acceleration - 0.20
+                acceleration = acceleration - 0.05
                 #drift = False
             else :
-                acceleration = acceleration - 0.10
+                acceleration = acceleration - 0.02
                 #drift = False
         return acceleration #drift 
     #on travaillera sur les drifts apres depuis cette fonction 
@@ -108,8 +108,8 @@ class Agent2(KartAgent):
         angle_evite = 0.0
         dist_min_evite = 15.0
 
-        for i, pos in enumerate(items_pos):
-            pos = np.array(pos, dtype=float)
+        for i, pos in enumerate(items_pos):#le sert à faire le lien entre la position de l'item qu'on regarde et son type
+            pos = np.array(pos)
             dist = np.linalg.norm(pos)
 
             # items derriere ou trop loin => ignorer
@@ -127,7 +127,7 @@ class Agent2(KartAgent):
             else:
                 # éviter les bad items proches
                 if dist < dist_min_evite:
-                    angle_evite = -0.6 if pos[0] > 0 else 0.6
+                    angle_evite = -0.61 if pos[0] > 0 else 0.61
 
         if abs(angle_evite) > 0:
             return angle_evite
