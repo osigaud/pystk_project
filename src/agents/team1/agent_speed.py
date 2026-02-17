@@ -28,7 +28,7 @@ class AgentSpeed(AgentCenter):
 
     def limit(self, acceleration):
         if acceleration >= 1:
-            return 1
+            return 2
         if acceleration <= 0:
             return 0.1
         return acceleration
@@ -48,7 +48,7 @@ class AgentSpeed(AgentCenter):
 
         # virage serré
         if msa <= self.msapetit:
-            accel = act["acceleration"] - 0.45
+            accel = act["acceleration"] - 0.25
             act["acceleration"] = self.limit(accel)
 
         elif msa >= self.msagrand:

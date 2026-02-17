@@ -23,7 +23,7 @@ from agents.team1.agent1 import Agent1
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 1
+MAX_TEAMS = 2
 NB_RACES = 1
 
 # Get the current timestamp
@@ -85,7 +85,7 @@ agents_specs = [
 def create_race():
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="abyss", render_mode="human", num_kart=MAX_TEAMS) #track="xr591"
+        env = STKRaceMultiEnv(agents=agents_specs, track="fortmagma", render_mode="human", num_kart=MAX_TEAMS) #track="xr591"
     else:
         env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
 
@@ -95,7 +95,7 @@ def create_race():
     names = []
 
     agents.append(Agent1(env, path_lookahead=3))
-    #agents.append(AgentCenter(env, path_lookahead=3)) 
+    agents.append(AgentSpeed(env, path_lookahead=3)) 
     
     #Pour pas que ça mélange la liste d'agents et qu'on puisse récupérer les données de notre agent plus facilement
     #np.random.shuffle(agents) 
