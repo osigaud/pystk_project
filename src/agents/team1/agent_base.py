@@ -52,7 +52,7 @@ class AgentInit(KartAgent):
         acceleration = random.random()
         steering = random.random()
         action = {
-            "acceleration": 1,
+            "acceleration": 0,
             "steer": 0,
             "brake": False,
             "drift": False,
