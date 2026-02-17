@@ -6,7 +6,7 @@ from .speed import SpeedController
 from .nitro import Nitro
 from .drift import Drift
 from .banana_detection import Banana
-from .esquive_adv import esquiveadv
+from .esquive_adv import EsquiveAdv
 
 
 
@@ -23,6 +23,7 @@ class Agent4(KartAgent):
         self.SpeedController=SpeedController()
         self.nitro = Nitro()
         self.drift = Drift()
+        self.esquive_adv = EsquiveAdv()
         self.drift_cd = 0
         self.during_drift = 0
         self.banana_dodge = Banana()

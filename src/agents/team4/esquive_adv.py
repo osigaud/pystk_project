@@ -1,4 +1,4 @@
-class esquiveadv:
+class EsquiveAdv:
     
     def esquive_adv(self,obs):
 
