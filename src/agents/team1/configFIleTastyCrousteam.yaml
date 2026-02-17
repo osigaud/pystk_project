@@ -2,10 +2,10 @@
 # contient les paramètres et les variables utilisés dans le programme
 
 # distance à partir de laquelle on considère notre distance par rapport au centre trop élevée
-dist : 0.5
+dist : 0.673833673012193
 
 # à quel point on ajuste la direction
-ajust : 0.25
+ajust : 0.6386812473361506
 
 # seuil à partir duquel on considère l'écart entre le front du kart et la direction du segment
 ecartpetit : 2.9
