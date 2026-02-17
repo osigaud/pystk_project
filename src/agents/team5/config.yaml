@@ -48,12 +48,12 @@ pilot:
 # PARAMÈTRES DE LA BANANE (Agent5Banana)
 banana:
   detection:
-    max_distance: 9.3    # Distance max pour repérer une banane (Anticipation).
+    max_distance: 16    # Distance max pour repérer une banane (Anticipation).
     safety_width: 1.44    # Largeur de sécurité latérale.
 
   avoidance:
-    steering_force: 0.9  # Force du coup de volant pour esquiver (0.0 à 1.0).
-    acceleration: 0      # accélération pendant l'esquive.
+    steering_force: 0.8  # Force du coup de volant pour esquiver (0.0 à 1.0).
+    acceleration: 0.1      # accélération pendant l'esquive.
 
 # PARAMÈTRES DU NITRO (Agent5Nitro)
 nitro:
