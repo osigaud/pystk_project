@@ -30,7 +30,7 @@ pilot:
 
   # Gestion de la vitesse
   speed_control:
-    default_accel: 1.0       # Accélération en ligne droite (0.0 à 1.0)
+    default_accel: 3.0       # Accélération en ligne droite (0.0 à 1.0)
     cornering_accel: 0.88     # Accélération dans les virages serrés
     steering_threshold: 0.1  # A partir de quel angle de volant considère-t-on qu'on est dans un virage ?
     hairpin_threshold: 0.92   # Seuil pour détecter l'épingle
