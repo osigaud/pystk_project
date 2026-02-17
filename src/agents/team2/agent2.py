@@ -2,6 +2,10 @@ import numpy as np
 import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
+from omegaconf import OmegaConf #ajouté S4
+
+
+config= OmegaConf.load("../agents/team2/configDemoPilote.yaml")
 
 class Agent2(KartAgent):
     def __init__(self, env, path_lookahead=3):
@@ -34,7 +38,7 @@ class Agent2(KartAgent):
         
         dist_depuis_center = center_path[0] #center_path[0] c'est le point X qui représente le décalage (gauche/droite) par rapport au centre
         
-        correction = dist_depuis_center * 0.5 #On calcule une correction proportionnelle à la distance 0.5 est un bon compromit => dose la force du coup de volant (pas trop mou, pas trop violent)
+        correction = dist_depuis_center * config.correction #On calcule une correction proportionnelle à la distance 0.5 est un bon compromit => dose la force du coup de volant (pas trop mou, pas trop violent)
         
         return np.clip(correction, -1.0, 1.0) #np.clip (=barrière de sécurité) sécurise pour que le res ne dépasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
     
@@ -60,11 +64,10 @@ class Agent2(KartAgent):
 
             curvature = abs(angle2 - angle1)
 
-            if curvature > 0.35:  # seuil à ajuster
+            if curvature > config.curvature :  # seuil à ajuster
                 virages.append({ "index": i, "curvature": curvature })
 
 
-        #print("Virages détectés :", virages)
 
         return virages
 
@@ -72,20 +75,20 @@ class Agent2(KartAgent):
         #le but va etre d'adpater l'acclération dans diverses situations dont notamment 
         #les virages serrés, les lignes droites ou une legere curvature 
         liste_virage=self.detectVirage(obs)
-        acceleration = 0.90
+        acceleration= 0.90
         if len(liste_virage) < 1 :  # s'il n'y a pas de virage 
-            acceleration = 1.0  # conduite normale on pourrait augmenter légèrement l'accélération -> à décider 
+            acceleration = config.acceleration.sans_virage  # conduite normale on pourrait augmenter légèrement l'accélération -> à décider 
         else : 
             proche_virage = liste_virage[0]
             curvature = proche_virage["curvature"]
             #print (curvature) # permet d afficher la variation des angles pour determiner les courbures 
-            if curvature > 2.80 :
+            if curvature > config.virages.drift:
                 #drift = True
                 acceleration = acceleration - 0.30
-            elif curvature > 1.80 and curvature <=2.80: # virage serré 
+            elif curvature > config.virages.serrer.i1 and curvature <=config.virages.serrer.i2: # virage serré 
                 acceleration= acceleration - 0.25
                 #drift = False 
-            elif curvature > 0.85 and curvature <= 1.80:  #virage moyen 
+            elif curvature > config.virages.moyen.i1 and curvature <= config.virages.moyen.i2:  #virage moyen 
                 acceleration = acceleration - 0.20
                 #drift = False
             else :
@@ -93,7 +96,6 @@ class Agent2(KartAgent):
                 #drift = False
         return acceleration #drift 
     #on travaillera sur les drifts apres depuis cette fonction 
-
 
 
     def choose_action(self, obs):
@@ -130,6 +132,7 @@ class Agent2(KartAgent):
             self.stuck_steps = 0
 
         angle = 0
+
         
         if len(nodes_path) > self.path_lookahead:
             target_node = nodes_path[self.path_lookahead]
@@ -139,7 +142,6 @@ class Agent2(KartAgent):
         else:
             steering = 0
 
-        # print(f"angle actuel: {angle:.3f} rad, {np.degrees(angle):.1f} deg") permet d afficher les angles à chaque frame 
 
         # CALCUL DE LA CORRECTION POUR RESTER AU CENTRE DE LA PISTE
         correction_piste = self.correction_centrePiste(obs) # APPEL DE LA FONCTION DE MAINTIEN SUR PISTE
@@ -157,8 +159,7 @@ class Agent2(KartAgent):
             "drift": False, 
             "nitro": False,  
             "rescue": False, 
-            "fire": False
+            "fire": False,
         }
-        
 
         return action
