@@ -1,4 +1,7 @@
 from .agent_center import AgentCenter
+from .agent_base import ECARTPETIT, ECARTGRAND, MSAPETIT, MSAGRAND
+import numpy as np
+
 
 class AgentSpeed(AgentCenter):
     def __init__(self, env, path_lookahead=3):

@@ -1,10 +1,13 @@
 from .agent_base import AgentInit
+from .agent_base import DIST, AJUST
+import numpy as np
+
 
 class AgentCenter(AgentInit):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env, path_lookahead)
-        self.dist = DIST 
-        self.ajust = AJUST 
+        self.dist = DIST
+        self.ajust = AJUST
 
     def path_ajust(self, act, obs):
         """

@@ -1,4 +1,6 @@
 from .agent_obstacles import AgentObstacles
+import numpy as np
+
 
 class AgentRescue(AgentObstacles) : 
     #Prendre le cas en compte où on est étourdi par un item dans is_blocked

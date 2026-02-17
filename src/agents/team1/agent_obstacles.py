@@ -1,4 +1,6 @@
 from .agent_speed import AgentSpeed
+import numpy as np
+from .agent_base import BONUS, OBSTACLES
 
 class AgentObstacles(AgentSpeed) : 
 
