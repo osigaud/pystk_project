@@ -10,7 +10,7 @@ class Banana:
         trouve = False  # Variable permettant de dire si une banane, sous certaines conditions, a été trouvée
 
         for i in range(len(items_pos)): #Boucle pour parcourir la liste entière des items
-            if items_type[i] == 1: #Si c'est une banane 
+            if items_type[i] == 1 or items_type[i] == 4: #Si c'est une banane 
                 pos_x = items_pos[i][0] # On récupère le décalage latéral
                 pos_z = items_pos[i][2] # On récupère la profondeur
                 if -2.5 <= pos_x <= 2.5 and 0.0 <= pos_z <= 20.0:
