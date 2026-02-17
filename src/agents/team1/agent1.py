@@ -1,4 +1,4 @@
-from agents.team1.agentwrappers import *
+from .agent_rescue import AgentRescue
 
 class Agent1(AgentRescue):
     def __init__(self, env, path_lookahead=3): 
