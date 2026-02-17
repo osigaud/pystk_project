@@ -59,6 +59,6 @@ class Agent5Banana(KartAgent):
                 "nitro": False, 
                 "rescue": False,
                 "brake" : False, 
-                "fire": False
+                "fire": True
             }
         return self.pilot.choose_action(obs)
