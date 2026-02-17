@@ -13,8 +13,12 @@ from dataclasses import dataclass
 # Append the "src" folder to sys.path.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src"))) #Changement du path ici pour que ce soit adapté
 
+from agents.team1.agent_base.py import AgentInit 
+from agents.team1.agent_center.py import AgentCenter
+from agents.team1.agent_speed.py import AgentSpeed
+from agents.team1.agent_obstacles.py import AgentObstacles
+from agents.team1.agent_rescue.py import AgentRescue
 from agents.team1.agent1 import Agent1
-from agents.team1.agentwrappers import *
 
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
