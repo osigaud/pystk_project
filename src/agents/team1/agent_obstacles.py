@@ -1,6 +1,6 @@
 from .agent_speed import AgentSpeed
 
-class AgentObstacles(AgentCenter) : 
+class AgentObstacles(AgentSpeed) : 
 
     def __init__(self, env, path_lookahead=3): 
         super().__init__(env, path_lookahead)
