@@ -6,6 +6,7 @@ from .speed import SpeedController
 from .nitro import Nitro
 from .drift import Drift
 from .banana_detection import Banana
+from .esquive_adv import esquiveadv
 
 
 
@@ -88,6 +89,13 @@ class Agent4(KartAgent):
             esquive = 3.0 # Constante permettant l'esquive
 
             gx += esquive * self.dodge_side # On ajoute l'esquive à x
+        else:
+            danger_adv, a_x, a_z = self.esquive_adv.esquive_adv(obs)
+            
+            if danger_adv:
+                if a_x >= 0:
+                    gx -= 2.0 # On se décale à gauche 
+                    gx += 2.0 # On se décale à droite
 
             
         steering = self.steering.manage_pure_pursuit(gx,gz,7.0) # Appel à la fonction pure_pursuit en condition normale (pas de danger detecté)
