@@ -38,10 +38,10 @@ pilot:
     hairpin_brake_speed: 15.0  # Vitesse au dessus de laquelle on freine
   
   rescue:
-    stuck_frames_limit : 5   # Nombre de frames à partir duquel on se dit être bloqué
-    active_after_meters : 5  # Distance par rapport au début de la course
-    stuck_speed_limit : 0.5  # Vitesse à partir de laquelle on se dit être bloqué
-    rescue_duration: 30      # Temps passé à reculer (frames)
+    stuck_frames_limit : 60         # Nombre de frames à partir duquel on se dit être bloqué
+    active_after_meters : 10        # Distance par rapport au début de la course
+    stuck_diff_dist_epsilon : 1   # Marge à partir de laquelle on considère que notre kart n'a pas bougé
+    rescue_duration: 20             # Temps passé à reculer (frames)
 
 
 
