@@ -24,15 +24,15 @@ class AgentItems(AgentRescue) :
 
             case 2 : 
             #CAKE : à compléter
-            premier_kart = obs["karts_position"][0]
-            if premier_kart[2]<0:
-                action["fire"] = False
-                return action 
-            for kart in obs["karts_position"]:
-                if kart[2]>=0 and kart[2]<60:
-                   action["fire"] = True
-                   return action
-            return action
+                premier_kart = obs["karts_position"][0]
+                if premier_kart[2]<0:
+                    action["fire"] = 0
+                    return action 
+                for kart in obs["karts_position"]:
+                    if kart[2]>=0 and kart[2]<60:
+                       action["fire"] = 1
+                       return action
+                return action
             
             case 3 : 
             #BOWLING : à compléter
@@ -56,6 +56,9 @@ class AgentItems(AgentRescue) :
 
             case 8 : 
             #RUBBERBALL : à compléter
+                premier_kart = obs["karts_position"][0]
+                if premier_kart[2] > 0:
+                    action["fire"] = 1
                 return action
 
             case 9 : 
