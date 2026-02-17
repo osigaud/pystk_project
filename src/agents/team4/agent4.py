@@ -11,6 +11,7 @@ from .drift import Drift
 from .banana_detection import Banana
 
 
+
 class Agent4(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)
@@ -133,7 +134,7 @@ class Agent4(KartAgent):
         
         
         brake = False
-        acceleration, brake = self.SpeedController.manage_speed(steering,obs) # Appel à la fonction gerer_vitesse
+        acceleration, brake = self.SpeedController.manage_speed(steering,speed,drift) # Appel à la fonction gerer_vitesse
         #print("speed_out:", self.SpeedController.manage_speed(steering, obs))
         
         nitro = False
