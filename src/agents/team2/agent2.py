@@ -97,6 +97,43 @@ class Agent2(KartAgent):
         return acceleration #drift 
     #on travaillera sur les drifts apres depuis cette fonction 
 
+    def reaction_items(self, obs):
+        items_pos = obs.get('items_position', [])            
+        items_type = obs.get('items_type', [])
+        steering_adjustment = 0.0
+
+        GOOD_ITEM_IDS = [0, 2, 3, 6]  # BONUS_BOX, NITRO_BIG, NITRO_SMALL, EASTER_EGG
+        best_good_dist = 1000.0 # tres grand nombre qui sert comme point de base
+
+        angle_evite = 0.0
+        dist_min_evite = 15.0
+
+        for i, pos in enumerate(items_pos):
+            pos = np.array(pos, dtype=float)
+            dist = np.linalg.norm(pos)
+
+            # items derriere ou trop loin => ignorer
+            if pos[2] < 0 or dist > 25.0:
+                continue
+
+            item_type = items_type[i] if i < len(items_type) else None
+
+            # prendre le meilleur "good" item le plus proche
+            if item_type in GOOD_ITEM_IDS:
+                if dist < best_good_dist:
+                    best_good_dist = dist
+                angle = np.arctan2(pos[0], pos[2])
+                steering_adjustment = float(np.clip(angle * 1.5, -0.5, 0.5))
+            else:
+                # éviter les bad items proches
+                if dist < dist_min_evite:
+                    angle_evite = -0.8 if pos[0] > 0 else 0.8
+
+        if abs(angle_evite) > 0:
+            return angle_evite
+        return steering_adjustment
+
+
 
     def choose_action(self, obs):
         if self.recovery_steps > 0:
@@ -143,15 +180,27 @@ class Agent2(KartAgent):
             steering = 0
 
 
-        # CALCUL DE LA CORRECTION POUR RESTER AU CENTRE DE LA PISTE
-        correction_piste = self.correction_centrePiste(obs) # APPEL DE LA FONCTION DE MAINTIEN SUR PISTE
+        # Calcul de la correctio pour rester au centre de la piste
+        correction_piste = self.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
 
-        # COMBINAISON DE LA DIRECTION DU CHEMIN ET DE LA CORRECTION DE PISTE
         final_steering = np.clip(steering + correction_piste, -1, 1) 
 
         # ADAPTATION DE L'ACCELERATION SELON LE VIRAGE POUR NE PAS SORTIR DE LA PISTE
         acceleration = self.adapteAcceleration(obs)
         
+
+        item_steering = self.reaction_items(obs)
+        # combinaison de la direction du chemin et de la correction de la piste
+
+        if abs(item_steering) > 0.6:
+            final_steering = item_steering
+        else:
+            final_steering = (
+             0.6*steering + 0.3*correction_piste + 0.2*item_steering
+        )
+
+        final_steering = np.clip(final_steering, -1, 1)
+
         action = {
             "acceleration": acceleration,
             "steer": final_steering,
@@ -161,5 +210,5 @@ class Agent2(KartAgent):
             "rescue": False, 
             "fire": False,
         }
-
+        #print(obs["center_path"])
         return action
