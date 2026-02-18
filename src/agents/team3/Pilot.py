@@ -79,7 +79,6 @@ class Pilot():
             "brake": brake,
             "drift": False,
             "nitro": nitro,
-            "rescue": rescue,
-            "fire": fire
+            "rescue": rescue
         }
         return action

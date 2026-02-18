@@ -23,5 +23,6 @@ class FireItems():
                 fire = True
                 break
 
+        action["fire"] = fire
         
         return action
