@@ -13,10 +13,12 @@ from dataclasses import dataclass
 # Append the "src" folder to sys.path.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src"))) #Changement du path ici pour que ce soit adapté
 
+from agents.team1.agent_base import AgentInit 
+from agents.team1.agent_center import AgentCenter
+from agents.team1.agent_speed import AgentSpeed
+from agents.team1.agent_obstacles import AgentObstacles
+from agents.team1.agent_rescue import AgentRescue
 from agents.team1.agent1 import Agent1
-from agents.team1.agent1 import AgentStraight
-from agents.team1.agent1 import AgentCenter
-from agents.team1.agent1 import AgentSpeed
 
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
@@ -93,13 +95,15 @@ def create_race():
     names = []
 
     agents.append(Agent1(env, path_lookahead=3))
-    agents.append(AgentCenter(env, path_lookahead=3)) 
+    agents.append(AgentSpeed(env, path_lookahead=3)) 
     
     #Pour pas que ça mélange la liste d'agents et qu'on puisse récupérer les données de notre agent plus facilement
     #np.random.shuffle(agents) 
 
     for i in range(MAX_TEAMS):
         names.append(agents[i].name)
+        agents_specs[i].name = agents[i].name
+        agents_specs[i].kart = agents[i].name
     return env, agents, names
 
 def single_race(env, agents, names, scores):
@@ -107,7 +111,7 @@ def single_race(env, agents, names, scores):
     done = False
     steps = 0
     positions = []
-    while not done and steps < 1500: #Changer ici pour que la course dure + longtemps
+    while not done and steps < 1000: #Changer ici pour que la course dure + longtemps
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
@@ -129,7 +133,7 @@ def single_race(env, agents, names, scores):
             str = f"{i}"
             pos[i] = info['infos'][str]['position']
             dist[i] = info['infos'][str]['distance']
-        # print(f"{names}{dist}")
+        #print(f"{names}{dist}")
         steps = steps + 1
         done = terminated or truncated
         positions.append(pos)
