@@ -2,6 +2,10 @@ import numpy as np
 import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
+from omegaconf import OmegaConf #ajouté S4
+
+
+config= OmegaConf.load("../agents/team2/configDemoPilote.yaml")
 
 class Agent2(KartAgent):
     def __init__(self, env, path_lookahead=3):
@@ -25,21 +29,21 @@ class Agent2(KartAgent):
         return self.isEnd
         
     
-    def coorection_centrePiste(self, obs):
+    def correction_centrePiste(self, obs):
         """
         Calcule la correction nécessaire pour rester au centre de la piste.
         """
         #center_path contient le vecteur vers le centre de la route
-        center_path = obs.get('path_start', np.array([0, 0, 0])) #si il y a 'path_start' alors center_path='center_path' sinon center_path est un vecteur par défaut mit a [0,0,0] jusqu'à qu'il retrouve le centre 
+        center_path = obs.get('path_start', np.array([0, 0, 0])) #si il y a 'path_start' alors center_path='path_start' sinon center_path est un vecteur par défaut mit a [0,0,0] jusqu'à qu'il retrouve le centre 
         
-        dist_depuis_center = center_path[0] #center_path[0] c'es' le point X qui représente le décalage (gauche/droite) par rapport au centre
+        dist_depuis_center = center_path[0] #center_path[0] c'est le point X qui représente le décalage (gauche/droite) par rapport au centre
         
-        correction = dist_depuis_center * 0.5 #On calcule une correction proportionnelle à la distance 0.5 est un bon compromit => dose la force du coup de volant (pas trop mou, pas trop violent)
+        correction = dist_depuis_center * config.correction #On calcule une correction proportionnelle à la distance 0.5 est un bon compromit => dose la force du coup de volant (pas trop mou, pas trop violent)
         
-        return np.clip(correction, -1.0, 1.0) #np.clip (=barrière de sécurité) sécurise pour que le res ne depasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
+        return np.clip(correction, -1.0, 1.0) #np.clip (=barrière de sécurité) sécurise pour que le res ne dépasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
     
 
-    def anticipeVirage(self,obs):
+    def detectVirage(self,obs):
 
         nodes_path = obs["paths_start"] #liste des neoud de la piste
         nb_nodes = len(nodes_path)
@@ -49,7 +53,7 @@ class Agent2(KartAgent):
 
         for i in range (nb_nodes - path_lookahead): #boucle pour le second (noeud loin=anticipation)
 
-            curr_node = nodes_path[i] #le premier noeud quon rgd (noeud proche)
+            curr_node = nodes_path[i] #le premier noeud qu'on rgd (noeud proche)
             lookahead_node = nodes_path[i+path_lookahead] #noeud loin
 
             x1, z1 = curr_node[0], curr_node[2] #coordonnees pour angle
@@ -60,39 +64,74 @@ class Agent2(KartAgent):
 
             curvature = abs(angle2 - angle1)
 
-            if curvature > 0.35:  # seuil à ajuster
+            if curvature > config.curvature :  # seuil à ajuster
                 virages.append({ "index": i, "curvature": curvature })
 
 
-        #print("Virages détectés :", virages)
 
         return virages
 
     def adapteAcceleration(self,obs):
         #le but va etre d'adpater l'acclération dans diverses situations dont notamment 
         #les virages serrés, les lignes droites ou une legere curvature 
-        liste_virage=self.anticipeVirage(obs)
-        acceleration = 0.90
+        liste_virage=self.detectVirage(obs)
+        acceleration= 1.0
         if len(liste_virage) < 1 :  # s'il n'y a pas de virage 
-            acceleration = 1.0  # conduite normale on pourrait augmenter légèrement l'accélération -> à décider 
+            acceleration = config.acceleration.sans_virage  # conduite normale on pourrait augmenter légèrement l'accélération -> à décider 
         else : 
             proche_virage = liste_virage[0]
             curvature = proche_virage["curvature"]
             #print (curvature) # permet d afficher la variation des angles pour determiner les courbures 
-            if curvature > 2.80 :
+            if curvature > config.virages.drift:
                 #drift = True
-                acceleration = acceleration - 0.30
-            elif curvature > 1.80 and curvature <=2.80: # virage serré 
-                acceleration= acceleration - 0.25
+                acceleration = acceleration - 0.27
+            elif curvature > config.virages.serrer.i1 and curvature <=config.virages.serrer.i2: # virage serré 
+                acceleration= acceleration - 0.10
                 #drift = False 
-            elif curvature > 0.85 and curvature <= 1.80:  #virage moyen 
-                acceleration = acceleration - 0.20
+            elif curvature > config.virages.moyen.i1 and curvature <= config.virages.moyen.i2:  #virage moyen 
+                acceleration = acceleration - 0.05
                 #drift = False
             else :
-                acceleration = acceleration - 0.10
+                acceleration = acceleration - 0.02
                 #drift = False
         return acceleration #drift 
     #on travaillera sur les drifts apres depuis cette fonction 
+
+    def reaction_items(self, obs):
+        items_pos = obs.get('items_position', [])            
+        items_type = obs.get('items_type', [])
+        steering_adjustment = 0.0
+
+        GOOD_ITEM_IDS = [0, 2, 3, 6]  # BONUS_BOX, NITRO_BIG, NITRO_SMALL, EASTER_EGG
+        best_good_dist = 1000.0 # tres grand nombre qui sert comme point de base
+
+        angle_evite = 0.0
+        dist_min_evite = 15.0
+
+        for i, pos in enumerate(items_pos):#le sert à faire le lien entre la position de l'item qu'on regarde et son type
+            pos = np.array(pos)
+            dist = np.linalg.norm(pos)
+
+            # items derriere ou trop loin => ignorer
+            if pos[2] < 0 or dist > 25.0:
+                continue
+
+            item_type = items_type[i] if i < len(items_type) else None
+
+            # prendre le meilleur "good" item le plus proche
+            if item_type in GOOD_ITEM_IDS:
+                if dist < best_good_dist:
+                    best_good_dist = dist
+                    angle = np.arctan2(pos[0], pos[2])
+                    steering_adjustment = float(np.clip(angle * 1.5, -0.5, 0.5))
+            else:
+                # éviter les bad items proches
+                if dist < dist_min_evite:
+                    angle_evite = -0.61 if pos[0] > 0 else 0.61
+
+        if abs(angle_evite) > 0:
+            return angle_evite
+        return steering_adjustment
 
 
 
@@ -130,6 +169,7 @@ class Agent2(KartAgent):
             self.stuck_steps = 0
 
         angle = 0
+
         
         if len(nodes_path) > self.path_lookahead:
             target_node = nodes_path[self.path_lookahead]
@@ -139,23 +179,17 @@ class Agent2(KartAgent):
         else:
             steering = 0
 
-        # print(f"angle actuel: {angle:.3f} rad, {np.degrees(angle):.1f} deg") permet d afficher les angles à chaque frame 
 
-        # CALCUL DE LA CORRECTION POUR RESTER AU CENTRE DE LA PISTE
-        correction_piste = self.coorection_centrePiste(obs) # APPEL DE LA FONCTION DE MAINTIEN SUR PISTE
-
-        # COMBINAISON DE LA DIRECTION DU CHEMIN ET DE LA CORRECTION DE PISTE
-        final_steering = np.clip(steering + correction_piste, -1, 1) # ADDITION DES DEUX FORCES
+        # Calcul de la correctio pour rester au centre de la piste
+        correction_piste = self.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
 
         # ADAPTATION DE L'ACCELERATION SELON LE VIRAGE POUR NE PAS SORTIR DE LA PISTE
-        #acceleration = 0.8 if abs(final_steering) < 0.3 else 0.4 # RALENTIR SI ON TOURNE FORT
         acceleration = self.adapteAcceleration(obs)
-        # on determinera le drift plus tard
-        #if abs(final_steering) > 0.9:
-        #    drift = True
-        #else :
-        #    drift = False
-            
+        
+        item_steering = self.reaction_items(obs)
+
+        final_steering = np.clip(item_steering+ correction_piste+ steering, -1, 1)
+
         action = {
             "acceleration": acceleration,
             "steer": final_steering,
@@ -163,32 +197,7 @@ class Agent2(KartAgent):
             "drift": False, 
             "nitro": False,  
             "rescue": False, 
-            "fire": False
+            "fire": False,
         }
-        
-        # if target_item_distance == 10:
-        #     if obs['target_item_type'] in bad_type:
-        #         if target_item_angle > 5: # obstacle a droite
-        #             action["steer"] = -0.5 
-        #             action["nitro"] = False
-        #             action["acceleration"] -= 0.5 
-        #         elif target_item_angle == 0: 
-        #             action["steer"] = -0.5 
-        #             action["nitro"] = False
-        #             action["acceleration"] -= 0.5 
-        #         elif target_item_angle < -5: # obstacle a gauche 
-        #             action["steer"] = 0.5 
-        #             action["nitro"] = False
-        #             action["acceleration"] -= 0.5 
-        #
-        #     elif target_item_type in good_type:
-        #         if target_item_angle < -5: # a gauche 
-        #             action["steer"] = -0.5 
-        #             action["nitro"] = True
-        #             action["acceleration"] += 0.5 
-        #         elif target_item_angle > 5: # a droite
-        #             action["steer"] = 0.5 
-        #             action["nitro"] = True
-        #             action["acceleration"] += 0.5 
-
+        #print(obs["center_path"])
         return action

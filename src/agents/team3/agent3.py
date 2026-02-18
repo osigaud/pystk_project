@@ -17,6 +17,7 @@ class Agent3(KartAgent):
         self.obs, _ = self.env.reset()
         self.prev_err = 0.0
         self.time_blocked = 0
+    
     def endOfTrack(self):
         return self.isEnd
 
