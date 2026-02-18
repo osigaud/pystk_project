@@ -21,6 +21,7 @@ pyproject.toml
 src/agents/team1/docs/
 #main.py demopilote
 demopilote/main.py
+/demopilote/
 
 
 src/agents/__pycache__/
