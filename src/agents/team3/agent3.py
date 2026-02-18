@@ -16,6 +16,7 @@ class Agent3(KartAgent):
         self.obs, _ = self.env.reset()
         self.prev_err = 0.0
         self.time_blocked = 0
+    
     def endOfTrack(self):
         return self.isEnd
 
@@ -41,13 +42,13 @@ class Agent3(KartAgent):
         if danger:
             avoid_force = (20.0 - closest_baditems_dist) / 2.0
             if closest_baditems_x > 0:
-                offset_force = -avoid_force 
+                offset_force -= avoid_force 
             else:
-                offset_force = avoid_force 
+                offset_force += avoid_force 
         target_ctr_x += offset_force
         err = math.atan2(target_ctr_x, target_ctr_z)
-        p_k = 1.2
-        d_k = 0.5
+        p_k = 1.8
+        d_k = 0.8
         drv = err - self.prev_err
         self.prev_err = err
         ctrl_pd = p_k * err + d_k * drv
@@ -59,9 +60,13 @@ class Agent3(KartAgent):
         acceleration = 1.0
         speed = math.sqrt(obs["velocity"][0]**2 + obs["velocity"][2]**2)
         brake = False
+        drift = False
         nitro = False
         rescue = False
-        if abs(steer) > 0.4 and speed > 22.0:
+        if abs(steer) > 0.7 and speed > 15.0:
+            drift = True 
+            acceleration = 1.0 
+        elif abs(steer) > 0.4 and speed > 22.0:
             acceleration = 0.5 
         if abs(err) > 1.0 and speed > 15.0:
             acceleration = 0.0
@@ -76,21 +81,17 @@ class Agent3(KartAgent):
             if 0 < kart_z < 25.0 and abs(kart_x) < 1.5:
                 fire = True
                 break
-        if (speed < 5.0):
-            self.time_blocked += 1 
-            if (self.time_blocked > 10):
-                acceleration = 0.0
-                brake = True
-                steer = -steer
-            elif self.time_blocked >= 20: 
+        if speed < 5.0:
+            self.time_blocked += 1
+            if self.time_blocked >= 15: 
                 rescue = True
-        if (self.time_blocked == 25):
+        else:
             self.time_blocked = 0
         action = {
             "acceleration": acceleration,
             "steer": steer,
             "brake": brake,
-            "drift": False,
+            "drift": drift,
             "nitro": nitro,
             "rescue": rescue,
             "fire": fire
