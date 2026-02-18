@@ -20,4 +20,7 @@ virages:
     i2: 1.80  
   
 
+# pour la fonction reaction_items
 
+angle_evite_p :  0.61
+angle_evite_n :  -0.61

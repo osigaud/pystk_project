@@ -127,7 +127,7 @@ class Agent2(KartAgent):
             else:
                 # éviter les bad items proches
                 if dist < dist_min_evite:
-                    angle_evite = cfg.angle_evite_p if pos[0] > 0 else cfg.angle_evite_n
+                    angle_evite = cfg.angle_evite_n if pos[0] > 0 else cfg.angle_evite_p
 
         if abs(angle_evite) > 0:
             return angle_evite #evite bad item
