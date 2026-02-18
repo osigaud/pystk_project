@@ -1,0 +1,7 @@
+Il faut décider sur quel PC on fait la 
+démo avant de passer.
+Chaque membre du groupe doit pouvoir 
+expliquer le code et on doit avoir un 
+document explicatif.
+Dans la philosophie agile, on fait que 
+ce qui est indispensable maintenant
