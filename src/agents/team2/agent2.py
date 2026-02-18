@@ -5,7 +5,7 @@ from agents.kart_agent import KartAgent
 from omegaconf import OmegaConf #ajouté S4
 
 
-config= OmegaConf.load("../agents/team2/configDemoPilote.yaml")
+cfg= OmegaConf.load("../agents/team2/configDemoPilote.yaml")
 
 class Agent2(KartAgent):
     def __init__(self, env, path_lookahead=3):
@@ -38,7 +38,7 @@ class Agent2(KartAgent):
         
         dist_depuis_center = center_path[0] #center_path[0] c'est le point X qui représente le décalage (gauche/droite) par rapport au centre
         
-        correction = dist_depuis_center * config.correction #On calcule une correction proportionnelle à la distance 0.5 est un bon compromit => dose la force du coup de volant (pas trop mou, pas trop violent)
+        correction = dist_depuis_center * cfg.correction #On calcule une correction proportionnelle à la distance 0.5 est un bon compromit => dose la force du coup de volant (pas trop mou, pas trop violent)
         
         return np.clip(correction, -1.0, 1.0) #np.clip (=barrière de sécurité) sécurise pour que le res ne dépasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
     
@@ -64,7 +64,7 @@ class Agent2(KartAgent):
 
             curvature = abs(angle2 - angle1)
 
-            if curvature > config.curvature :  # seuil à ajuster
+            if curvature > cfg.curvature :  # seuil à ajuster
                 virages.append({ "index": i, "curvature": curvature })
 
 
@@ -77,18 +77,18 @@ class Agent2(KartAgent):
         liste_virage=self.detectVirage(obs)
         acceleration= 1.0
         if len(liste_virage) < 1 :  # s'il n'y a pas de virage 
-            acceleration = config.acceleration.sans_virage  # conduite normale on pourrait augmenter légèrement l'accélération -> à décider 
+            acceleration = cfg.acceleration.sans_virage  # conduite normale on pourrait augmenter légèrement l'accélération -> à décider 
         else : 
             proche_virage = liste_virage[0]
             curvature = proche_virage["curvature"]
             #print (curvature) # permet d afficher la variation des angles pour determiner les courbures 
-            if curvature > config.virages.drift:
+            if curvature > cfg.virages.drift:
                 #drift = True
                 acceleration = acceleration - 0.27
-            elif curvature > config.virages.serrer.i1 and curvature <=config.virages.serrer.i2: # virage serré 
+            elif curvature > cfg.virages.serrer.i1 and curvature <=cfg.virages.serrer.i2: # virage serré 
                 acceleration= acceleration - 0.10
                 #drift = False 
-            elif curvature > config.virages.moyen.i1 and curvature <= config.virages.moyen.i2:  #virage moyen 
+            elif curvature > cfg.virages.moyen.i1 and curvature <= cfg.virages.moyen.i2:  #virage moyen 
                 acceleration = acceleration - 0.05
                 #drift = False
             else :
@@ -127,11 +127,11 @@ class Agent2(KartAgent):
             else:
                 # éviter les bad items proches
                 if dist < dist_min_evite:
-                    angle_evite = -0.61 if pos[0] > 0 else 0.61
+                    angle_evite = cfg.angle_evite_p if pos[0] > 0 else cfg.angle_evite_n
 
         if abs(angle_evite) > 0:
-            return angle_evite
-        return steering_adjustment
+            return angle_evite #evite bad item
+        return steering_adjustment #se dirige vers good items
 
 
 
