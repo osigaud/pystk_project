@@ -1,3 +1,4 @@
+import math
 import numpy as np
 
 from utils.track_utils import compute_curvature, compute_slope
@@ -71,7 +72,7 @@ class Pilot():
                 rescue = True
         if (self.time_blocked == 25):
             self.time_blocked = 0
-            
+
         action = {
             "acceleration": acceleration,
             "steer": steer,
