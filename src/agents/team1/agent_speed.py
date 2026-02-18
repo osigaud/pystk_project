@@ -8,8 +8,8 @@ class AgentSpeed(AgentCenter):
         super().__init__(env, path_lookahead)
         self.ecartpetit = ECARTPETIT #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
         self.ecartgrand = ECARTGRAND #seuil a partir du quel on considere l'ecart comme grand (virage serré)
-        self.msapetit = MSAPETIT  
-        self.msagrand = MSAGRAND
+        self.msapetit = MSAPETIT  #seuil a partir duquel max steer angle ne permet pas de bien tourner le volant
+        self.msagrand = MSAGRAND  #seuil a partir duquel max steer angle ne permet de bien tourner le volant
         
     def analyse(self, obs):
         virage_serre = False
