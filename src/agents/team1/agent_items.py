@@ -6,6 +6,8 @@ class AgentItems(AgentRescue) :
     def __init__(self, env, path_lookahead=3) :
         super().__init__(env, path_lookahead) 
 
+
+    
     def observation_item(self, obs, action) : 
         """
         Paramètres : obs, action (dict)
@@ -14,7 +16,7 @@ class AgentItems(AgentRescue) :
         current_item = obs["powerup"]
 
         match current_item : 
-            case 0 or 10 : 
+            case 0 | 10 : 
             #NOTHING ou ANVIL
                 return action
 
@@ -68,7 +70,18 @@ class AgentItems(AgentRescue) :
                     action["fire"] = 1
                 return action
 
+
         return action
+
+        
+
+
+    def use_nitro(self, obs, act):
+        nit = obs["energy"]
+        virage_serre = False
+        if nit > 0.05 :
+            act["nitro"] = True
+        return act 
 
     def choose_action(self, obs) : 
         """
@@ -76,6 +89,9 @@ class AgentItems(AgentRescue) :
         Renvoie : action (dict), dictionnaire d'actions corrigé
         """
         action = super().choose_action(obs)
-        action = observation_item(obs, action)
+    
+        action = self.observation_item(obs, action)
+        
+        action = self.use_nitro(obs, action)
         return action
     
