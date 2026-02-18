@@ -123,7 +123,7 @@ class Agent2(KartAgent):
                 if dist < best_good_dist:
                     best_good_dist = dist
                     angle = np.arctan2(pos[0], pos[2])
-                    steering_adjustment = float(np.clip(angle * 1.5, -0.5, 0.5))
+                    steering_adjustment = float(np.clip(angle * 2, -0.5, 0.5))#adapter cette partie aux differentes pistes
             else:
                 # éviter les bad items proches
                 if dist < dist_min_evite:
@@ -158,7 +158,8 @@ class Agent2(KartAgent):
         else:
             nodes_path = [] 
 
-        if phase > 2:  
+
+        if phase > 3:  
             if speed < 0.2:  
                 self.stuck_steps += 1
             else:
@@ -199,5 +200,5 @@ class Agent2(KartAgent):
             "rescue": False, 
             "fire": False,
         }
-        #print(obs["center_path"])
+        #print(obs["phase"])
         return action
