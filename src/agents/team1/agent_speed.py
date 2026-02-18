@@ -1,5 +1,5 @@
 from .agent_center import AgentCenter
-from .agent_base import ECARTPETIT, ECARTGRAND, MSAPETIT, MSAGRAND
+from .agent_base import ECARTPETIT, ECARTGRAND, MSAPETIT, MSAGRAND, ACCEL_LIGNE_DROITE, FREIN_VIRAGE, ACCEL_VIRAGE, DIST_SEGMENT
 import numpy as np
 
 
@@ -10,6 +10,10 @@ class AgentSpeed(AgentCenter):
         self.ecartgrand = ECARTGRAND #seuil a partir du quel on considere l'ecart comme grand (virage serré)
         self.msapetit = MSAPETIT  #seuil a partir duquel max steer angle ne permet pas de bien tourner le volant
         self.msagrand = MSAGRAND  #seuil a partir duquel max steer angle ne permet de bien tourner le volant
+        self.accel_ligne_droite = ACCEL_LIGNE_DROITE
+        self.frein_virage = FREIN_VIRAGE
+        self.accel_virage = ACCEL_VIRAGE
+        self.dist_segment = DIST_SEGMENT
         
     def analyse(self, obs):
         virage_serre = False
@@ -20,7 +24,7 @@ class AgentSpeed(AgentCenter):
             ecart = float(np.linalg.norm(diff))
             dist = abs(obs["paths_distance"][i][0] - obs["paths_distance"][0][0])
                 
-            if ecart >= self.ecartgrand and dist < 6:
+            if ecart >= self.ecartgrand and dist < self.dist_segment:
                 virage_serre = True
       
         return virage_serre
@@ -39,7 +43,7 @@ class AgentSpeed(AgentCenter):
 
         # ligne droite
         if not virage_serre:
-            act["acceleration"] = 2
+            act["acceleration"] = self.accel_ligne_droite
 
             segdirection = obs["paths_end"][0] - obs["paths_start"][0]
             if segdirection[1] > 0.05:
@@ -49,11 +53,11 @@ class AgentSpeed(AgentCenter):
 
         # virage serré
         if msa <= self.msapetit:
-            accel = act["acceleration"] - 0.25
+            accel = act["acceleration"] - self.frein_virage
             act["acceleration"] = self.limit(accel)
 
         elif msa >= self.msagrand:
-            accel = act["acceleration"] + 0.5
+            accel = act["acceleration"] + self.accel_virage
             act["acceleration"] = self.limit(accel)
 
         segdirection = obs["paths_end"][0] - obs["paths_start"][0]
