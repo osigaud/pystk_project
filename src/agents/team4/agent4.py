@@ -151,7 +151,20 @@ class Agent4(KartAgent):
         if is_dodging: # Si on est en train d'esquiver
             
             drift = False       # Pas de drift
-            nitro = False       # Pas de nitro
+            nitro = False       # Pas de nitroer
+            
+        fire_items = False
+        karts_pos = obs.get("karts_position",[])
+        if len(karts_pos)>0:
+            for ennemis in karts_pos:
+                e_x = ennemis[0]
+                e_z = ennemis[1]
+                if 2.0 < e_z < 20.0:
+                    fire_items = True
+                    break
+                elif -15.0 < e_z < -2.0:
+                    fire_items = True
+                    break
         
         action = {
             "acceleration": acceleration,
@@ -160,6 +173,6 @@ class Agent4(KartAgent):
             "drift": drift,
             "nitro": nitro,
             "rescue":False,
-            "fire": False,
+            "fire": fire_items,
         }
         return action
