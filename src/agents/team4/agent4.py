@@ -155,14 +155,18 @@ class Agent4(KartAgent):
             
         fire_items = False
         karts_pos = obs.get("karts_position",[])
+        #attachment_id = obs.get("attachment",0)
         if len(karts_pos)>0:
             for ennemis in karts_pos:
                 e_x = ennemis[0]
                 e_z = ennemis[2]
-                if 2.0 < e_z < 20.0:
+                seuil = 1 + (e_z/15.0)      # item comme la balle de bowling pour lancer le mieux possible sur l'adversaire selon la distance qui nous le sépare
+                if 2.0 < e_z < 15.0 and abs(e_x) < seuil:
+                    #print(attachment_id)
                     fire_items = True
                     break
                 elif -15.0 < e_z < -2.0:
+                    #print(attachment_id)
                     fire_items = True
                     break
         
