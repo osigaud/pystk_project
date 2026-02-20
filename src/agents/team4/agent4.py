@@ -158,7 +158,7 @@ class Agent4(KartAgent):
         if len(karts_pos)>0:
             for ennemis in karts_pos:
                 e_x = ennemis[0]
-                e_z = ennemis[1]
+                e_z = ennemis[2]
                 if 2.0 < e_z < 20.0:
                     fire_items = True
                     break
