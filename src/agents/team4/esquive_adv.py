@@ -1,6 +1,22 @@
 class EsquiveAdv:
+
+    """
+    Module EsquiveAdv : Gère la logique de détection d'adversaires
+    """
     
     def esquive_adv(self,obs):
+        """
+        Détecte Les Adversaires 
+
+        Args:
+            obs(dict)
+        
+        Returns:
+            bool : Variable permettant d'affirmer la présence d'un adversaire
+            float : Position latéral de l'adversaire
+            float : Profondeur de l'adversaire
+        """
+
 
         kart_pos = obs.get('karts_position', []) 
         if len(kart_pos) == 0:

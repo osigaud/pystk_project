@@ -1,6 +1,24 @@
 class SpeedController:
     
+    """
+    Module SpeedController : Gère la logique d'accélération
+    """
+    
     def manage_speed(self, steer, speed, drift):
+        """
+        Gère l'accélération
+
+        Args:
+            steer(float)
+            speed(float)
+            drift(bool)
+        
+        Returns:
+            bool : Variable permettant d'activer ou non le brake
+            float : Valeur représentant l'accélération
+        """
+        
+        
         a = abs(steer)
 
         if drift:

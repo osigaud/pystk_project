@@ -1,6 +1,22 @@
 class Nitro:
+
+    """
+    Module Nitro : Gère la logique d'activation du nitro
+    """
     
     def manage_nitro(self,steer,energy,obs):
+
+        """
+        Gère l'activation du nitro
+
+        Args:
+            obs(dict)
+            steer(float)
+            energy(float)
+        
+        Returns:
+            bool : Variable permettant d'affirmer ou non l'utilisation du nitro
+        """
         
         points = obs['paths_start'] # Récupération des points 
         

@@ -2,11 +2,25 @@ import math
 import numpy as np
 
 class Steering:
+    """
+    Module Steering : Gère la logique de direction
+    """
     
     def __init__(self):
         self.L = 2.5  # On simule un empattement
         
     def manage_pure_pursuit(self,gx,gz,gain):
+        """
+        Gère la logique de direction grâce au pure pursuit
+
+        Args:
+            gx(float)
+            gz(float)
+            gain(float)
+        
+        Returns:
+            float : Variable donnant la direction des roues
+        """
         
         l2 = gx**2 + gz**2 # calcul de l'hypoténuse
             

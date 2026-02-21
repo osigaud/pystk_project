@@ -1,6 +1,23 @@
 class Banana:
 
+    """
+    Module Banana : Gère la logique de détection de bananes et de chewing-gum
+    """
+    
     def banana_detection(self,obs,limit_path,center_path):
+        """
+        Gère la détection des bananes et de chewing-gum
+
+        Args:
+            obs(dict)
+            limit_path(float)
+            center_path(float)
+        
+        Returns:
+            str : Variable donnant le mode d'esquive auquel on est confronté
+            float : Valeur représentant un décalage latéral ou la position de la banane (LIGNE / SINGLE)
+            list : Liste contenant les bananes
+        """
 
         items_pos = obs['items_position'] # Récupération des positions des items
         items_type = obs['items_type'] # Récupération des types des items

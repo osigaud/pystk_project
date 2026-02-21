@@ -9,8 +9,15 @@ from .esquive_adv import EsquiveAdv
 
 
 
+
+
 class Agent4(KartAgent):
+    """
+    Module Agent4 : Gère la logique général de pilotage de l'agent
+    """
+
     def __init__(self, env, path_lookahead=3):
+        """Initialise les variables d'instances de l'agent."""
         super().__init__(env)
         self.path_lookahead = path_lookahead
         self.agent_positions = []
@@ -30,6 +37,7 @@ class Agent4(KartAgent):
         
         
     def reset(self):
+        """Réinitialise les variables d'instances de l'agent en début de course."""
         self.obs, _ = self.env.reset()
         self.agent_positions = []
         self.dodge_timer = 0
@@ -39,9 +47,21 @@ class Agent4(KartAgent):
         self.rescue = RescueManager()
 
     def endOfTrack(self):
+        """Indique si la course est fini"""
         return self.isEnd
 
     def choose_action(self, obs):
+        """
+        Calcule la meilleure action (accélération, direction, fire) 
+        en fonction des observations du radar.
+        
+        Args:
+            obs (dict): Les données fournies par le simulateur.
+            
+        Returns:
+            dict: Le dictionnaire d'actions pour le moteur physique.
+        """
+        
         
         points = obs.get("paths_start",[]) # On récupère la liste des points
         
