@@ -22,10 +22,7 @@ class Agent4(KartAgent):
         self.rescue = RescueManager()
         self.SpeedController=SpeedController()
         self.nitro = Nitro()
-        self.drift = Drift()
         self.esquive_adv = EsquiveAdv()
-        self.drift_cd = 0
-        self.during_drift = 0
         self.banana_dodge = Banana()
         self.dodge_side = 0
         self.dodge_timer = 0
@@ -34,8 +31,6 @@ class Agent4(KartAgent):
     def reset(self):
         self.obs, _ = self.env.reset()
         self.agent_positions = []
-        self.drift_cd = 0
-        self.during_drift = 0
         self.dodge_timer = 0
         self.dodge_side = 0
         self.last_banana_z = float("inf")
@@ -113,33 +108,14 @@ class Agent4(KartAgent):
         vel = obs.get("velocity", [0.0, 0.0, 0.0])
         speed = float(vel[2])
         energy = float(obs.get("energy", [0.0])[0])
-        drift = False
-        
-        if self.drift_cd > 0:
-            drift = False
-            self.drift_cd -= 1
-        else:
-            drift, steering = self.drift.manage_drift(steering, distance)
-            if drift:
-                self.during_drift += 1
-            else :
-                self.during_drift = 0
-            
-            if self.during_drift > 3:
-                self.drift_cd = 7
-                self.during_drift = 0
-        
-        
+    
         brake = False
         acceleration, brake = self.SpeedController.manage_speed(steering,speed,drift) # Appel à la fonction gerer_vitesse
         #print("speed_out:", self.SpeedController.manage_speed(steering, obs))
         
         nitro = False
         nitro = self.nitro.manage_nitro(steering,energy,obs) # Appel à la fonction gerer_nitro
-        if (drift == True):
-            nitro = False
-
-        
+       
         if(self.rescue.is_stuck(distance,speed)): # Si on est bloque, on appelle la fonction rescue
             return self.rescue.sortir_du_mur(steering)
 
@@ -174,7 +150,7 @@ class Agent4(KartAgent):
             "acceleration": acceleration,
             "steer": steering,
             "brake": brake,
-            "drift": drift,
+            "drift": False,
             "nitro": nitro,
             "rescue":False,
             "fire": fire_items,
