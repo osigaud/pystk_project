@@ -8,7 +8,7 @@ class Banana:
         banana = []
 
         for i in range(len(items_pos)):
-            if items_type == 1 or items_type == 4:
+            if items_type[i] == 1 or items_type[i] == 4:
                 pos_x = items_pos[i][0]
                 pos_z = items_pos[i][2]
 

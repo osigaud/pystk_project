@@ -26,6 +26,8 @@ class Agent4(KartAgent):
         self.banana_dodge = Banana()
         self.dodge_side = 0
         self.dodge_timer = 0
+        self.lock_mode = None
+        self.locked_gx = 0.0
         self.last_banana_z = float("inf")
         
     def reset(self):
@@ -33,6 +35,8 @@ class Agent4(KartAgent):
         self.agent_positions = []
         self.dodge_timer = 0
         self.dodge_side = 0
+        self.lock_mode = None
+        self.locked_gx = 0.0
         self.last_banana_z = float("inf")
         self.rescue = RescueManager()
 
@@ -49,7 +53,7 @@ class Agent4(KartAgent):
                 "steer": 0.0,
                 "brake": False,
                 "drift": False,
-                "nitro": False,
+                "nitro": True,
                 "rescue":False,
                 "fire": False,
             }
@@ -58,43 +62,67 @@ class Agent4(KartAgent):
         gx = target[0] # On récupère x, le décalage latéral
         gz = target[2] # On récupère z, la profondeur
 
-        danger, b_x, b_z = self.banana_dodge.banana_detection(obs) # Appel de la fonction de detection
+        paths_width = obs.get("paths_width",0.0)
+        center_path_distance = obs.get("center_path_distance",0.0)
+        limit_path = paths_width[0]/2
+        #print(center_path_distance)
 
-        if danger:
-
-            #print("Danger "+str(b_x)) # Pour Debug, A retirer apres Test
-
-            # Si la banane est à notre droite on va à gauche et vice-versa
-            if b_x >=0:
-                new_side = -1
-            else:
-                new_side = 1
-
-            # Utilisation d'un compteur pour maintenir le cap d'esquive sur x frames
-            if self.dodge_timer == 0:
-                self.dodge_timer = 4
-                self.dodge_side = new_side
-                self.last_banana_z = b_z
-            
-        is_dodging = False
+        gain_volant = 7.0
         
+        mode, b_x, banana_list = self.banana_dodge.banana_detection(obs,limit_path,center_path_distance) # Appel de la fonction de detection
+
+        if mode == "SINGLE" and self.lock_mode != "LIGNE":
+
+            if (limit_path - abs(center_path_distance)) <= 1.5 :
+                print("choix par limite de bord")
+                #print(limit_path, center_path_distance)
+                
+                
+                if center_path_distance >= 0:
+                    new_side = -1
+                else:
+                    new_side = 1
+            else:   
+                print("choix normal")
+                if b_x>=0:
+                    new_side = -1
+                    
+                else:
+                    new_side = 1
+            
+        # Utilisation d'un compteur pour maintenir le cap d'esquive sur x frames
+            if self.dodge_timer == 0 or (self.lock_mode == "SINGLE" and self.dodge_side != new_side):
+                self.lock_mode = "SINGLE"
+                self.dodge_timer = 10
+                self.dodge_side = new_side
+
+        elif mode == "LIGNE":
+            self.lock_mode = "LIGNE"
+            self.dodge_timer = 2
+            self.locked_gx = b_x
+            #print(banana_list)
+            #print("Esquive Ligne")
+
         if self.dodge_timer >0:
             self.dodge_timer -= 1 # On decremente le compteur
-            is_dodging = True # Variable representant l'etat "est en train d'esquiver"
+            if self.lock_mode == "SINGLE":
+                gx += 2.5 * self.dodge_side
+            elif self.lock_mode == "LIGNE":
+                gx = self.locked_gx
+                gain_volant = 6.0
 
-            esquive = 3.0 # Constante permettant l'esquive
-
-            gx += esquive * self.dodge_side # On ajoute l'esquive à x
         else:
-            danger_adv, a_x, a_z = self.esquive_adv.esquive_adv(obs)
+            self.lock_mode = None
+            danger_adv, a_x,a_z = self.esquive_adv.esquive_adv(obs)
             
             if danger_adv:
                 if a_x >= 0:
                     gx -= 2.0 # On se décale à gauche 
+                else:
                     gx += 2.0 # On se décale à droite
-
             
-        steering = self.steering.manage_pure_pursuit(gx,gz,7.0) # Appel à la fonction pure_pursuit en condition normale (pas de danger detecté)
+            
+        steering = self.steering.manage_pure_pursuit(gx,gz,gain_volant) # Appel à la fonction pure_pursuit en condition normale (pas de danger detecté)
         
         epsilon = 0.05
         
@@ -109,6 +137,7 @@ class Agent4(KartAgent):
         speed = float(vel[2])
         energy = float(obs.get("energy", [0.0])[0])
     
+        drift = False
         brake = False
         acceleration, brake = self.SpeedController.manage_speed(steering,speed,drift) # Appel à la fonction gerer_vitesse
         #print("speed_out:", self.SpeedController.manage_speed(steering, obs))
@@ -124,10 +153,10 @@ class Agent4(KartAgent):
             steering = 0.0
             acceleration = 1.0
              
-        if is_dodging: # Si on est en train d'esquiver
+        if self.lock_mode != None: # Si on est en train d'esquiver
             
             drift = False       # Pas de drift
-            nitro = False       # Pas de nitroer
+            nitro = False       # Pas de nitro
             
         fire_items = False
         karts_pos = obs.get("karts_position",[])
