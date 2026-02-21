@@ -65,17 +65,18 @@ class Agent4(KartAgent):
         limit_path = paths_width[0]/2
         #print(center_path_distance)
 
-        gain_volant = 7.0
+        gain_volant = 7.0  #Gain par défaut
         
         mode, b_x, banana_list = self.banana_dodge.banana_detection(obs,limit_path,center_path_distance) # Appel de la fonction de detection
 
-        if mode == "SINGLE" and self.lock_mode != "LIGNE":
+        if mode == "SINGLE" and self.lock_mode != "LIGNE": # Si on a capte un cas d'une banane seule et qu'on était pas déjà dans une situation d'esquive de barrage
 
+            #Sécurité pour éviter de sortir de la piste
             if (limit_path - abs(center_path_distance)) <= 1.5 :
                 print("choix par limite de bord")
                 #print(limit_path, center_path_distance)
                 
-                
+                # ATTENTION LOGIQUE INVERSEE POUR CENTER PATH, si > 0 l'agent se situe à droite de la piste
                 if center_path_distance >= 0:
                     new_side = -1
                 else:
@@ -88,13 +89,13 @@ class Agent4(KartAgent):
                 else:
                     new_side = 1
             
-        # Utilisation d'un compteur pour maintenir le cap d'esquive sur x frames
+            # Utilisation d'un compteur pour maintenir le cap d'esquive sur x frames
             if self.dodge_timer == 0 or (self.lock_mode == "SINGLE" and self.dodge_side != new_side):
                 self.lock_mode = "SINGLE"
                 self.dodge_timer = 10
                 self.dodge_side = new_side
 
-        elif mode == "LIGNE":
+        elif mode == "LIGNE": #Si on a capte un mode ligne
             self.lock_mode = "LIGNE"
             self.dodge_timer = 2
             self.locked_gx = b_x
@@ -104,10 +105,10 @@ class Agent4(KartAgent):
         if self.dodge_timer >0:
             self.dodge_timer -= 1 # On decremente le compteur
             if self.lock_mode == "SINGLE":
-                gx += 2.5 * self.dodge_side
+                gx += 2.5 * self.dodge_side # On cree le decalage pour le cas single
             elif self.lock_mode == "LIGNE":
-                gx = self.locked_gx
-                gain_volant = 6.0
+                gx = self.locked_gx # On vise le gap calculé pour le mode ligne
+                gain_volant = 6.0 # Ajustement du gain pour le mode ligne
 
         else:
             self.lock_mode = None
