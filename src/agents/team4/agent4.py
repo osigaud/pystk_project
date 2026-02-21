@@ -4,7 +4,6 @@ from .steering import Steering
 from .rescue import RescueManager
 from .speed import SpeedController
 from .nitro import Nitro
-from .drift import Drift
 from .banana_detection import Banana
 from .esquive_adv import EsquiveAdv
 
@@ -28,7 +27,7 @@ class Agent4(KartAgent):
         self.dodge_timer = 0
         self.lock_mode = None
         self.locked_gx = 0.0
-        self.last_banana_z = float("inf")
+        
         
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -37,7 +36,6 @@ class Agent4(KartAgent):
         self.dodge_side = 0
         self.lock_mode = None
         self.locked_gx = 0.0
-        self.last_banana_z = float("inf")
         self.rescue = RescueManager()
 
     def endOfTrack(self):
