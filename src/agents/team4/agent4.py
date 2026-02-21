@@ -6,7 +6,8 @@ from .speed import SpeedController
 from .nitro import Nitro
 from .banana_detection import Banana
 from .esquive_adv import EsquiveAdv
-
+from omegaconf import OmegaConf
+conf = OmegaConf.load("../agents/team4/configuration.yaml")
 
 
 
@@ -33,7 +34,7 @@ class Agent4(KartAgent):
         self.dodge_side = 0
         self.dodge_timer = 0
         self.lock_mode = None
-        self.locked_gx = 0.0
+        self.locked_gx = 0.
         
         
     def reset(self):
@@ -158,7 +159,7 @@ class Agent4(KartAgent):
     
         drift = False
         brake = False
-        acceleration, brake = self.SpeedController.manage_speed(steering,speed,drift) # Appel à la fonction gerer_vitesse
+        acceleration, brake = self.SpeedController.manage_speed(steering,speed,drift,conf) # Appel à la fonction gerer_vitesse
         #print("speed_out:", self.SpeedController.manage_speed(steering, obs))
         
         nitro = False
@@ -193,6 +194,7 @@ class Agent4(KartAgent):
                     #print(attachment_id)
                     fire_items = True
                     break
+
         
         action = {
             "acceleration": acceleration,

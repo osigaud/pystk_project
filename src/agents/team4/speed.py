@@ -4,7 +4,7 @@ class SpeedController:
     Module SpeedController : Gère la logique d'accélération
     """
     
-    def manage_speed(self, steer, speed, drift):
+    def manage_speed(self, steer, speed, drift, conf):
         """
         Gère l'accélération
 
@@ -22,17 +22,17 @@ class SpeedController:
         a = abs(steer)
 
         if drift:
-            if a > 0.95 and speed > 20.0:
+            if a > 0.95 and speed > conf.vitesse_seuil:
                 return 0.98, False
             return 1.0, False
 
-        if a > 0.95 and speed > 20.0:
+        if a > 0.95 and speed > conf.vitesse_seuil:
             return 0.22, True
 
-        if a > 0.90 and speed > 18.0:
+        if a > 0.90 and speed > (conf.vitesse_seuil - 2):
             return 0.85, False
 
-        if a > 0.75 and speed > 19.0:
+        if a > 0.75 and speed > (conf.vitesse_seuil - 1):
             return 0.95, False
 
         return 1.0, False
