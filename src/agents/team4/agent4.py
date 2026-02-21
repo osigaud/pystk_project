@@ -35,6 +35,7 @@ class Agent4(KartAgent):
         self.dodge_timer = 0
         self.lock_mode = None
         self.locked_gx = 0.
+        print(OmegaConf.to_yaml(conf))
         
         
     def reset(self):
