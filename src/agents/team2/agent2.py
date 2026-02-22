@@ -192,6 +192,12 @@ class Agent2(KartAgent):
             nitro=True
         else: 
             nitro=False
+            
+        #utiliser les cadeaux attrapés
+        if obs["items_type"][0]==0:
+            fire=True
+        else:
+            fire=False
 
         # Calcul de la correctio pour rester au centre de la piste
         correction_piste = self.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
@@ -210,7 +216,6 @@ class Agent2(KartAgent):
             "drift": False, 
             "nitro": nitro,  
             "rescue": rescue, 
-            "fire": False,
+            "fire": fire,
         }
-
         return action
