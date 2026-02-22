@@ -5,7 +5,18 @@ from agents.kart_agent import KartAgent
 
 
 class Agent5Nitro(KartAgent):
+    """
+    Agent 'Donkey Bombs Nitro'.
+    Ce wrapper gère l'utilisation optimale du boost (Nitro). 
+    Il agit comme une couche décisionnelle supplémentaire qui surveille l'état du kart 
+    et l'énergie disponible pour injecter de la puissance en ligne droite.
+    """
     def __init__(self, env, pilot_agent, conf, path_lookahead=3):
+        """
+        Initialise le module Nitro.
+        Prend en paramètre le pilote de base (pilot_agent) pour pouvoir 
+        analyser ses intentions de conduite avant d'activer le boost.
+        """
         super().__init__(env)
         self.path_lookahead = path_lookahead
         self.pilot = pilot_agent
@@ -14,11 +25,17 @@ class Agent5Nitro(KartAgent):
         self.using_nitro = False
 
     def reset(self):
+        """Réinitialise l'état du Nitro et du pilote interne."""
         self.pilot.reset()
         self.using_nitro = False
 
     def detect_nitro(self, obs):
-        
+        """
+        Analyse si les conditions sont favorables au déclenchement du Nitro.
+        Le boost est activé si le volant est droit, que le kart accélère, 
+        qu'aucun freinage ou drift n'est en cours, et que l'énergie est suffisante.
+        Une fois activé, le Nitro est maintenu jusqu'à épuisement de la jauge.
+        """
         # On récupère l'action du pilot pour analyser le steer
         action_pilot = self.pilot.choose_action(obs)
 
@@ -49,7 +66,12 @@ class Agent5Nitro(KartAgent):
 
 
     def choose_action(self, obs):
-
+        """
+        Arbitre entre l'action boostée et l'action normale du pilote.
+        Si les conditions de detect_nitro sont validées, force l'activation du boost.
+        Sinon, délègue totalement le contrôle au pilote de base.
+        """
+        # La fonction choisit quelles actions le kart doit choisir en fonction des observation de detect_nitro()
         use_nitro, steer, accel, nitro = self.detect_nitro(obs)
 
         if use_nitro:
