@@ -1,4 +1,5 @@
 from enum import Enum
+import random
 import heapq
 import logging
 import functools
@@ -326,6 +327,7 @@ class BaseSTKRaceEnv(gym.Env[Any, STKAction]):
         self.world = None
         self.current_track = None
         self.path_cache: Optional[PathCache] = None
+        random.shuffle(kart_skin)
 
     def reset_race(
         self,
@@ -338,9 +340,12 @@ class BaseSTKRaceEnv(gym.Env[Any, STKAction]):
 
         # Setup the race configuration
         self.current_track = self.default_track
-        if self.current_track is None:
+        while self.current_track is None:
             self.current_track = self.TRACKS[random.randint(0, len(self.TRACKS))]
+            print(f"track selected: {self.current_track}")
             logging.debug("Selected %s", self.current_track)
+            if self.current_track == "black_forest":
+                self.current_track = None
         self.config = pystk2.RaceConfig(
             num_kart=self.num_kart,
             seed=random.randint(2**16),

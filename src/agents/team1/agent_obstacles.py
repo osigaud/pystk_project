@@ -75,12 +75,14 @@ class AgentObstacles(AgentSpeed) :
         #si l'écart est trop grand, on ne détourne pas du chemin de base
 
         if (self.target_item == index) and (node_item_gap_vector[2] <= (next_node[2] - 1)) and (self.target_obstacle is None) :
+            """
             next_node = obs["paths_end"][0]
             node_item_gap_vector = next_node - item_vector
-            #if 0 < node_item_gap_vector[2] < next_node[2] : #optimisation ici ? 
-            #if abs(item_vector[0] - action["steer"]) < 0.1 :
-                #return action
-            #else : 
+            if 0 < node_item_gap_vector[2] < next_node[2] : #optimisation ici ? 
+            if abs(item_vector[0] - action["steer"]) < 0.1 :
+                return action
+            else : 
+            """
             action["steer"] = item_vector[0]
         return action
         

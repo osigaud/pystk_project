@@ -20,7 +20,7 @@ class AgentSpeed(AgentCenter):
             ecart = float(np.linalg.norm(diff))
             dist = abs(obs["paths_distance"][i][0] - obs["paths_distance"][0][0])
                 
-            if ecart >= self.ecartgrand and dist < 10:
+            if ecart >= self.ecartgrand and dist < 6:
                 virage_serre = True
       
         return virage_serre
@@ -28,17 +28,18 @@ class AgentSpeed(AgentCenter):
 
     def limit(self, acceleration):
         if acceleration >= 1:
-            return 2
+            return 1
         if acceleration <= 0:
             return 0.1
         return acceleration
 
     def reaction(self, virage_serre, act, obs):
+        act["acceleration"] = max(act["acceleration"], 1)
         msa = obs["max_steer_angle"]
 
         # ligne droite
         if not virage_serre:
-            act["acceleration"] = 1
+            act["acceleration"] = 2
 
             segdirection = obs["paths_end"][0] - obs["paths_start"][0]
             if segdirection[1] > 0.05:

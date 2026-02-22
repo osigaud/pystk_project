@@ -18,8 +18,8 @@ path_conf = str(path_conf) + '/configFIleTastyCrousteam.yaml'
 conf = OmegaConf.load(path_conf)
 
 #définition des variables qui viennent du fichier de configuration
-DIST = 0.673833673012193
-AJUST = 0.6386812473361506
+DIST = conf.dist
+AJUST = conf.ajust
 ECARTPETIT = conf.ecartpetit
 ECARTGRAND = conf.ecartgrand
 MSAPETIT = conf.msapetit
@@ -52,7 +52,7 @@ class AgentInit(KartAgent):
         acceleration = random.random()
         steering = random.random()
         action = {
-            "acceleration": 1,
+            "acceleration": 0,
             "steer": 0,
             "brake": False,
             "drift": False,
