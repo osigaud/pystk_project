@@ -65,6 +65,10 @@ class Agent5Banana(KartAgent):
 
 
     def edge_safety(self, obs):
+        """
+        La fonction fait en sorte de ne pas trop s'éloigner du centre (dans un diamètre déterminé dans 
+        le fichier de configuration).
+        """
         dist_center = obs["center_path_distance"]
 
         max_dist = self.conf.banana.edge_safety.max_center_dist
