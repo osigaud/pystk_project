@@ -2,8 +2,18 @@
 from agents.kart_agent import KartAgent
 
 class Agent5Drift(KartAgent):
+    """
+    Agent 'Donkey Drift'.
+    Ce wrapper gère spécifiquement les phases de dérapage contrôlé (drift) dans les épingles.
+    Il utilise une double anticipation (regard lointain pour l'entrée, regard proche pour la sortie)
+    pour optimiser la trajectoire et conserver une vitesse de sortie élevée.
+    """
     # AGENT DRIFT : Il gère les dérapages dans les épingles en anticipant la courbure de la piste.
     def __init__(self, env, pilot_agent, conf, path_lookahead=3):
+        """
+        Initialise l'agent de drift avec les paramètres de seuils de détection,
+        de sécurité et de physique de glisse définis dans le fichier YAML.
+        """
         super().__init__(env)
         self.conf = conf
         self.pilot = pilot_agent
@@ -25,12 +35,18 @@ class Agent5Drift(KartAgent):
         self.turn_confirm_counter = 0 # Compteur pour valider que le virage est bien une épingle
 
     def reset(self):
+        """Réinitialise l'état du drift et le pilote interne."""
         self.pilot.reset()
         self.is_drifting = False
         self.cooldown_timer = 0
         self.turn_confirm_counter = 0
 
     def choose_action(self, obs):
+        """
+        Arbitre l'activation du drift en analysant la courbure de la piste à longue distance.
+        Si le drift est actif, il remplace les commandes du pilote par des paramètres de glisse.
+        Sinon, il laisse le contrôle au pilote de base (MidPilot).
+        """
         # On récupère l'action calculée par le Mid Pilot
         action = self.pilot.choose_action(obs)
         paths = obs['paths_end']
@@ -83,11 +99,13 @@ class Agent5Drift(KartAgent):
                 self.cooldown_timer = self.cooldown_limit # Pause pour stabiliser la trajectoire
 
         if self.is_drifting:
+            # Si le mode drift est actif, on écrase les commandes du pilote de base.
             action['drift'] = True
             action['steer'] = self.conf.drift.drift_steer_angle if far_target_x > 0 else -self.conf.drift.drift_steer_angle
             action['acceleration'] = self.drift_accel
             action['nitro'] = False
         else:
+            # Si on ne drift pas, on s'assure que le bouton drift est relâché
             action['drift'] = False
 
         return action
