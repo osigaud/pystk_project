@@ -48,7 +48,7 @@ pilot:
 # PARAMÈTRES DE LA BANANE (Agent5Banana)
 banana:
   detection:
-    max_distance: 13
+    max_distance: 9.5
     safety_width: 1.2
     #trajectory_width: 0.8   # Largeur du couloir autour de la corde (demi-largeur du kart + marge)
 
