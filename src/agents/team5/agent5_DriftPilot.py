@@ -84,7 +84,7 @@ class Agent5Drift(KartAgent):
 
         if self.is_drifting:
             action['drift'] = True
-            action['steer'] = 0.8 if far_target_x > 0 else -0.8
+            action['steer'] = self.conf.drift.drift_steer_angle if far_target_x > 0 else -self.conf.drift.drift_steer_angle
             action['acceleration'] = self.drift_accel
             action['nitro'] = False
         else:

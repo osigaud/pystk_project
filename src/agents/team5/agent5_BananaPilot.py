@@ -12,41 +12,79 @@ class Agent5Banana(KartAgent):
         self.name = "Donkey Bombs Banana"
         self.conf = conf
 
+        self.ahead_dist = self.conf.pilot.navigation.lookahead_meters
+        self.lookahead_factor = self.conf.pilot.navigation.lookahead_speed_factor
+        self.lookahead_max = self.conf.pilot.navigation.lookahead_max
+
+
     def reset(self):
         self.pilot.reset()
 
-    def detect_banana(self, obs):
-        '''La fonction detecte la banane la plus proche et devant le kart, décide si on doit l'éviter et par quel coté on doit l'éviter.
-        Cette fonction renvoie : si le wrapper prend le contrôle de l'agent ou pas, un float correspondant au steering, un float correspondant à l'acceleration'''
+    def position_track(self, obs):
+        # La fonction analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique.
+        paths = obs['paths_end']
 
+        if len(paths) == 0:
+            return 0, self.ahead_dist  # par défaut si aucun noeud n'est donné dans la liste paths_end
+
+        # On calcule la vitesse actuelle pour adapter la distance de visée.
+        speed = np.linalg.norm(obs['velocity'])
+
+        # Plus on va vite, plus on regarde loin
+        lookahead = self.ahead_dist + (speed * self.lookahead_factor)
+
+        # On plafonne la visée
+        lookahead = min(lookahead, self.lookahead_max)
+
+        target_vector = paths[-1]  # Par défaut on prend le noeud le plus loin pour éviter tout bug
+
+        # On cherche le premier point qui dépasse notre distance de visée calculée
+        for p in paths:
+            if p[2] > lookahead:
+                target_vector = p
+                break
+
+        # On retourne l'écart latéral x et l'écart avant z du point cible
+        return target_vector[0], target_vector[2]
+
+
+    def detect_banana(self, obs):
         items_pos = np.array(obs["items_position"])
         items_type = obs["items_type"]
 
         if items_type is None or len(items_type) == 0:
-            return False, 0.0, 1.0 #Il n'y a pas d'item sur la map, le wrapper ne prend pas le controle
+            return False, 0.0, 1.0
 
-        index_bananas = [i for i, j in enumerate(items_type) if (j == 1 or j == 4 or j == 5)]  # Trouvés dans le code source du jeu
+        index_bananas = [i for i, j in enumerate(items_type) if (j == 1 or j == 4 or j == 5)]
         bananas = items_pos[index_bananas]
 
         if len(index_bananas) == 0:
-            return False, 0.0, 1.0 #Il n'y a pas banane sur la map, le wrapper ne prend pas le controle
+            return False, 0.0, 1.0
 
+        node_dist_x, _ = self.position_track(obs)
 
         for b in bananas:
             x = b[0]
             z = b[2]
 
             if 0 < z < self.conf.banana.detection.max_distance and abs(x) < self.conf.banana.detection.safety_width:
-                # Évitement
-                if x < 0:
-                    steering = self.conf.banana.avoidance.steering_force
-                else :
-                    steering = -self.conf.banana.avoidance.steering_force
-                accel = self.conf.banana.avoidance.acceleration
 
-                return True, steering, accel #Le wrapper prend le controle du kart, tourne soit à gauche soit à droite, accelère en fonction de la variable accel
+                banana_dist_node = x - node_dist_x  # Distance latérale entre banane et noeud suivit
 
-        return False, 0.0, 1.0 #Si il n'y a pas de banane proche et devant le kart le wrapper ne prend pas le controle
+                # La banane est plus proche du noeud que le kart alors on l'évite
+                # Le kart évite les bananes qui sont dans sa trajectoire
+                if abs(banana_dist_node) <= abs(node_dist_x):                    
+                    # Évitement
+                    if x < 0:
+                        steering = self.conf.banana.avoidance.steering_force
+                    else:
+                        steering = -self.conf.banana.avoidance.steering_force
+
+                    accel = self.conf.banana.avoidance.acceleration
+                    return True, steering, accel
+
+        return False, 0.0, 1.0
+
 
     def choose_action(self, obs):
         '''La fonction choisit quelles actions le kart doit choisir en fonction des observation de detect_banana() et renvoie les actions choisies'''

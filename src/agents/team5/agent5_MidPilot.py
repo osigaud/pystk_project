@@ -110,7 +110,8 @@ class Agent5Mid(KartAgent):
                 # Reset des paramètres maintenant que notre mission "rescue" a été accomplie
                 self.is_rescuing = False
                 self.stuck_counter = 0
-                self.last_distance = dist_now
+                self.last_distance = dist_now   # last_distance est la distance par rapport à la ligne de départ de la frame précédente
+
         
         # Structure conditionnel nous permettant d'activer is_rescuing :
         # On commence par vérifier si on a dépassé la ligne de départ

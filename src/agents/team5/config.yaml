@@ -4,28 +4,28 @@ pilot:
   
   # Réglages du cerveau
   brain:
-    kp: 14.0  # Puissance du braquage.
+    kp: 13  # Puissance du braquage.
     # Augmenter si le kart ne tourne pas assez dans les virages serrés
     # Diminuer si le kart oscille trop violemment gauche/droite
     
-    kd: 7.835 # Stabilité.
+    kd: 8 # Stabilité.
     # Augmenter si le volant tremble trop en ligne droite
     # Diminuer si la direction semble "molle" ou réagit en retard
 
   # Navigation et Vision
   navigation:
-    lookahead_meters: 9.2   # Distance de visée (en mètres, Le kart regarde ce point pour décider où tourner)
+    lookahead_meters: 6   # Distance de visée (en mètres, Le kart regarde ce point pour décider où tourner)
     min_dist_safety: 1      # Distance minimale de sécurité
     
-    lookahead_far: 13.7    # Le point qu'on regarde au loin pour savoir si ça tourne
+    lookahead_far: 13    # Le point qu'on regarde au loin pour savoir si ça tourne
     apex_offset: 0.65
     
-    lookahead_speed_factor: 0.22 # Facteur d'anticipation lié à la vitesse
+    lookahead_speed_factor: 0.20 # Facteur d'anticipation lié à la vitesse
     # Plus cette valeur est haute, plus le kart regarde loin quand il prend de la vitesse
     # Augmenter pour anticiper les virages plus tôt
     # Diminuer si le kart commence à tourner trop tôt
     
-    lookahead_max: 13.7 # Plafond maximal de la visée (mètres)
+    lookahead_max: 15 # Plafond maximal de la visée (mètres)
     # Limite la distance de regard pour ne pas que le kart voie trop loin
 
   # Gestion de la vitesse
@@ -48,37 +48,40 @@ pilot:
 # PARAMÈTRES DE LA BANANE (Agent5Banana)
 banana:
   detection:
-    max_distance: 14    # Distance max pour repérer une banane (Anticipation).
-    safety_width: 1.77    # Largeur de sécurité latérale.
+    max_distance: 11    # Distance max pour repérer une banane (Anticipation).
+    safety_width: 1.5   # Largeur de sécurité latérale.
 
   avoidance:
-    steering_force: 0.73  # Force du coup de volant pour esquiver (0.0 à 1.0).
-    acceleration: 0.4      # accélération pendant l'esquive.
+    steering_force: 0.8  # Force du coup de volant pour esquiver (0.0 à 1.0).
+    acceleration: 0.3      # accélération pendant l'esquive.
 
 # PARAMÈTRES DU NITRO (Agent5Nitro)
 nitro:
   detection:
     steering_threshold_nitro: 0.3 # A partir de quel angle on peut utiliser le nitro.
     min_acceleration: 0.8         # A partir de quel vitesse on peut utiliser le nitro.
-    min_energy: 2                 # A partir de combien d'energie on peut utiliser le nitro. 
+    min_energy: 1                 # A partir de combien d'energie on peut utiliser le nitro. 
     
     
 # PARAMÈTRES DU DRIFT (Agent5Drift)
 drift:
+
+  #Angle de braquage du volant lors des drifts
+  drift_steer_angle : 0.7
   # Vision et Anticipation
   far_lookahead: 12.5        # Distance de détection lointaine (mètres)
   # C'est l'oeil qui cherche l'épingle au loin pour préparer le drift
   
-  near_lookahead: 5.2       # Distance de visée courte (mètres)
+  near_lookahead: 5       # Distance de visée courte (mètres)
   # Sert à détecter si la piste devant le kart redevient droite pour arrêter le drift
 
   far_target_threshold: 3.5  # Seuil de décalage latéral de la piste au loin
   # Augmenter si le kart drift trop souvent dans des virages légers
   
-  steer_trigger: 0.8        # Seuil d'angle du volant (0.0 à 1.0)
+  steer_trigger: 0.9        # Seuil d'angle du volant (0.0 à 1.0)
   # Si le pilote braque plus fort que ce seuil, on considère que c'est une épingle
   
-  confirmation_frames: 4.7     # Nombre de frames de validation
+  confirmation_frames: 5     # Nombre de frames de validation
   # Le virage doit être détecté pendant X frames avant de lancer le drift
 
   min_speed: 10.0            # Vitesse minimale pour autoriser le drift (m/s)
@@ -93,4 +96,4 @@ drift:
   cooldown_frames: 10        # Temps de repos forcé après un drift
   # Empêche le kart de recommencer à drifter immédiatement
 
-  drift_accel: 0.9           # Accélération maintenue pendant le drift
+  drift_accel: 1           # Accélération maintenue pendant le drift
