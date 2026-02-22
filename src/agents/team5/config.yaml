@@ -4,17 +4,17 @@ pilot:
   
   # Réglages du cerveau
   brain:
-    kp: 13  # Puissance du braquage.
+    kp: 12  # Puissance du braquage.
     # Augmenter si le kart ne tourne pas assez dans les virages serrés
     # Diminuer si le kart oscille trop violemment gauche/droite
     
-    kd: 8 # Stabilité.
+    kd: 6 # Stabilité.
     # Augmenter si le volant tremble trop en ligne droite
     # Diminuer si la direction semble "molle" ou réagit en retard
 
   # Navigation et Vision
   navigation:
-    lookahead_meters: 6   # Distance de visée (en mètres, Le kart regarde ce point pour décider où tourner)
+    lookahead_meters: 5   # Distance de visée (en mètres, Le kart regarde ce point pour décider où tourner)
     min_dist_safety: 1      # Distance minimale de sécurité
     
     lookahead_far: 13    # Le point qu'on regarde au loin pour savoir si ça tourne
@@ -25,7 +25,7 @@ pilot:
     # Augmenter pour anticiper les virages plus tôt
     # Diminuer si le kart commence à tourner trop tôt
     
-    lookahead_max: 15 # Plafond maximal de la visée (mètres)
+    lookahead_max: 13 # Plafond maximal de la visée (mètres)
     # Limite la distance de regard pour ne pas que le kart voie trop loin
 
   # Gestion de la vitesse
@@ -48,19 +48,20 @@ pilot:
 # PARAMÈTRES DE LA BANANE (Agent5Banana)
 banana:
   detection:
-    max_distance: 11    # Distance max pour repérer une banane (Anticipation).
-    safety_width: 1.5   # Largeur de sécurité latérale.
+    max_distance: 13
+    safety_width: 1.2
+    #trajectory_width: 0.8   # Largeur du couloir autour de la corde (demi-largeur du kart + marge)
 
   avoidance:
-    steering_force: 0.8  # Force du coup de volant pour esquiver (0.0 à 1.0).
-    acceleration: 0.3      # accélération pendant l'esquive.
+    steering_force: 0.8
+    acceleration: 0.3
 
 # PARAMÈTRES DU NITRO (Agent5Nitro)
 nitro:
   detection:
-    steering_threshold_nitro: 0.3 # A partir de quel angle on peut utiliser le nitro.
+    steering_threshold_nitro: 0.2 # A partir de quel angle on peut utiliser le nitro.
     min_acceleration: 0.8         # A partir de quel vitesse on peut utiliser le nitro.
-    min_energy: 1                 # A partir de combien d'energie on peut utiliser le nitro. 
+    min_energy: 0                 # A partir de combien d'energie on peut utiliser le nitro. 
     
     
 # PARAMÈTRES DU DRIFT (Agent5Drift)

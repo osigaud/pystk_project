@@ -61,25 +61,27 @@ class Agent5Banana(KartAgent):
         if len(index_bananas) == 0:
             return False, 0.0, 1.0
 
-        node_dist_x, _ = self.position_track(obs)
+        node_x, node_z = self.position_track(obs)
+
+        denominator = np.sqrt(node_x**2 + node_z**2)
+
+        if denominator < 1e-6:
+            return False, 0.0, 1.0
 
         for b in bananas:
-            x = b[0]
-            z = b[2]
+            x_b = b[0]
+            z_b = b[2]
 
-            if 0 < z < self.conf.banana.detection.max_distance and abs(x) < self.conf.banana.detection.safety_width:
+            if 0 < z_b < self.conf.banana.detection.max_distance:
 
-                banana_dist_node = x - node_dist_x  # Distance latérale entre banane et noeud suivit
+                # distance perpendiculaire entre le point de la banane et la droite séparant le kart et le noeud
+                d = abs(node_x * z_b - node_z * x_b) / denominator
 
-                # La banane est plus proche du noeud que le kart alors on l'évite
-                # Le kart évite les bananes qui sont dans sa trajectoire
-                if abs(banana_dist_node) <= abs(node_dist_x):                    
-                    # Évitement
-                    if x < 0:
-                        steering = self.conf.banana.avoidance.steering_force
+                if d < self.conf.banana.detection.safety_width:
+                    if x_b < 0:
+                        steering = self.conf.banana.avoidance.steering_force 
                     else:
                         steering = -self.conf.banana.avoidance.steering_force
-
                     accel = self.conf.banana.avoidance.acceleration
                     return True, steering, accel
 
