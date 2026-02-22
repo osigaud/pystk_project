@@ -5,7 +5,16 @@ from agents.kart_agent import KartAgent
 
 
 class Agent5Banana(KartAgent):
+    """
+    Agent 'Donkey Bombs Banana'.
+    Ce wrapper est responsable de la détection et de l'évitement des obstacles 
+    (bananes et autres objets fixes) sur la trajectoire du kart.
+    """
     def __init__(self, env, pilot_agent, conf, path_lookahead=3):
+        """
+        Initialise le module d'évitement avec les paramètres de détection et de force 
+        de braquage définis dans le fichier de configuration.
+        """
         super().__init__(env)
         self.path_lookahead = path_lookahead
         self.pilot = pilot_agent
@@ -18,9 +27,15 @@ class Agent5Banana(KartAgent):
 
 
     def reset(self):
+        """Réinitialise le pilote interne."""
         self.pilot.reset()
 
     def position_track(self, obs):
+        """
+        Calcule le point de visée dynamique. 
+        Utilisé ici pour définir la droite de trajectoire théorique afin de calculer 
+        la distance perpendiculaire des obstacles.
+        """
         # La fonction analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique.
         paths = obs['paths_end']
 
@@ -49,6 +64,11 @@ class Agent5Banana(KartAgent):
 
 
     def detect_banana(self, obs):
+        """
+        Scanne les objets environnants et identifie les menaces (types 1, 4, 5).
+        Calcule la distance perpendiculaire de chaque obstacle par rapport à la droite 
+        Kart-Cible. Si un objet est trop proche, génère une commande d'évitement.
+        """
         items_pos = np.array(obs["items_position"])
         items_type = obs["items_type"]
 
@@ -78,6 +98,7 @@ class Agent5Banana(KartAgent):
                 d = abs(node_x * z_b - node_z * x_b) / denominator
 
                 if d < self.conf.banana.detection.safety_width:
+                    # Si la banane est à gauche, on tourne à droite, et inversement
                     if x_b < 0:
                         steering = self.conf.banana.avoidance.steering_force 
                     else:
@@ -89,6 +110,10 @@ class Agent5Banana(KartAgent):
 
 
     def choose_action(self, obs):
+        """
+        Arbitre entre la conduite normale et la manœuvre d'évitement.
+        Si un danger est détecté, la priorité est donnée à l'esquive.
+        """
         '''La fonction choisit quelles actions le kart doit choisir en fonction des observation de detect_banana() et renvoie les actions choisies'''
         danger, steer, accel = self.detect_banana(obs)
         if danger:
