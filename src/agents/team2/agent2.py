@@ -180,6 +180,14 @@ class Agent2(KartAgent):
         else:
             steering = 0
 
+        
+        #eviter les murs/ revenir sur la piste si kart bloqué
+        if abs(obs["center_path_distance"])> obs["paths_width"][0]:
+            rescue=True
+        else:
+            rescue=False
+
+
 
         # Calcul de la correctio pour rester au centre de la piste
         correction_piste = self.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
@@ -197,7 +205,7 @@ class Agent2(KartAgent):
             "brake": False, 
             "drift": False, 
             "nitro": False,  
-            "rescue": False, 
+            "rescue": rescue, 
             "fire": False,
         }
         #print(obs["phase"])
