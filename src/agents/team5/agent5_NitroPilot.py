@@ -57,7 +57,7 @@ class Agent5Nitro(KartAgent):
             # 2. Le frein n'est pas activé par le pilot
             # 3. Le dérapage (drift) n'est pas activé par le pilot
             # 4. L'energie est superieur a min_energie
-            if accel > self.conf.nitro.detection.min_acceleration and not action_pilot["brake"] and not action_pilot["drift"] and (energy > self.conf.nitro.detection.min_energy) :
+            if accel > self.conf.nitro.detection.min_acceleration and not action_pilot["brake"] and not action_pilot["drift"]:
 
                 self.using_nitro = True
                 return True, steer, accel, True
