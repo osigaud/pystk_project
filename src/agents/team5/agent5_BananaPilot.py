@@ -48,6 +48,28 @@ class Agent5Banana(KartAgent):
         return target_vector[0], target_vector[2]
 
 
+
+    def edge_safety(self, obs):
+        dist_center = obs["center_path_distance"]
+
+        max_dist = self.conf.banana.edge_safety.max_center_dist
+
+        if abs(dist_center) > max_dist:
+
+            # Si trop à droite on braquer à gauche
+            if dist_center > 0:
+                steering = -self.conf.banana.edge_safety.steering_correction
+            else:
+                steering = self.conf.banana.edge_safety.steering_correction
+
+            accel = self.conf.banana.edge_safety.correction_accel
+
+            return True, steering, accel
+
+        return False, 0.0, 1.0
+
+
+
     def detect_banana(self, obs):
         items_pos = np.array(obs["items_position"])
         items_type = obs["items_type"]
@@ -90,15 +112,32 @@ class Agent5Banana(KartAgent):
 
     def choose_action(self, obs):
         '''La fonction choisit quelles actions le kart doit choisir en fonction des observation de detect_banana() et renvoie les actions choisies'''
+        # Priorité aux évitement de bananes
         danger, steer, accel = self.detect_banana(obs)
         if danger:
             return {
                 "acceleration": accel,
                 "steer": steer,
-                "drift": False, 
-                "nitro": False, 
+                "drift": False,
+                "nitro": False,
                 "rescue": False,
-                "brake" : False, 
+                "brake": False,
                 "fire": True
             }
+
+        # Ensuite sécurité bordures
+        # Cela nous évite de créer un nouveau wrapper pour l'instant
+        edge, steer, accel = self.edge_safety(obs)
+        if edge:
+            return {
+                "acceleration": accel,
+                "steer": steer,
+                "drift": False,
+                "nitro": False,
+                "rescue": False,
+                "brake": False,
+                "fire": False
+            }
+
+        # Puis enfin Pilot prend le controle 
         return self.pilot.choose_action(obs)
