@@ -138,6 +138,19 @@ class Agent2(KartAgent):
         return steering_adjustment #se dirige vers good items
 
 
+    def attack_rivals(self, obs):
+        """ 
+        permet d'utiliser les item seulement lorsqu'il y a des adversaires devant notre kart
+        """
+        karts_pos = obs['karts_position']  # les pos des autres karts
+        for pos in karts_pos:
+            dist = np.linalg.norm(pos)
+            if pos[2] > 0: # si l'adversaire est devant nous
+                angle = np.degrees(np.arctan2(pos[0], pos[2]))
+                if dist < 40 and abs(angle) < 15.0: # si l'adversaire est pres de nous, alors utiliser l'item
+                    return True
+        return False
+
 
     def choose_action(self, obs):
         if self.recovery_steps > 0:
@@ -212,6 +225,9 @@ class Agent2(KartAgent):
         item_steering = self.reaction_items(obs)
 
         final_steering = np.clip(item_steering+ correction_piste+ steering, -1, 1)
+
+        has_item = obs.get("attachment", 0) != 0 # 0 si il ne possede pas l'item
+        fire = has_item and self.attack_rivals(obs) 
 
         action = {
             "acceleration": acceleration,
