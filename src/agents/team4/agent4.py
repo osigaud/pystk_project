@@ -163,9 +163,9 @@ class Agent4(KartAgent):
     
         drift = False
         brake = False
-        acceleration, brake = self.SpeedController.manage_speed(steering,speed,drift,conf) # Appel à la fonction gerer_vitesse
+        acceleration, brake = self.SpeedController.manage_speed(steering,speed,drift,conf,obs) # Appel à la fonction gerer_vitesse
         #print("speed_out:", self.SpeedController.manage_speed(steering, obs))
-        
+        #print("accel = ",acceleration)
         nitro = False
         nitro = self.nitro.manage_nitro(steering,energy,obs) # Appel à la fonction gerer_nitro
        
