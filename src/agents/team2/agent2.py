@@ -33,15 +33,19 @@ class Agent2(KartAgent):
         """
         Calcule la correction nécessaire pour rester au centre de la piste.
         """
-        #center_path contient le vecteur vers le centre de la route
-        center_path = obs.get('path_start', np.array([0, 0, 0])) #si il y a 'path_start' alors center_path='path_start' sinon center_path est un vecteur par défaut mit a [0,0,0] jusqu'à qu'il retrouve le centre 
-        
-        dist_depuis_center = center_path[0] #center_path[0] c'est le point X qui représente le décalage (gauche/droite) par rapport au centre
-        
-        correction = dist_depuis_center * cfg.correction #On calcule une correction proportionnelle à la distance 0.5 est un bon compromit => dose la force du coup de volant (pas trop mou, pas trop violent)
-        
-        return np.clip(correction, -1.0, 1.0) #np.clip (=barrière de sécurité) sécurise pour que le res ne dépasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
-    
+        #si paths_start n'existe pas,on renvoie 0
+        if "paths_start" not in obs or len(obs["paths_start"]) == 0:
+            return 0.0
+        #le point au centre de la piste juste devant le kart
+        point_proche_kart = obs["paths_start"][0]
+        x = point_proche_kart[0] #coordonees du point qui nous indique gche ou drte
+        z = point_proche_kart[2] #coordonnees du pt qui nous indique devant ou derriere
+        if z<=0.0:
+            return 0.0
+        # angle qu'il faut tourner pour atteindre le point
+        angle_vers_centre= np.arctan2(x, z)
+        correction = angle_vers_centre * cfg.correction
+        return np.clip(correction, -0.6, 0.6) #np.clip (=barrière de sécurité) sécurise pour que le res ne dépasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
 
     def detectVirage(self,obs):
 
