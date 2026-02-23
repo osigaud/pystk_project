@@ -54,8 +54,8 @@ class Agent4(KartAgent):
 
     def choose_action(self, obs):
         """
-        Calcule la meilleure action (accélération, direction, fire) 
-        en fonction des observations du radar.
+        Calcule les différentes actions à réaliser en fonction des observations
+        et des conditions reçues.
         
         Args:
             obs (dict): Les données fournies par le simulateur.
@@ -119,19 +119,19 @@ class Agent4(KartAgent):
 
         elif mode == "LIGNE": #Si on a capte un mode ligne
             self.lock_mode = "LIGNE"
-            self.dodge_timer = 2
+            self.dodge_timer = 0
             self.locked_gx = b_x
             #print(banana_list)
             #print("Esquive Ligne")
 
-        if self.dodge_timer >0:
+        if self.dodge_timer >0: # On est dans le mode Single
             self.dodge_timer -= 1 # On decremente le compteur
-            if self.lock_mode == "SINGLE":
-                gx += 2.5 * self.dodge_side # On cree le decalage pour le cas single
-            elif self.lock_mode == "LIGNE":
-                gx = self.locked_gx # On vise le gap calculé pour le mode ligne
-                gain_volant = 6.0 # Ajustement du gain pour le mode ligne
-
+            gx += 2.5 * self.dodge_side # On cree le decalage pour le cas single
+            
+        elif (mode == "SINGLE" or mode == "LIGNE") and self.lock_mode == "LIGNE":
+            gx = self.locked_gx # On vise le gap calculé pour le mode ligne
+            gain_volant = 6.0 # Ajustement du gain pour le mode ligne
+        
         else:
             self.lock_mode = None
             danger_adv, a_x,a_z = self.esquive_adv.esquive_adv(obs)
