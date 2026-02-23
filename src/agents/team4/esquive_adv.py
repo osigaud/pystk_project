@@ -9,12 +9,12 @@ class EsquiveAdv:
         Détecte Les Adversaires 
 
         Args:
-            obs(dict)
+            obs(dict) : Les données fournies par le simulateur.
         
         Returns:
-            bool : Variable permettant d'affirmer la présence d'un adversaire
-            float : Position latéral de l'adversaire
-            float : Profondeur de l'adversaire
+            bool : Variable permettant d'affirmer la présence d'un adversaire.
+            float : Position latéral de l'adversaire.
+            float : Profondeur de l'adversaire.
         """
 
 

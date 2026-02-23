@@ -7,9 +7,12 @@ from .nitro import Nitro
 from .banana_detection import Banana
 from .esquive_adv import EsquiveAdv
 from omegaconf import OmegaConf
-conf = OmegaConf.load("../agents/team4/configuration.yaml")
+from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent # On obtient le chemin absolu vers notre fichier agent4
+CONFIG_PATH = BASE_DIR / "configuration.yaml" # On dit que notre fichier de config se trouve aussi ici
 
+conf = OmegaConf.load(str(CONFIG_PATH)) # On charge le fichier de config
 
 
 class Agent4(KartAgent):
@@ -126,7 +129,7 @@ class Agent4(KartAgent):
 
         if self.dodge_timer >0: # On est dans le mode Single
             self.dodge_timer -= 1 # On decremente le compteur
-            gx += 2.5 * self.dodge_side # On cree le decalage pour le cas single
+            gx += 3.0 * self.dodge_side # On cree le decalage pour le cas single
             
         elif (mode == "SINGLE" or mode == "LIGNE") and self.lock_mode == "LIGNE":
             gx = self.locked_gx # On vise le gap calculé pour le mode ligne

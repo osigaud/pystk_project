@@ -10,9 +10,9 @@ class Nitro:
         Gère l'activation du nitro
 
         Args:
-            obs(dict)
-            steer(float)
-            energy(float)
+            obs(dict) : Les données fournies par le simulateur.
+            steer(float) : Angle de braquage des roues.
+            energy(float) : Mesure donnant le taux restant de nitro.
         
         Returns:
             bool : Variable permettant d'affirmer ou non l'utilisation du nitro

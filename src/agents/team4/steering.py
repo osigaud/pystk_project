@@ -14,12 +14,12 @@ class Steering:
         Gère la logique de direction grâce au pure pursuit
 
         Args:
-            gx(float)
-            gz(float)
-            gain(float)
+            gx(float) : Décalage latéral de la cible.
+            gz(float) : Profondeur de la cible.
+            gain(float) : Gain à appliquer à l'angle final.
         
         Returns:
-            float : Variable donnant la direction des roues
+            float : Variable donnant la direction des roues.
         """
         
         l2 = gx**2 + gz**2 # calcul de l'hypoténuse

@@ -9,13 +9,13 @@ class SpeedController:
         Gère l'accélération
 
         Args:
-            steer(float)
-            speed(float)
-            drift(bool)
+            steer(float) : Angle de braquage des roues.
+            speed(float) : Vitesse de l'agent.
+            drift(bool) : Booléen disant si l'agent drift ou non.
         
         Returns:
-            bool : Variable permettant d'activer ou non le brake
-            float : Valeur représentant l'accélération
+            bool : Variable permettant d'activer ou non le brake.
+            float : Valeur représentant l'accélération.
         """
         
         

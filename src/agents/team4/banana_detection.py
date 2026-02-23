@@ -9,14 +9,14 @@ class Banana:
         Gère la détection des bananes et de chewing-gum
 
         Args:
-            obs(dict)
-            limit_path(float)
-            center_path(float)
+            obs(dict) : Les données fournies par le simulateur.
+            limit_path(float) : Limite calculée de la piste.
+            center_path(float) : Centre de la piste par rapport à la situation de notre agent.
         
         Returns:
-            str : Variable donnant le mode d'esquive auquel on est confronté
-            float : Valeur représentant un décalage latéral ou la position de la banane (LIGNE / SINGLE)
-            list : Liste contenant les bananes
+            str : Variable donnant le mode d'esquive auquel on est confronté.
+            float : Valeur représentant un décalage latéral ou la position de la banane (LIGNE / SINGLE).
+            list : Liste contenant les bananes.
         """
 
         items_pos = obs['items_position'] # Récupération des positions des items

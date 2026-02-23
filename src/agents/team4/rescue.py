@@ -17,11 +17,11 @@ class RescueManager:
         Gère la détection d'un blocage de l'agent
 
         Args:
-            distance(float)
-            speed(float)
+            distance(float) : Distance parcourue depuis le debut de la course.
+            speed(float) : Vitesse de l'agent.
         
         Returns:
-            bool : Variable permettant d'affirmer ou non que l'agent est bloqué
+            bool : Variable permettant d'affirmer ou non que l'agent est bloqué.
         """
         
         self.agent_positions.append(distance)
