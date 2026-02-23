@@ -149,8 +149,8 @@ class Agent4(KartAgent):
         
         road_straight = abs(points[2][0]) < 0.8
 
-        # Pour eviter les vibrations, si on est sur une ligne droite, on met le steering à 0
-        if road_straight and abs(steering) <= epsilon:
+        # Pour eviter les vibrations, si on est sur une ligne droite et dans aucun cas d'esquive, on met le steering à 0
+        if road_straight and abs(steering) <= epsilon and self.lock_mode == None and not danger_adv:
             steering = 0.0
         
         distance = float(obs.get("distance_down_track", [0.0])[0])
