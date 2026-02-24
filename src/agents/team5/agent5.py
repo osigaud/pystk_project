@@ -2,8 +2,12 @@ import numpy as np
 import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
+from .agent5_DriftPilot import Agent5Drift
 from .agent5_MidPilot import Agent5Mid
 from .agent5_BananaPilot import Agent5Banana
+#from .agent5_Rescue import Agent5Rescue
+from .agent5_NitroPilot import Agent5Nitro
+from .agent5_ItemPilot import Agent5Item
 from omegaconf import OmegaConf 
 import os
 
@@ -25,9 +29,20 @@ class Agent5(KartAgent):
         
         # On crée le Pilote qui suit la piste 
         self.pilot = Agent5Mid(env, self.conf, path_lookahead)
+        
+        # Enveloppement de l'agent de base dans l'agent de gestion du nitro
+        self.nitro = Agent5Nitro(env, self.pilot, self.conf, path_lookahead)
+
+        # On créer le pilote qui drift sur la piste
+        self.drift = Agent5Drift(env, self.nitro, self.conf, path_lookahead)
 
         # On l'enveloppe dans l'agent qui esquive les bananes
-        self.brain = Agent5Banana(env, self.pilot, self.conf, path_lookahead)
+        self.brain = Agent5Banana(env, self.drift, self.conf, path_lookahead)
+        
+        # On crée le pilot qui gère les items
+        self.item = Agent5Item(env, self.brain, self.conf, path_lookahead)
+
+        #self.rescue = Agent5Rescue(env, self.brain, self.conf, path_lookahead)
 
     def endOfTrack(self):
         return self.isEnd

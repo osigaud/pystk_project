@@ -7,8 +7,9 @@ curvature: 0.35
 
 #valeurs a ajuster dans la fonction adapteAcceleration():
 
-acceleration:      
-  sans_virage: 0.90   #acceleration avant de rencontrer un virage
+acceleration: 
+#j'ai modifié c'était 0.90      
+  sans_virage: 1.0   #acceleration avant de rencontrer un virage
 
 virages:
   drift: 2.80   #seuil necessitant un drift (tres serrer)
@@ -20,4 +21,7 @@ virages:
     i2: 1.80  
   
 
+# pour la fonction reaction_items
 
+angle_evite_p :  0.61
+angle_evite_n :  -0.61

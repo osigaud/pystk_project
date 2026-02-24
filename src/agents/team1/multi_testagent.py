@@ -1,6 +1,6 @@
 """
 MultiAgent race
-Simule 21 courses sur toutes les map, dans l'ordre
+Simule 21 courses sur toutes les map, dans l'ordre, sans le visuel
 """
 
 import sys, os
@@ -104,6 +104,7 @@ def create_race(map=None):
     for i in range(MAX_TEAMS):
         names.append(agents[i].name)
         agents_specs[i].name = agents[i].name
+        agents_specs[i].kart = agents[i].name
     return env, agents, names
 
 
