@@ -32,7 +32,7 @@ class AgentItems(AgentRescue) :
                     return action 
                 for kart in obs["karts_position"]:
                     if kart[2]>=0 and kart[2]<60:
-                       action["fire"] = 1
+                       action["fire"] = True
                        return action
                 return action
             
@@ -42,6 +42,8 @@ class AgentItems(AgentRescue) :
 
             case 4 : 
             #ZIPPER : à compléter
+                if virage_serre = false and self.target.obstacle = None:
+                    action["fire"] = True                  
                 return action
 
             case 5 : 
@@ -60,14 +62,14 @@ class AgentItems(AgentRescue) :
             #RUBBERBALL : à compléter
                 premier_kart = obs["karts_position"][0]
                 if premier_kart[2] > 0:
-                    action["fire"] = 1
+                    action["fire"] = True
                 return action
 
             case 9 : 
             #PARACHUTE : à compléter
                 premier_kart = obs["karts_position"][0]
                 if premier_kart[2] > 0:
-                    action["fire"] = 1
+                    action["fire"] = True
                 return action
 
 
