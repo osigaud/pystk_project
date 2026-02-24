@@ -33,16 +33,17 @@
 <td class="decor title-decor" colspan=2><span class="code">Module&nbsp;<a href="#SpeedController">SpeedController</a>&nbsp;:&nbsp;Gère&nbsp;la&nbsp;logique&nbsp;d'accélération<br>&nbsp;</span></td></tr>
 <tr><td>&nbsp;</td>
 <td class="singlecolumn">Methods defined here:<br>
-<dl><dt><a name="SpeedController-manage_speed"><strong>manage_speed</strong></a>(self, steer, speed, drift, conf)</dt><dd><span class="code">Gère&nbsp;l'accélération<br>
+<dl><dt><a name="SpeedController-manage_speed"><strong>manage_speed</strong></a>(self, speed, drift, conf, obs)</dt><dd><span class="code">Gère&nbsp;l'accélération<br>
 &nbsp;<br>
 Args:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;steer(float)&nbsp;:&nbsp;Angle&nbsp;de&nbsp;braquage&nbsp;des&nbsp;roues.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;speed(float)&nbsp;:&nbsp;Vitesse&nbsp;de&nbsp;l'agent.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;drift(bool)&nbsp;:&nbsp;Booléen&nbsp;disant&nbsp;si&nbsp;l'agent&nbsp;drift&nbsp;ou&nbsp;non.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;conf(float)&nbsp;:&nbsp;Valeur&nbsp;representant&nbsp;un&nbsp;seuil&nbsp;de&nbsp;vitesse.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;obs(dict)&nbsp;:&nbsp;Les&nbsp;données&nbsp;fournies&nbsp;par&nbsp;le&nbsp;simulateur.<br>
 &nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;bool&nbsp;:&nbsp;Variable&nbsp;permettant&nbsp;d'activer&nbsp;ou&nbsp;non&nbsp;le&nbsp;brake.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;float&nbsp;:&nbsp;Valeur&nbsp;représentant&nbsp;l'accélération.</span></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;float:&nbsp;Valeur&nbsp;représentant&nbsp;l'accélération.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bool:&nbsp;Variable&nbsp;permettant&nbsp;d'activer&nbsp;ou&nbsp;non&nbsp;le&nbsp;brake.</span></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>

@@ -4,18 +4,20 @@ class SpeedController:
     Module SpeedController : Gère la logique d'accélération
     """
     
-    def manage_speed(self, steer, speed, drift, conf,obs):
+    def manage_speed(self,speed,drift,conf,obs):
         """
         Gère l'accélération
 
         Args:
-            steer(float) : Angle de braquage des roues.
             speed(float) : Vitesse de l'agent.
             drift(bool) : Booléen disant si l'agent drift ou non.
+            conf(float) : Valeur representant un seuil de vitesse.
+            obs(dict) : Les données fournies par le simulateur.
         
         Returns:
-            bool : Variable permettant d'activer ou non le brake.
-            float : Valeur représentant l'accélération.
+            float: Valeur représentant l'accélération.
+            bool: Variable permettant d'activer ou non le brake.
+
         """
         points = obs.get("paths_start",[]) # On récupère la liste des points
         dx = points[3][0] #on prend le decalage latéral x du troisieme point devant l'agent
