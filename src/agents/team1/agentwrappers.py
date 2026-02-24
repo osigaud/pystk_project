@@ -485,9 +485,6 @@ class AgentRescue(AgentObstacles) :
 
 
 #Agent qui derape quand la courbe est serree (virage serre)
-<<<<<<< HEAD
-class AgentDrift(AgentItems)  :
-=======
 class AgentDrift(AgentSpeed)  :
 
     """Agent qui active le drift dans les virages serrés.
@@ -502,14 +499,11 @@ class AgentDrift(AgentSpeed)  :
     et de récuperer des boosts.
     """
 
->>>>>>> 8ca8f2801503ef8be54f0a79b871a221e9925388
     def __init__(self, env, path_lookahead = 3):
         super().__init__(env,path_lookahead)
         self.is_drifting = False   
 
     def drift_control(self, obs, action) :
-<<<<<<< HEAD
-=======
 
         """Active ou désactive le drift selon la situation.
 
@@ -526,7 +520,6 @@ class AgentDrift(AgentSpeed)  :
             dict: Action avec le champ "drift" mis à True ou False.
         """
         
->>>>>>> 8ca8f2801503ef8be54f0a79b871a221e9925388
         virage_serre = self.analyse(obs)
         speed = np.linalg.norm(obs["velocity"])
         msa = obs["max_steer_angle"]
