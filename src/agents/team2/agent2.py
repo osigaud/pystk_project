@@ -49,8 +49,12 @@ class Agent2(KartAgent):
         correction = angle_vers_centre * cfg.correction
         return np.clip(correction, -0.6, 0.6) #np.clip (=barrière de sécurité) sécurise pour que le res ne dépasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
 
-    def detectVirage(self,obs):
 
+
+    def detectVirage(self,obs):
+        """ 
+        permet de creer un dictionnaire pour faciliter la detection des differents types de virages à partir de deux noeuds 
+        """
         nodes_path = obs["paths_start"] #liste des neoud de la piste
         nb_nodes = len(nodes_path)
         path_lookahead = 5
@@ -73,13 +77,12 @@ class Agent2(KartAgent):
             if curvature > cfg.curvature :  # seuil à ajuster
                 virages.append({ "index": i, "curvature": curvature })
 
-
-
         return virages
 
     def adapteAcceleration(self,obs):
-        #le but va etre d'adpater l'acclération dans diverses situations dont notamment 
-        #les virages serrés, les lignes droites ou une legere curvature 
+        """le but va etre d'adpater l'acclération dans diverses situations dont notamment 
+        les virages serrés, les virages moyens et les lignes droites --> cette fonction a fait appel à detectViragz """
+        
         liste_virage=self.detectVirage(obs)
         acceleration= 1.0
         if len(liste_virage) < 1 :  # s'il n'y a pas de virage 
@@ -108,6 +111,9 @@ class Agent2(KartAgent):
     #on travaillera sur les drifts apres depuis cette fonction 
 
     def reaction_items(self, obs):
+        """
+        permet d'eviter les 'bad' items et se diriger les 'good' items 
+        """
         items_pos = obs.get('items_position', [])            
         items_type = obs.get('items_type', [])
         steering_adjustment = 0.0

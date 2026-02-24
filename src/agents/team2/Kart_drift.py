@@ -94,3 +94,44 @@ class Kart_drift(Agent2):
                 acceleration = 1.0
                 drift = False
         return acceleration, drift
+        
+        
+    def adapteAcceleration(self, obs):
+        #calcul de la vitesse réelle (norme)
+        velocity = np.array(obs.get("velocity", [0, 0, 0]))
+        speed = np.linalg.norm(velocity)
+        
+        liste_virage = self.detectVirage(obs)
+        acceleration = 1.0
+        drift = False
+
+        if len(liste_virage) < 1:
+            acceleration = cfg.acceleration.sans_virage
+        else:
+            proche_virage = liste_virage[0]
+            curvature = proche_virage["curvature"]
+            
+            #drift courbure maximale
+            if curvature > cfg.virages.drift:
+                # On n'active le drift que si on a assez de vitesse
+                if speed > 10.0:
+                    drift = True
+                    acceleration = 1.0 - 0.27 # Ta valeur pour le drift
+                else:
+                    acceleration = 1.0 - 0.27 # Trop lent pour drift, mais on ralentit quand même
+            
+            #virage serré 
+            elif cfg.virages.serrer.i1 < curvature <= cfg.virages.serrer.i2:
+                acceleration = 1.0 - 0.10
+            
+            #virage moyen
+            elif cfg.virages.moyen.i1 < curvature <= cfg.virages.moyen.i2:
+                acceleration = 1.0 - 0.05
+            
+            #virage léger 
+            else:
+                acceleration = 1.0 - 0.02
+                
+        return acceleration, drift #on renvoie un tuple
+ 
+ 
