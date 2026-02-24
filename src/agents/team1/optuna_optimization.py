@@ -168,7 +168,12 @@ def run_once(dist, ajust):
         max_distance = max(max_distance, distance_i)
 
     env.close()
-    return -max_distance
+
+    if not terminated: #si le kart ne termine pas la course
+        return 4000
+
+    
+    return steps
 
 def objective(trial):
 
@@ -180,7 +185,7 @@ def objective(trial):
     return score  # plus petit = meilleure position
 
 study = optuna.create_study(direction="minimize")
-study.optimize(objective, n_trials=3000)
+study.optimize(objective, n_trials= 3000)
 
 print(study.best_params)
 
