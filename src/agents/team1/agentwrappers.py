@@ -316,30 +316,33 @@ class AgentRescue(AgentObstacles) :
 
 
 #Agent qui derape quand la courbe est serree (virage serre)
-class AgentDrift(AgentSpeed)  :
+class AgentDrift(AgentItems)  :
     def __init__(self, env, path_lookahead = 3):
         super().__init__(env,path_lookahead)
+        self.is_drifting = False   
 
     def drift_control(self, obs, action) :
         virage_serre = self.analyse(obs)
         speed = np.linalg.norm(obs["velocity"])
         msa = obs["max_steer_angle"]
 
-        curvature = np.linalg.norm(obs["paths_end"][0] - obs["paths_start"][0] - obs["front"])
+        #condition pour deraper 
+        drift_condition = ( virage_serre 
+                            and speed > 7   #la vitesse est assez grande
+                            and abs(action["steer"]) > 0.4  
+                            and msa < self.msapetit        
+                            and sefl.target_obstacle is None   #Si il y a des items, on ne derape pas
+                            )
 
-        #la condition de drift
-        drift_condition = ( curvature > 1.2            and
-                            speed > 7                  and
-                            abs(action["steer"]) > 0.4 and
-                            msa < self.msapetit        and
-                            sefl.target_obstacle is None )
+        if drift_condition == True:  # si sa condi satisfait
+            self.is_drifting = True
+        elif speed < 4:  #si la vitesse ne satisfait pas
+            self.is_drifting = False
 
-        if drift_condition == True:
-            action["drift"] = True          #activer deraper
-            action["acceleration"] *= 0.75 #ralentir le kart
+        action["drift"] = self.is_drifting
 
-        else:
-            action["drift"] = False
+        if self.is_drifting:
+            action["acceleration"] *= 0.8 # ralentir le kart pour deraper
 
         return action
 
