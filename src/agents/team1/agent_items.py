@@ -6,9 +6,6 @@ class AgentItems(AgentRescue) :
     def __init__(self, env, path_lookahead=3) :
         super().__init__(env, path_lookahead) 
     
-
-
-    
     def observation_item(self, obs, action) : 
         """
         Paramètres : obs, action (dict)
@@ -55,8 +52,8 @@ class AgentItems(AgentRescue) :
 
             case 4 : 
             #ZIPPER : à compléter
-                if virage_serre = false and self.target_obstacle = None:
-                    action["fire"] = True               
+                #if virage_serre = false and self.target_obstacle = None:
+                    #action["fire"] = True               
                 return action
 
             case 5 : 
