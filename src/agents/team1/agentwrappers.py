@@ -61,6 +61,15 @@ class AgentInit(KartAgent):
 
 #Agent qui suit le centre de la piste
 class AgentCenter(AgentInit):
+
+    """Agent de base chargé de maintenir le kart au centre de la piste.
+
+    L’agent utilise les observations de l’environnement (notamment les points de la piste
+    `paths_start` / `paths_end` et la distance au centre) pour corriger la direction
+    (`steer`). Il applique une correction progressive proportionnelle à l’écart
+    latéral pour ramener le kart vers le centre tout en limitant l’angle de braquage (pour éviter les "zig zag").
+    """
+
     def __init__(self, env, path_lookahead=3):
         super().__init__(env, path_lookahead)
         self.dist = DIST 
@@ -68,8 +77,16 @@ class AgentCenter(AgentInit):
 
     def path_ajust(self, act, obs):
         """
-        Paramètres : obs, act (dict)
-        Renvoie : act (dict), dictionnaire des actions du kart corrigé pour suivre le centre de la piste
+        Ajuste la direction du kart pour suivre le centre de la piste.
+
+        Args:
+            act (dict): Dictionnaire des actions du kart (ex: {"steer": float}).
+            obs (dict): Observations de l’environnement contenant notamment
+                    "paths_end" et "center_path_distance".
+
+        Returns:
+            dict: Dictionnaire des actions corrigé avec une valeur de
+                "steer" comprise entre -1 et 1.
         """
         steer = act["steer"]
         center = obs["paths_end"][2]
@@ -82,15 +99,38 @@ class AgentCenter(AgentInit):
     
     def choose_action(self, obs):
         """
-        Paramètres : obs
-        Renvoie : act (dict), le dictionnaire d'action après correction
-        """
+        Sélectionne une action puis applique une correction de trajectoire.
+
+        Args:
+            obs (dict): Observations de l’environnement.
+
+        Returns:
+            dict: Dictionnaire d’action corrigé.
+    """
         act = super().choose_action(obs)
         act_corr = self.path_ajust(act, obs)
         return act_corr
             
 #Agent qui adapte la vitesse en fonction des virages
 class AgentSpeed(AgentCenter):
+    
+
+    """Agent qui adapte la vitesse en fonction de la forme de la piste dans les prochaines secondes (ligne droite ou virage?).
+
+    Cet agent hérite de AgentCenter (qui gère le maintien au centre de la piste)
+    et ajoute un comportement de gestion de l'accélération selon les
+    segments de piste devant le kart (ligne droite vs virage serré).
+
+    Attributes:
+        ecartpetit (float): Seuil en dessous duquel on considère que l'écart de direction
+            est faible (ligne droite).
+        ecartgrand (float): Seuil à partir duquel l'écart est grand (virage serré).
+        msapetit (float): Seuil bas sur obs["max_steer_angle"] pour moduler l'accélération.
+        msagrand (float): Seuil haut sur obs["max_steer_angle"] pour moduler l'accélération.
+    """
+
+
+
     def __init__(self, env, path_lookahead=3):
         super().__init__(env, path_lookahead)
         self.ecartpetit = ECARTPETIT #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
@@ -99,6 +139,22 @@ class AgentSpeed(AgentCenter):
         self.msagrand = MSAGRAND
         
     def analyse(self, obs):
+        """Analyse la piste devant le kart et classe la situation.
+
+        La méthode inspecte jusqu'à `path_lookahead`(on choisi 3) segments (paths_start/end) et
+        estime un "écart" entre la direction des segments et le vecteur `obs["front"]`.
+        Si un segment proche correspond à un écart élevé, on detecte un virage serré.
+
+        Args:
+            obs (dict): Observations de l’environnement. Clés typiques utilisées :
+                - paths_start (list/array): points de début des segments.
+                - paths_end (list/array): points de fin des segments.
+                - front (array): direction actuelle du kart (vecteur).
+                - paths_distance (list): distances latérales  associees aux segments.
+
+        Returns:
+            str: "ligne droite" ou "virage serre".
+        """
         s = []
        	nbsegments = min(self.path_lookahead, len(obs["paths_start"]))
        	for i in range(nbsegments):
@@ -120,6 +176,17 @@ class AgentSpeed(AgentCenter):
        		return react
 
     def gap(self, acceleration) : 
+        """Borne l'accélération dans une plage utile.
+
+        Au-dessus ou égal à 1, on force à 1
+        En dessous ou égal à 0, on impose un minimum (0.1)
+
+        Args:
+            acceleration (float): Valeur d'accélération à l'instant.
+
+        Returns:
+            float: Accélération bornée.
+        """
         if acceleration >= 1 : 
             return 1
         if acceleration <= 0 : 
@@ -127,6 +194,21 @@ class AgentSpeed(AgentCenter):
         return acceleration
         		
     def reaction(self, react, act, obs):
+        """Modifie l'action `act` en fonction du contexte.
+
+        Ajuste principalement `act["acceleration"]` selon :
+        - le type de trajectoire ("ligne droite" / "virage serre")
+        - `obs["max_steer_angle"]` (indicateur de la difficulté du virage)
+        - une pente éventuelle dans laquelle il faut accélerer(via segdirection[1])
+
+        Args:
+            react (str): Résultat de `analyse` ("ligne droite" ou "virage serre").
+            act (dict): Action courante (doit contenir "acceleration").
+            obs (dict): Observations (doit contenir "max_steer_angle", "paths_start/end"...).
+
+        Returns:
+            dict: Action corrigé (accélération bornée via `gap`).
+        """
         msa = obs["max_steer_angle"]
             
         if react == "ligne droite":
@@ -165,15 +247,40 @@ class AgentSpeed(AgentCenter):
 #Agent qui analyse les obstacles et bonus sur la course et corrige sa trajectoire en conséquences
 class AgentObstacles(AgentCenter) : 
 
+    """Agent qui gere les obstacles et les bonus en corrigeant la trajectoire.
+
+    L'agent hérite de AgentCenter (suivi du centre de piste) et applique ensuite
+    une correction de direction pour :
+    - éviter les obstacles détectés
+    - se diriger vers des bonus (items) si c'est pertinent
+
+    Attributes:
+        target_obstacle (int | None): Index de l'obstacle actuellement ciblé .
+        target_item (int | None): Index du bonus actuellement ciblé.
+    """
+
+
     def __init__(self, env, path_lookahead=3): 
         super().__init__(env, path_lookahead)
         self.target_obstacle = None
         self.target_item = None
 
     def observation_next_item(self, obs, action) : 
-        """
-        Paramètres : obs, action (dict)
-        Renvoie : action (dict), le dictionnaire d'actions corrigé après avoir pris en compte les items sur la piste
+        """Analyse les items visibles (bonus/obstacles) et corrige l'action soit en s'en approchant ou soit en esquivant.
+
+        La méthode :
+        1) repère les indices des items bonus et obstacles via `obs["items_type"]`
+        2) applique d'abord l'évitement des obstacles
+        3) puis (si possible) l'alignement vers un bonus
+
+        Args:
+            obs (dict): Observations de l’environnement. Clés utilisées typiquement :
+                - items_type (list[int] | list[str]): type de chaque item détecté.
+                - items_position (list[array]): vecteur position de chaque item (x, y, z) dans le repère du kart.
+            action (dict): Dictionnaire d'action courant (au minimum "steer").
+
+        Returns:
+            dict: Action corrigée après prise en compte des bonus et obstacles.
         """
         tab_bonus = [i for i in range(len(obs["items_type"])) if obs["items_type"][i] in BONUS]
         tab_obstacles = [i for i in range(len(obs["items_type"])) if obs["items_type"][i] in OBSTACLES]
@@ -196,9 +303,19 @@ class AgentObstacles(AgentCenter) :
         return action
 
     def dodge_obstacle(self, obs, action, index) : 
-        """
-        Paramètres : obs, action (dict), index
-        Renvoie : action (dict), après avoir pris en compte le prochain obstacle (sauf si on a un SHIELD équipé)
+        """Évite un obstacle donné (sauf si un shield est actif).
+
+        La logique conserve une cible (`target_obstacle`) pour éviter de changer
+        d'obstacle ciblé à chaque frame. Si l'obstacle n'est plus pertinent
+        (trop proche, hors zone, ou autre), la cible est remise a None.
+
+        Args:
+            obs (dict): Observations (utilise `items_position`, `attachment`, `attachment_time_left`).
+            action (dict): Action courante (modifie "steer").
+            index (int): Index de l'obstacle dans `obs["items_type"]` / `obs["items_position"]`.
+
+        Returns:
+            dict: Action corrigée (steer modifié pour dévier de l'obstacle).
         """
         if self.target_obstacle is None : 
             self.target_obstacle = index
@@ -220,9 +337,20 @@ class AgentObstacles(AgentCenter) :
         return action
 
     def take_bonus(self, obs, action, index) :
-        """
-        Paramètres : obs, action (dict), index
-        Renvoie : action (dict), après avoir pris en compte le prochain bonus pour se diriger vers celui-ci
+        """Se dirige vers un bonus (item) s'il n'y a pas d'autre priorité et s'il est pertinent de le récupérer.
+
+        La méthode conserve une cible (`target_item`). Elle ignore un item si :
+        - il est trop proche / trop loin / hors zone latérale
+        - il détourne trop de la trajectoire (comparaison avec un noeud de piste)
+        - un obstacle est actuellement ciblé (priorité à la sécurité)
+
+        Args:
+            obs (dict): Observations (utilise `items_position`, `paths_end`).
+            action (dict): Action courante (modifie "steer").
+            index (int): Index du bonus dans `obs["items_type"]` / `obs["items_position"]`.
+
+        Returns:
+            dict: Action corrigée (steer orienté vers l'item si conditions remplies).
         """
         if self.target_item is None : 
             self.target_item = index
@@ -255,7 +383,22 @@ class AgentObstacles(AgentCenter) :
         return action
 
 class AgentRescue(AgentObstacles) : 
-    #Prendre le cas en compte où on est étourdi par un item dans is_blocked
+    
+    """Agent de secours chargé de détecter et faire reculer un kart qui est bloqué.
+
+    Cet agent hérite de AgentObstacles et ajoute un mécanisme de détection
+    de blocage basé sur la progression sur la piste (`distance_down_track`).
+    Si le kart ne progresse plus pendant plusieurs itérations, l’agent déclenche
+    une séquence de freinage afin de tenter de se débloquer.
+
+    Attributes:
+        last_distance (float | None): Dernière distance mesurée le long de la piste.
+        block_counter (int): Nombre de frames consécutives sans progression significative.
+        unblock_steps (int): Nombre d’actions restantes dans la séquence de déblocage.
+        is_braking (bool): Indique si une phase de déblocage est en cours.
+    """
+
+    
     def __init__(self, env, path_lookahead=3): 
         super().__init__(env, path_lookahead)  
         self.last_distance = None
@@ -264,10 +407,19 @@ class AgentRescue(AgentObstacles) :
         self.is_braking = False
 
     def is_blocked(self, obs):
+        """Détecte si le kart est bloqué et met à jour le compteur interne.
+
+        Un blocage est détecté si la progression (`distance_down_track`)
+        varie très peu pendant plusieurs frames, que le kart n’est pas en saut,
+        et qu’il n’est pas affecté par certains items (ex: étourdissement).
+
+        Args:
+            obs (dict): Observations de l’environnement contenant notamment :
+                - distance_down_track
+                - jumping
+                - attachment
         """
-        Paramètres : obs
-        Incrémente self.block_counter si le kart n'a pas bougé
-        """
+
         distance_down_track = obs["distance_down_track"][0]
         attachment = obs["attachment"]
         if self.last_distance is None :
@@ -280,9 +432,17 @@ class AgentRescue(AgentObstacles) :
             self.last_distance = distance_down_track
 
     def unblock_action(self, act):
-        """
-        Paramètres : act (dict)
-        Renvoie : act (dict), modifié si on doit reculer
+        """Applique un recul pour tenter de débloquer le kart.
+
+        Pendant un nombre limité de frames (`unblock_steps`), l’agent force
+        une action de recul afin de sortir d’une situation de blocage.
+
+        Args:
+            act (dict): Action courante.
+
+        Returns:
+            dict: Action modifiée si une phase de déblocage est active,
+                  sinon l’action originale.
         """
         if self.unblock_steps > 0 : 
             self.unblock_steps -= 1
@@ -300,9 +460,18 @@ class AgentRescue(AgentObstacles) :
             return act
     
     def choose_action(self, obs):
-        """
-        Paramètres : obs
-        Renvoie : action (dict), le dictionnaire d'actions de notre kart
+        """Choisit une action et déclenche un déblocage si nécessaire.
+
+        Étapes :
+        1) Vérifie si le kart est bloqué.
+        2) Récupère l’action normale (centre + obstacles).
+        3) Si blocage est prolongé, lance un recul.
+
+        Args:
+            obs (dict): Observations de l’environnement.
+
+        Returns:
+            dict: Action finale appliquée au kart.
         """
         self.is_blocked(obs)
         action = super().choose_action(obs)   
@@ -317,10 +486,39 @@ class AgentRescue(AgentObstacles) :
 
 #Agent qui derape quand la courbe est serree (virage serre)
 class AgentDrift(AgentSpeed)  :
+
+    """Agent qui active le drift dans les virages serrés.
+
+    Hérite de AgentSpeed (gestion de la vitesse) et ajoute
+    un comportement de dérapage lorsque :
+    - un virage serré est détecté,
+    - l'angle de direction est suffisamment important,
+    - la vitesse est assez élevée.
+
+    Le drift permet d'améliorer la prise de virage
+    et de récuperer des boosts.
+    """
+
     def __init__(self, env, path_lookahead = 3):
         super().__init__(env,path_lookahead)
 
-    def drift_contSrol(self, obs, action) :
+    def drift_control(self, obs, action) :
+
+        """Active ou désactive le drift selon la situation.
+
+        Conditions d’activation :
+        - Virage serré détecté via `analyse`
+        - |steer| >= 0.5
+        - vitesse > 6
+
+        Args:
+            obs (dict): Observations contenant notamment `velocity`.
+            action (dict): Action courante (modifie la clé "drift").
+
+        Returns:
+            dict: Action avec le champ "drift" mis à True ou False.
+        """
+        
         virage_serre = self.analyse(obs)
         speed = np.linalg.norm(obs["velocity"])
 
