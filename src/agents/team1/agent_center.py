@@ -15,7 +15,7 @@ class AgentCenter(AgentInit):
         Renvoie : act (dict), dictionnaire des actions du kart corrigé pour suivre le centre de la piste
         """
         steer = act["steer"]
-        center = obs["paths_end"][2]
+        center = obs["paths_end"][self.path_lookahead]
         if (center[2] > 20 and abs(obs["center_path_distance"]) < 3) : 
             steer = 0
         elif abs(center[0]) > self.dist : 
