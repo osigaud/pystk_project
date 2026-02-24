@@ -22,7 +22,7 @@ class AgentItems(AgentRescue) :
 
             case 1 : 
             #BUBBLEGUM : à compléter
-                
+                action ["fire"] = True
                 return action
 
             case 2 : 
@@ -39,6 +39,12 @@ class AgentItems(AgentRescue) :
             
             case 3 : 
             #BOWLING : à compléter
+                if self.target_item != None : 
+                    action ["fire"] = True
+                for kart in obs["kart_position"]:
+                    if kart[2]>=0 and kart[2]<25:         #optimiser valeurs
+                        if abs(kart[0]) <= 3:
+                            action["fire"] = True                
                 return action
 
             case 4 : 
