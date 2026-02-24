@@ -25,8 +25,8 @@ from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 7
-MAX_STEPS = 1000
+MAX_TEAMS = 5
+MAX_STEPS = 800
 NB_RACES = 1
 
 # Get the current timestamp
@@ -102,8 +102,8 @@ def create_race():
     agents.append(Agent3(env, path_lookahead=3))
     agents.append(Agent4(env, path_lookahead=3))
     agents.append(Agent5(env, path_lookahead=3))
-    agents.append(Agent6(env, path_lookahead=3))
-    agents.append(Agent7(env, path_lookahead=3))
+    #agents.append(Agent6(env, path_lookahead=3))
+    #agents.append(Agent7(env, path_lookahead=3))
     np.random.shuffle(agents)
 
     for i in range(MAX_TEAMS):
