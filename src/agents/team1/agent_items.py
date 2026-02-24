@@ -22,13 +22,14 @@ class AgentItems(AgentRescue) :
 
             case 1 : 
             #BUBBLEGUM : à compléter
+                
                 return action
 
             case 2 : 
             #CAKE : à compléter
                 premier_kart = obs["karts_position"][0]
                 if premier_kart[2]<0:
-                    action["fire"] = 0
+                    action["fire"] = False
                     return action 
                 for kart in obs["karts_position"]:
                     if kart[2]>=0 and kart[2]<60:
@@ -42,16 +43,21 @@ class AgentItems(AgentRescue) :
 
             case 4 : 
             #ZIPPER : à compléter
-                if virage_serre = false and self.target.obstacle = None:
-                    action["fire"] = True                  
+                if virage_serre = false and self.target_obstacle = None:
+                    action["fire"] = True               
                 return action
 
             case 5 : 
             #PLUNGER : à compléter
+                
                 return action
 
             case 6 : 
             #SWITCH : à compléter
+                if self.target_item != None:
+                    action["fire"] = False
+                else: 
+                    action["fire"] = True
                 return action
 
             case 7 : 
@@ -74,9 +80,6 @@ class AgentItems(AgentRescue) :
 
 
         return action
-
-        
-
 
     def use_nitro(self, obs, act):
         nit = obs["energy"]
