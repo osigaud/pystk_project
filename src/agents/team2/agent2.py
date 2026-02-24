@@ -66,7 +66,7 @@ class Agent2(KartAgent):
             angle1 = np.arctan2(x1, z1)
             angle2 = np.arctan2(x2, z2)
 
-            curvature = abs(angle2 - angle1)
+            curvature = abs(angle1 - angle2)
 
             if curvature > cfg.curvature :  # seuil à ajuster
                 virages.append({ "index": i, "curvature": curvature })
