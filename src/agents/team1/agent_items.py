@@ -80,6 +80,9 @@ class AgentItems(AgentRescue) :
 
             case 7 : 
             #SWATTER : à compléter
+                for kart in obs["karts_position"]:
+                    if abs(kart[2])<=10 and abs(kart[0])<=10 and abs(kart[1])<=5:
+                        action["fire"] = True
                 return action
 
             case 8 : 
