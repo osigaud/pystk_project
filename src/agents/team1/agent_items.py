@@ -5,6 +5,7 @@ class AgentItems(AgentRescue) :
 
     def __init__(self, env, path_lookahead=3) :
         super().__init__(env, path_lookahead) 
+    
 
 
     
@@ -14,6 +15,8 @@ class AgentItems(AgentRescue) :
         Renvoie : action (dict), dictionnaire d'actions corrigé après prise en compte des objets tenus
         """
         current_item = obs["powerup"]
+        
+        action["fire"] = False        
 
         match current_item : 
             case 0 | 10 : 
@@ -39,10 +42,13 @@ class AgentItems(AgentRescue) :
             
             case 3 : 
             #BOWLING : à compléter
+                premier_kart = obs["karts_position"][0]
+                if premier_kart[2]<0:
+                    action["fire"] = False
                 if self.target_item != None : 
                     action ["fire"] = True
-                for kart in obs["kart_position"]:
-                    if kart[2]>=0 and kart[2]<25:         #optimiser valeurs
+                for kart in obs["karts_position"]:
+                    if kart[2]>=0 and kart[2]<=25:         #optimiser valeurs
                         if abs(kart[0]) <= 3:
                             action["fire"] = True                
                 return action
@@ -55,7 +61,13 @@ class AgentItems(AgentRescue) :
 
             case 5 : 
             #PLUNGER : à compléter
-                
+                premier_kart = obs["karts_position"][0]
+                if premier_kart[2]<0:
+                    action["fire"] = False
+                for kart in obs["karts_position"]:
+                    if kart[2]>=0 and kart[2]<25:
+                        if abs(kart[0]) <= 3:
+                            action["fire"] = True 
                 return action
 
             case 6 : 
