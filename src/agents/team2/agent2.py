@@ -123,7 +123,7 @@ class Agent2(KartAgent):
             dist = np.linalg.norm(pos)
 
             # items derriere ou trop loin => ignorer
-            i
+            
             if pos[2] < 0 or dist > 25.0:
                 continue
 
