@@ -37,8 +37,8 @@ class Agent4(KartAgent):
         self.dodge_side = 0
         self.dodge_timer = 0
         self.lock_mode = None
-        self.locked_gx = 0.
-        print(OmegaConf.to_yaml(conf))
+        self.locked_gx = 0.0
+        #print(OmegaConf.to_yaml(conf))
         
         
     def reset(self):
@@ -98,7 +98,7 @@ class Agent4(KartAgent):
 
             #Sécurité pour éviter de sortir de la piste
             if (limit_path - abs(center_path_distance)) <= 1.5 :
-                print("choix par limite de bord")
+                #print("choix par limite de bord")
                 #print(limit_path, center_path_distance)
                 
                 # ATTENTION LOGIQUE INVERSEE POUR CENTER PATH, si > 0 l'agent se situe à droite de la piste
@@ -107,7 +107,7 @@ class Agent4(KartAgent):
                 else:
                     new_side = 1
             else:   
-                print("choix normal")
+                #print("choix normal")
                 if b_x>=0:
                     new_side = -1
                     
