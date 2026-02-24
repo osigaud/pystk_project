@@ -2,7 +2,7 @@ from .agent_speed import AgentSpeed
 import numpy as np
 
 #Agent qui derape quand la courbe est serree (virage serre)
-class AgentDrift(AgentRescue)  :
+class AgentDrift(AgentSpeed)  :
     def __init__(self, env, path_lookahead = 3):
         super().__init__(env,path_lookahead)
 
