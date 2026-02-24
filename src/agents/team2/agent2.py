@@ -33,17 +33,19 @@ class Agent2(KartAgent):
         """
         Calcule la correction nécessaire pour rester au centre de la piste.
         """
-        #si paths_start n'existe pas,on renvoie 0
-        if "paths_start" not in obs or len(obs["paths_start"]) == 0:
+        #si paths_start n'existe pas,on renvoie 0 et on veut qu'il y ait au moins 2 points devant le kar
+        if "paths_start" not in obs or len(obs["paths_start"])<3:
             return 0.0
         #le point au centre de la piste juste devant le kart
-        point_proche_kart = obs["paths_start"][0]
+        point_proche_kart = obs["paths_start"][2]
         x = point_proche_kart[0] #coordonees du point qui nous indique gche ou drte
         z = point_proche_kart[2] #coordonnees du pt qui nous indique devant ou derriere
         if z<=0.0:
             return 0.0
         # angle qu'il faut tourner pour atteindre le point
         angle_vers_centre= np.arctan2(x, z)
+        # if abs(angle_vers_centre)<0.03:
+        #     return 0.0
         correction = angle_vers_centre * cfg.correction
         return np.clip(correction, -0.6, 0.6) #np.clip (=barrière de sécurité) sécurise pour que le res ne dépasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
 
@@ -88,15 +90,19 @@ class Agent2(KartAgent):
             #print (curvature) # permet d afficher la variation des angles pour determiner les courbures 
             if curvature > cfg.virages.drift:
                 #drift = True
-                acceleration = acceleration - 0.27
+                #0.27
+                acceleration = acceleration - 0.20
             elif curvature > cfg.virages.serrer.i1 and curvature <=cfg.virages.serrer.i2: # virage serré 
-                acceleration= acceleration - 0.10
+                #0.10
+                acceleration= acceleration - 0.05
                 #drift = False 
             elif curvature > cfg.virages.moyen.i1 and curvature <= cfg.virages.moyen.i2:  #virage moyen 
-                acceleration = acceleration - 0.05
+                #0.05
+                acceleration = acceleration - 0.02
                 #drift = False
             else :
-                acceleration = acceleration - 0.02
+                #0.02
+                acceleration = acceleration - 0.01
                 #drift = False
         return acceleration #drift 
     #on travaillera sur les drifts apres depuis cette fonction 
@@ -127,7 +133,8 @@ class Agent2(KartAgent):
                 if dist < best_good_dist:
                     best_good_dist = dist
                     angle = np.arctan2(pos[0], pos[2])
-                    steering_adjustment = float(np.clip(angle * 2, -0.5, 0.5))#adapter cette partie aux differentes pistes
+                    #modification parce que correction centre piste etait largement plus importante que steering adjustement
+                    steering_adjustment = float(np.clip(angle * 5, -0.8, 0.8))#adapter cette partie aux differentes pistes
             else:
                 # éviter les bad items proches
                 if dist < dist_min_evite:
