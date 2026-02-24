@@ -93,7 +93,7 @@ class AgentCenter(AgentInit):
 class AgentSpeed(AgentCenter):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env, path_lookahead)
-        self.ecartpetit = ECARTPETIT #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
+        self.ecartpetit = ECARTPETIT #seuil a partir du quel on considere l'ecart comme petit (ligne droite)
         self.ecartgrand = ECARTGRAND #seuil a partir du quel on considere l'ecart comme grand (virage serré)
         self.msapetit = MSAPETIT
         self.msagrand = MSAGRAND
@@ -320,13 +320,25 @@ class AgentDrift(AgentSpeed)  :
     def __init__(self, env, path_lookahead = 3):
         super().__init__(env,path_lookahead)
 
-    def drift_contSrol(self, obs, action) :
+    def drift_control(self, obs, action) :
         virage_serre = self.analyse(obs)
         speed = np.linalg.norm(obs["velocity"])
+        msa = obs["max_steer_angle"]
 
-        if virage_serre and abs(action["steer"]) >= 0.5 and speed > 6:
-            action["drift"] = True
-        else :
+        curvature = np.linalg.norm(obs["paths_end"][0] - obs["paths_start"][0] - obs["front"])
+
+        #la condition de drift
+        drift_condition = ( curvature > 1.2            and
+                            speed > 7                  and
+                            abs(action["steer"]) > 0.4 and
+                            msa < self.msapetit        and
+                            sefl.target_obstacle is None )
+
+        if drift_condition == True:
+            action["drift"] = True          #activer deraper
+            action["acceleration"] *= 0.75 #ralentir le kart
+
+        else:
             action["drift"] = False
 
         return action
