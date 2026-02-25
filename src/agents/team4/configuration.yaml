@@ -1,0 +1,4 @@
+# Configuration The Winners
+agent : "The Winners"
+#Paramètres de vitesse
+vitesse_seuil : 20.0    # C'est un seuil fixé pour la fonction manage_speed
