@@ -1,8 +1,4 @@
-"""
-Code repris du script single_track_race_display.py
-Render de l'Agent1 seul, possibilité de le comparer aux autres
-Pas d'écriture sur le HTML aussi
-"""
+import optuna
 
 import sys, os
 import numpy as np
@@ -13,22 +9,18 @@ from dataclasses import dataclass
 # Append the "src" folder to sys.path.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src"))) #Changement du path ici pour que ce soit adapté
 
-from agents.team1.agent_base import AgentInit 
-from agents.team1.agent_center import AgentCenter
-from agents.team1.agent_speed import AgentSpeed
-from agents.team1.agent_obstacles import AgentObstacles
-from agents.team1.agent_rescue import AgentRescue
 from agents.team1.agent1 import Agent1
+from agents.team1.agentwrappers import AgentCenter
+from agents.team1.agentwrappers import AgentCenter2
 
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 2
+MAX_TEAMS = 3
 NB_RACES = 1
 
 # Get the current timestamp
 current_timestamp = datetime.now()
-
 # Format it into a human-readable string
 formatted_timestamp = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -64,11 +56,11 @@ class Scores:
 default_action = {
             "acceleration": 0.0,
             "steer": 0.0,
-            "brake": False, # bool(random.getrandbits(1)),
-            "drift": False, # bool(random.getrandbits(1)),
-            "nitro": False, # bool(random.getrandbits(1)),
-            "rescue":False, # bool(random.getrandbits(1)),
-            "fire": False, # bool(random.getrandbits(1)),
+            "brake": False,
+            "drift": False, 
+            "nitro": False, 
+            "rescue":False, 
+            "fire": False, 
         }
 
 
@@ -82,10 +74,10 @@ agents_specs = [
     AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.ON) for i in range(MAX_TEAMS)
 ]
 
-def create_race():
+def create_race(distance, ajustement):
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="sandtrack", render_mode="human", num_kart=MAX_TEAMS) #track="xr591"
+        env = STKRaceMultiEnv(agents=agents_specs, track="cornfield_crossing", num_kart=MAX_TEAMS) #track="xr591"
     else:
         env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
 
@@ -94,16 +86,12 @@ def create_race():
     agents = []
     names = []
 
-    agents.append(Agent1(env, path_lookahead=3))
-    agents.append(AgentSpeed(env, path_lookahead=3)) 
-    
-    #Pour pas que ça mélange la liste d'agents et qu'on puisse récupérer les données de notre agent plus facilement
-    #np.random.shuffle(agents) 
+    agents.append(Agent1(env, path_lookahead=3, dist=distance, ajust=ajustement))
+    agents.append(AgentCenter2(env, path_lookahead=3))  
+    agents.append(AgentCenter2(env, path_lookahead=3))
 
     for i in range(MAX_TEAMS):
         names.append(agents[i].name)
-        agents_specs[i].name = agents[i].name
-        agents_specs[i].kart = agents[i].name
     return env, agents, names
 
 def single_race(env, agents, names, scores):
@@ -111,7 +99,7 @@ def single_race(env, agents, names, scores):
     done = False
     steps = 0
     positions = []
-    while not done and steps < 1000: #Changer ici pour que la course dure + longtemps
+    while not done and steps < 1500:
         actions = {}
         for i in range(MAX_TEAMS):
             str = f"{i}"
@@ -122,18 +110,13 @@ def single_race(env, agents, names, scores):
                 print(f"Team {i+1} error: {e}")
                 actions[str] = default_action
         obs, _, terminated, truncated, info = env.step(actions)
-
-        #affichage des variables du kart de l'équipe 1 (indice 0)
-        #affichage_variables(actions["0"], obs)
-
-        #print(f"{info['infos']}")
         pos = np.zeros(MAX_TEAMS)
         dist = np.zeros(MAX_TEAMS)
         for i in range(MAX_TEAMS):
             str = f"{i}"
             pos[i] = info['infos'][str]['position']
             dist[i] = info['infos'][str]['distance']
-        #print(f"{names}{dist}")
+        # print(f"{names}{dist}")
         steps = steps + 1
         done = terminated or truncated
         positions.append(pos)
@@ -142,6 +125,7 @@ def single_race(env, agents, names, scores):
     for i in range(MAX_TEAMS):
         scores.append(names[i], avg_pos[i], std_pos[i])
 
+"""
 def main_loop():
     scores = Scores()
     #unsatisfactory: first call just to init the names
@@ -160,46 +144,52 @@ def main_loop():
     scores.display()
     scores.display_mean()
     return scores
-
-
-def output_html(output: Path, scores: Scores):
-    # Use https://github.com/tofsjonas/sortable?tab=readme-ov-file#1-link-to-jsdelivr
-    with output.open("wt") as fp:
-        fp.write(
-            f"""<html><head>
-<title>STK Race results</title>
-<link href="https://cdn.jsdelivr.net/gh/tofsjonas/sortable@latest/dist/sortable.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/gh/tofsjonas/sortable@latest/dist/sortable.min.js"></script>
-<body>
-<h1>Team evaluation on SuperTuxKart</h1><div style="margin: 10px; font-weight: bold">Timestamp: {formatted_timestamp}</div>
-<table class="sortable n-last asc">
-  <thead>
-    <tr>
-      <th class="no-sort">Name</th>
-      <th id="position">Avg. position</th>
-      <th class="no-sort">±</th>
-    </tr>
-  </thead>
-  <tbody>"""
-        )
-
-        scores.display_html(fp)
-            
-        fp.write(
-            """<script>
-  window.addEventListener('load', function () {
-    const el = document.getElementById('position')
-    if (el) {
-      el.click()
-    }
-  })
-</script>
 """
-        )
-        fp.write("""</body>""")
 
+def run_once(dist, ajust):
 
+    env, agents, names = create_race(dist, ajust)
+    obs, _ = env.reset()
+    done = False
+    steps = 0
 
+    max_distance = 0
+
+    while not done and steps < 1500:
+        actions = {}
+        for i in range(MAX_TEAMS):
+            actions[str(i)] = agents[i].choose_action(obs[str(i)])
+
+        obs, _, terminated, truncated, info = env.step(actions)
+        done = terminated or truncated
+        steps += 1
+
+        distance_i = info['infos']["0"]['distance']
+        max_distance = max(max_distance, distance_i)
+
+    env.close()
+
+    if not terminated: #si le kart ne termine pas la course
+        return 4000
+
+    
+    return steps
+
+def objective(trial):
+
+    dist = trial.suggest_float("dist", 0.2, 1.5)
+    ajust = trial.suggest_float("ajust", 0.08, 0.9)
+
+    score = run_once(dist, ajust)
+
+    return score  # plus petit = meilleure position
+
+study = optuna.create_study(direction="minimize")
+study.optimize(objective, n_trials= 3000)
+
+print(study.best_params)
+
+"""
 if __name__ == "__main__":
     scores = main_loop()
-    #output_html(Path("../../docs/index.html"), scores)
+"""
