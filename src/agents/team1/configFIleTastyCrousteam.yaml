@@ -15,6 +15,18 @@ ecartgrand : 3
 msapetit : 0.2
 msagrand : 0.9
 
+#vitesse max ligne droite
+accel_ligne_droite : 2
+
+#ralentissement dans un virage serré
+frein_virage : 0.25
+
+#acceleration sortie de virage
+accel_virage : 0.5
+
+#distance a partir de laquelle on reagit a un segment
+dist_segment : 6
+
 #agent 
 nom d'équipe : TastyCrousteam
 

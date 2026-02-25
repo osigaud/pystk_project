@@ -12,7 +12,16 @@ from omegaconf import OmegaConf
 import os
 
 class Agent5(KartAgent):
+    """
+    Agent principal 'Donkey Bombs' (Team 5).
+    Cette classe agit comme un orchestrateur (Wrapper global) qui assemble les différents 
+    modules de pilotage (Mid, Nitro, Drift, Banana, Item) selon une hiérarchie de priorité.
+    """
     def __init__(self, env, path_lookahead=3):
+        """
+        Initialise l'agent complet en chargeant la configuration YAML et en 
+        emboîtant les différents pilotes les uns dans les autres.
+        """
         super().__init__(env)
         self.path_lookahead = path_lookahead
         self.name = "Donkey Bombs"
@@ -45,10 +54,17 @@ class Agent5(KartAgent):
         #self.rescue = Agent5Rescue(env, self.brain, self.conf, path_lookahead)
 
     def endOfTrack(self):
+        """Indique si le kart a atteint la fin de la piste."""
         return self.isEnd
 
     def reset(self):
+        """Réinitialise la chaîne complète des pilotes (Brain et couches inférieures)."""
         self.brain.reset()
 
     def choose_action(self, obs):
+        """
+        Méthode d'entrée principale du simulateur. 
+        Elle délègue la décision à la couche supérieure du 'cerveau' qui 
+        redescend ensuite la hiérarchie des wrappers.
+        """
         return self.brain.choose_action(obs)

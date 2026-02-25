@@ -1,4 +1,8 @@
 class RescueManager:
+    """
+    Module RescueManager : Gère la logique de détection de blocage et de réaction au blocage
+    """
+    
     def __init__(self):
         self.agent_positions = []
         self.times_blocked = 0
@@ -8,6 +12,17 @@ class RescueManager:
         self.switch_side = False
 
     def is_stuck(self, distance, speed):
+
+        """
+        Gère la détection d'un blocage de l'agent
+
+        Args:
+            distance(float) : Distance parcourue depuis le debut de la course.
+            speed(float) : Vitesse de l'agent.
+        
+        Returns:
+            bool : Variable permettant d'affirmer ou non que l'agent est bloqué.
+        """
         
         self.agent_positions.append(distance)
         
@@ -26,6 +41,15 @@ class RescueManager:
         return self.times_blocked >= 7
 
     def sortir_du_mur(self, current_steer):
+        """
+        Gère la réaction à un blocage
+
+        Args:
+            current_steer(float)
+        
+        Returns:
+            dict : Dictionnaire d'actions à effectué pour sortir d'un blocage
+        """
     
         if self.recovery_cd > 0:
             self.recovery_cd -= 1 #Si on est déjà en recovery on continue dans le même sens

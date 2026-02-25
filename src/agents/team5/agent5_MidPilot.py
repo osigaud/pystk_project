@@ -4,8 +4,17 @@ from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 
 class Agent5Mid(KartAgent):
+    """
+    Agent de base 'Donkey Bombs Mid'.
+    Responsable du suivi de piste principal en utilisant un contrôle PD (Proportionnel-Dérivé)
+    et une gestion d'anticipation dynamique basée sur la vitesse du kart.
+    """
     # AGENT DE BASE : Sa seule responsabilité est de suivre la piste avec anticipation.
     def __init__(self, env, conf, path_lookahead=3):
+        """
+        Initialise l'agent avec les paramètres de configuration YAML.
+        Définit les gains du contrôleur (Kp, Kd) et les distances de visée (lookahead).
+        """
         super().__init__(env)
         self.path_lookahead = path_lookahead
         self.name = "Donkey Bombs Mid"
@@ -31,12 +40,17 @@ class Agent5Mid(KartAgent):
         self.rescue_duration = self.conf.pilot.rescue.rescue_duration
 
     def reset(self):
+        """Réinitialise les variables d'état de l'agent au début d'une course."""
         self.obs, _ = self.env.reset()
         self.stuck_counter = 0
         self.last_error = 0.0
         self.is_rescuing = False
 
     def position_track(self, obs):
+        """
+        Analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique.
+        La distance de visée (lookahead) augmente proportionnellement à la vitesse.
+        """
         # La fonction analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique.
         paths = obs['paths_end']
 
@@ -64,6 +78,10 @@ class Agent5Mid(KartAgent):
         return target_vector[0], target_vector[2]
 
     def compute_turning(self, x, z):
+        """
+        Calcule l'angle du volant (steering) en fonction des distances (x, z).
+        Utilise un gain Proportionnel (Kp) pour la direction et un gain Dérivé (Kd) comme amortisseur.
+        """
         # La fonction calcule l'angle du volant en fonction des distances (x, z).
 
         # On évite de diviser par zéro si le point est trop proche.
@@ -90,6 +108,10 @@ class Agent5Mid(KartAgent):
         return steering_normalise, z
 
     def manage_speed(self, obs, steering, z):
+        """
+        Gère l'accélération, le freinage et la logique de sauvetage (rescue).
+        Réduit la vitesse en virage et gère les épingles serrées (hairpin).
+        """
         dist_now = obs['distance_down_track']
         velocity = obs['velocity']
         speed = np.linalg.norm(velocity)
@@ -110,7 +132,8 @@ class Agent5Mid(KartAgent):
                 # Reset des paramètres maintenant que notre mission "rescue" a été accomplie
                 self.is_rescuing = False
                 self.stuck_counter = 0
-                self.last_distance = dist_now
+                self.last_distance = dist_now   # last_distance est la distance par rapport à la ligne de départ de la frame précédente
+
         
         # Structure conditionnel nous permettant d'activer is_rescuing :
         # On commence par vérifier si on a dépassé la ligne de départ
@@ -148,6 +171,10 @@ class Agent5Mid(KartAgent):
         return accel, brake, steering
 
     def choose_action(self, obs):
+        """
+        Méthode principale orchestrant la lecture de la piste, le braquage et la vitesse.
+        Retourne le dictionnaire d'actions final.
+        """
         target_x, target_z = self.position_track(obs)
         steering, z = self.compute_turning(target_x, target_z)
         accel, brake, steering = self.manage_speed(obs, steering, z)

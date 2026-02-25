@@ -4,7 +4,7 @@ black_forest
 fortmagma
 candela_city
 abyss
-lightouse
+lighthouse
 cornfield_crossing
 gran_paradiso_island
 hacienda

@@ -24,6 +24,10 @@ ECARTPETIT = conf.ecartpetit
 ECARTGRAND = conf.ecartgrand
 MSAPETIT = conf.msapetit
 MSAGRAND = conf.msagrand
+ACCEL_LIGNE_DROITE = conf.accel_ligne_droite
+FREIN_VIRAGE = conf.frein_virage
+ACCEL_VIRAGE = conf.accel_virage
+DIST_SEGMENT = conf.dist_segment
 
 #autres variables qu'on utilise dans le code 
 BONUS = [0, 2, 3]

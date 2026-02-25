@@ -1,0 +1,16 @@
+C'est bien de travailler.
+Les dessins sont biens pour expliquer les 
+choses.
+Il faut être capable d'expliquer ce qu'on
+a codé, pour convaincre le client.
+Dylan fait tout et bah c'est pas bien.
+Il faut désigner un testeur pour le code.
+La documentation peut être déléguée à qqun
+d'autre que dylan.
+Il faut utiliser le fichier config si on 
+en a un.
+Pour la prochaine fois, on expliquera 
+comment on pilote mais c'est pas dylan qui
+parle.
+Y'a pas que la performance qui compte, 
+l'organisation aussi.

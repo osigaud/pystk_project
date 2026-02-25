@@ -1,0 +1,50 @@
+Analyse environment:
+    on extrait les données utiles
+    vitesse
+    indice du noeud qu'on prend en compte (plus on va vite
+    plus c'est loin)
+    calcul position moyenne du noeud (start + end /2) c'est
+    la target pour l'instant
+    types des items
+    positions des items
+
+Décision de la direction:
+    on détermine si il y a danger (banane ou chewing gum 
+    dans le rectangle en face 3.5 largeur et 20 longueur)
+    si danger : on décale le x de la target à droite ou
+                gauche plus ou moins selon la distance 
+                de l'objet
+    on détermine l'angle du kart par rapport à la target
+    avec arctan(z/x)
+    on calcule la dérivée de l'angle (angle actuel - angle
+    précédent)
+    on détermine le steer selon l'angle et la dérivée de 
+    l'angle
+
+Gestion de l'acceleration:
+    on détermine l'acceleration (et boost potentiellement) 
+    selon le steer, l'angle de la target et la vitesse 
+    actuelle
+    
+Gestion des situations particulières:
+    Blocage : si on est lent pendant une certaine période
+    (donc bloqué), on passe en marche arrière et on inverse
+    le steer et si on est encore bloqué on appelle rescue
+
+    Fire item: on prend les positions des karts
+                si il y a un kart dans le rectangle en face
+                de largeur 1.5 et de longueur 25 alors on 
+                tire
+
+Conclusion: 
+    Pour l'instant notre kart fini très régulièrement 
+    les courses
+    Pour s'améliorer, il faut : mieux prendre les virages
+    (meilleure ligne, bonne gestion de vitesse, drift)
+    éviter de sortir de la piste et se bloquer souvent
+
+    Objectifs futurs: 
+        on espère finir de coder la logique élémentaire 
+        de conduite du kart pour passer à l'optimisation
+        d'hyperparamètres via optuna
+
