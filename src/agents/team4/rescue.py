@@ -5,22 +5,30 @@ class RescueManager:
     
     def __init__(self):
         self.agent_positions = []
+        """@private"""
         self.times_blocked = 0
+        """@private"""
         self.recovery_steer = None
+        """@private"""
         self.recovery_cd = 0
-        self.recovery_timer = 10   #nombre de frames à garder le même sens
+        """@private"""
+        self.recovery_timer = 10 #nombre de frames à garder le même sens
+        """@private"""   
         self.switch_side = False
+        """@private"""
 
-    def is_stuck(self, distance, speed):
+    def is_stuck(self, distance : float, speed : float) -> bool:
 
         """
         Gère la détection d'un blocage de l'agent
 
         Args:
+            
             distance(float) : Distance parcourue depuis le debut de la course.
             speed(float) : Vitesse de l'agent.
         
         Returns:
+            
             bool : Variable permettant d'affirmer ou non que l'agent est bloqué.
         """
         
@@ -40,15 +48,17 @@ class RescueManager:
         
         return self.times_blocked >= 7
 
-    def sortir_du_mur(self, current_steer):
+    def sortir_du_mur(self, current_steer : float) -> dict:
         """
         Gère la réaction à un blocage
 
         Args:
-            current_steer(float)
+            
+            current_steer(float) : Angle actuel du braquage des roues.
         
         Returns:
-            dict : Dictionnaire d'actions à effectué pour sortir d'un blocage
+            
+            dict : Dictionnaire d'actions à effectué pour sortir d'un blocage.
         """
     
         if self.recovery_cd > 0:

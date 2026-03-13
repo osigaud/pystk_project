@@ -8,17 +8,20 @@ class Steering:
     
     def __init__(self):
         self.L = 2.5  # On simule un empattement
+        """@private"""
         
-    def manage_pure_pursuit(self,gx,gz,gain):
+    def manage_pure_pursuit(self,gx:float,gz:float,gain:float) -> float:
         """
         Gère la logique de direction grâce au pure pursuit
 
         Args:
+            
             gx(float) : Décalage latéral de la cible.
             gz(float) : Profondeur de la cible.
             gain(float) : Gain à appliquer à l'angle final.
         
         Returns:
+            
             float : Variable donnant la direction des roues.
         """
         

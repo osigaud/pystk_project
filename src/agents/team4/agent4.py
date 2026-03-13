@@ -14,34 +14,51 @@ CONFIG_PATH = BASE_DIR / "configuration.yaml" # On dit que notre fichier de conf
 
 conf = OmegaConf.load(str(CONFIG_PATH)) # On charge le fichier de config
 
+__all__ = ["Agent4"]
 
 class Agent4(KartAgent):
     """
     Module Agent4 : Gère la logique général de pilotage de l'agent
     """
 
-    def __init__(self, env, path_lookahead=3):
+    def __init__(self, env, path_lookahead=2):
         """Initialise les variables d'instances de l'agent."""
+        
         super().__init__(env)
-        self.path_lookahead = path_lookahead
+        self._path_lookahead = path_lookahead
+        """@private"""
         self.agent_positions = []
+        """@private"""
         self.obs = None
+        """@private"""
         self.isEnd = False
+        """@private"""
         self.name = "The Winners"
+        """Nom de notre équipe."""
         self.steering = Steering()
+        """@private"""
         self.rescue = RescueManager()
+        """@private"""
         self.SpeedController=SpeedController()
+        """@private"""
         self.nitro = Nitro()
+        """@private"""
         self.esquive_adv = EsquiveAdv()
+        """@private"""
         self.banana_dodge = Banana()
+        """@private"""
         self.dodge_side = 0
+        """@private"""
         self.dodge_timer = 0
+        """@private"""
         self.lock_mode = None
+        """@private"""
         self.locked_gx = 0.0
+        """@private"""
         #print(OmegaConf.to_yaml(conf))
         
         
-    def reset(self):
+    def reset(self) -> None:
         """Réinitialise les variables d'instances de l'agent en début de course."""
         self.obs, _ = self.env.reset()
         self.agent_positions = []
@@ -50,21 +67,24 @@ class Agent4(KartAgent):
         self.lock_mode = None
         self.locked_gx = 0.0
         self.rescue = RescueManager()
+        
 
-    def endOfTrack(self):
-        """Indique si la course est fini"""
+    def endOfTrack(self) -> bool:
+        """Indique si la course est fini."""
         return self.isEnd
 
-    def choose_action(self, obs):
+    def choose_action(self,obs : dict) -> dict:
         """
         Calcule les différentes actions à réaliser en fonction des observations
         et des conditions reçues.
-        
+
         Args:
-            obs (dict): Les données fournies par le simulateur.
             
+            obs(dict) : Les données de télémétrie fournies par le simulateur.
+
         Returns:
-            dict: Le dictionnaire d'actions pour le moteur physique.
+            
+            dict : Le dictionnaire d'actions (accélération, direction, nitro, etc.).
         """
         
         
@@ -81,7 +101,7 @@ class Agent4(KartAgent):
                 "fire": False,
             }
         
-        target = points[2] # On récupère le deuxième point de la liste
+        target = points[self._path_lookahead] # On récupère le troisième point de la liste
         gx = target[0] # On récupère x, le décalage latéral
         gz = target[2] # On récupère z, la profondeur
 

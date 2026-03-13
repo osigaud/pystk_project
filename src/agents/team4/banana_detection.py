@@ -4,19 +4,23 @@ class Banana:
     Module Banana : Gère la logique de détection de bananes et de chewing-gum
     """
     
-    def banana_detection(self,obs,limit_path,center_path):
+    def banana_detection(self,obs : dict,limit_path : float,center_path : float) -> tuple[str,float,list]:
         """
-        Gère la détection des bananes et de chewing-gum
+        
+        Gère la logique de détection des obstacles (bananes et chewing-gums).
 
         Args:
-            obs(dict) : Les données fournies par le simulateur.
-            limit_path(float) : Limite calculée de la piste.
-            center_path(float) : Centre de la piste par rapport à la situation de notre agent.
-        
+                
+            obs(dict) : Les données de télémétrie fournies par le simulateur.
+            limit_path(float) : La largeur maximale autorisée sur la piste.
+            center_path(float) : Position du centre de la piste par rapport au kart.
+
         Returns:
-            str : Variable donnant le mode d'esquive auquel on est confronté.
-            float : Valeur représentant un décalage latéral ou la position de la banane (LIGNE / SINGLE).
-            list : Liste contenant les bananes.
+            
+            str : Le mode de détection ("CLEAR", "SINGLE" ou "LIGNE").
+            float : La coordonnée X cible (décalage latéral ou centre du gap).
+            list : La liste des positions (x, z) des bananes détectées dans le radar.
+        
         """
 
         items_pos = obs['items_position'] # Récupération des positions des items

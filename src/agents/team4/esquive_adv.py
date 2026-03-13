@@ -4,14 +4,16 @@ class EsquiveAdv:
     Module EsquiveAdv : Gère la logique de détection d'adversaires
     """
     
-    def esquive_adv(self,obs):
+    def esquive_adv(self,obs : dict) -> tuple[bool,float,float]:
         """
-        Détecte Les Adversaires 
+        Détecte Les Adversaires.
 
         Args:
+            
             obs(dict) : Les données fournies par le simulateur.
         
         Returns:
+            
             bool : Variable permettant d'affirmer la présence d'un adversaire.
             float : Position latéral de l'adversaire.
             float : Profondeur de l'adversaire.

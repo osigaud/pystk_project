@@ -4,17 +4,19 @@ class SpeedController:
     Module SpeedController : Gère la logique d'accélération
     """
     
-    def manage_speed(self,speed,drift,conf,obs):
+    def manage_speed(self,speed:float,drift:bool,conf:float,obs:dict) -> tuple[float,bool]:
         """
-        Gère l'accélération
+        Gère l'accélération.
 
         Args:
+            
             speed(float) : Vitesse de l'agent.
             drift(bool) : Booléen disant si l'agent drift ou non.
             conf(float) : Valeur representant un seuil de vitesse.
             obs(dict) : Les données fournies par le simulateur.
         
         Returns:
+            
             float: Valeur représentant l'accélération.
             bool: Variable permettant d'activer ou non le brake.
 
