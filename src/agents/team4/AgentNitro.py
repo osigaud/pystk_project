@@ -1,8 +1,11 @@
-class Nitro:
+class AgentNitro:
 
     """
     Module Nitro : Gère la logique d'activation du nitro
     """
+    
+    def __init__(self):
+        pass
     
     def manage_nitro(self,obs : dict,steer : float,energy : float) -> bool:
 
