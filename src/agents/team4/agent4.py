@@ -25,7 +25,7 @@ class Agent4(KartAgent):
         """Initialise les variables d'instances de l'agent."""
         
         super().__init__(env)
-        self._path_lookahead = path_lookahead
+        self.path_lookahead = 2
         """@private"""
         self.obs = None
         """@private"""
@@ -74,7 +74,6 @@ class Agent4(KartAgent):
             dict : Le dictionnaire d'actions (accélération, direction, nitro, etc.).
         """
         
-        
         points = obs.get("paths_start",[]) # On récupère la liste des points
         
         if len(points) <= 2: # Si la longueur de la liste est inferieur à 2, on accèlère à fond (ligne d'arrivée proche)
@@ -88,7 +87,7 @@ class Agent4(KartAgent):
                 "fire": False,
             }
         
-        target = points[self._path_lookahead] # On récupère le troisième point de la liste
+        target = points[self.path_lookahead] # On récupère le x-ème point de la liste defini par la variable de classe
         gx = target[0] # On récupère x, le décalage latéral
         gz = target[2] # On récupère z, la profondeur
 
@@ -101,7 +100,7 @@ class Agent4(KartAgent):
         steering = self.steering.manage_pure_pursuit(gx,gz,gain_volant)
         acceleration, brake = self.speedcontroller.manage_speed(speed,False,conf,obs) # Appel à la fonction gerer_vitesse
 
-        nitro = self.expert_nitro.manage_nitro(obs,steering,energy) # Appel à la fonction gerer_nitro
+        nitro = self.expert_nitro.manage_nitro(obs,steering,energy) # Appel à la fonction manage_nitro
         drift = False
 
         # Au depart on avance tout droit pour eviter de se cogner contre les adversaires
@@ -109,21 +108,24 @@ class Agent4(KartAgent):
             steering = 0.0
             acceleration = 1.0
 
+        # Appel en priorité de la fonction rescue
         is_stuck, action_stuck = self.expert_rescue.choose_action(steering,speed,distance)
         if is_stuck and obs['distance_down_track'] >= 3:
             return action_stuck
         
+        # Appel de la fonction esquive banane
         danger_banane, action_banane = self.expert_banana_dodge.choose_action(obs,gx,gz,acceleration)
         if danger_banane:
             return action_banane
         
+        # Appel de la fonction esquive adversaire
         danger_adv, action_adv = self.expert_esquive_adv.choose_action(obs,gx,gz,acceleration)
         if danger_adv:
             return action_adv
         
+        # Mécanisme Anti Vibration
         epsilon = 0.05
         road_straight = abs(points[2][0]) < 0.8
-        # Pour eviter les vibrations, si on est sur une ligne droite et dans aucun cas d'esquive, on met le steering à 0
         if road_straight and abs(steering) <= epsilon:
             steering = 0.0
         

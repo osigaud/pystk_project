@@ -104,7 +104,7 @@ class AgentBanana:
         
         if mode == "SINGLE" and self.lock_mode != "LIGNE": # Si on a capte un cas d'une banane seule et qu'on était pas déjà dans une situation d'esquive de barrage
 
-            print(banana_list)
+            #print(banana_list)
             
             #Sécurité pour éviter de sortir de la piste
             if (limit_path - abs(center_path_distance)) <= 1.5 :
@@ -134,16 +134,16 @@ class AgentBanana:
             self.lock_mode = "LIGNE"
             self.dodge_timer = 0
             self.locked_gx = b_x
-            print(banana_list)
+            #print(banana_list)
             #print("Esquive Ligne")
 
         if self.dodge_timer >0: # On est dans le mode Single
-            print("Esquive SINGLE")
+            #print("Esquive SINGLE")
             self.dodge_timer -= 1 # On decremente le compteur
             gx += 3.0 * self.dodge_side # On cree le decalage pour le cas single
             
         elif (mode == "SINGLE" or mode == "LIGNE") and self.lock_mode == "LIGNE":
-            print("Esquive LIGNE")
+            #print("Esquive LIGNE")
             gx = self.locked_gx # On vise le gap calculé pour le mode ligne
             gain_volant = 6.0 # Ajustement du gain pour le mode ligne
 
