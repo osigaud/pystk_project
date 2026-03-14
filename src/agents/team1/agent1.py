@@ -8,6 +8,7 @@ from agents.kart_agent import KartAgent
 from agents.team1.agent_center import AgentCenter
 from agents.team1.agent_speed import AgentSpeed
 from agents.team1.agent_obstacles import AgentObstacles
+from agents.team1.agent_rescue import AgentRescue
 """
 import math
 from omegaconf import OmegaConf
@@ -29,6 +30,7 @@ class Agent1(KartAgent):
         self.agentCenter = AgentCenter(env, self.conf, self.path_lookahead)
         self.agentSpeed = AgentSpeed(env, self.conf, self.agentCenter, self.path_lookahead)
         self.agentObstacles = AgentObstacles(env, self.conf, self.agentSpeed, self.path_lookahead)
+        self.agentRescue = AgentRescue(env, self.conf, self.agentObstacles)
 
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -49,6 +51,6 @@ class Agent1(KartAgent):
             "rescue": False,
             "fire": False,
         }
-        return self.agentObstacles.choose_action(obs)
+        return self.agentRescue.choose_action(obs)
         return action
         

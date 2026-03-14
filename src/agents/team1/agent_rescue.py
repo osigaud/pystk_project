@@ -1,14 +1,13 @@
-from .agent_obstacles import AgentObstacles
+from agents.kart_agent import KartAgent
 import numpy as np
 
-MIN_PROGRESS_THRESHOLD = 0.5
-BLOCK_COUNTER_THRESHOLD = 18
-UNBLOCK_STEPS_DEFAULT = 6
-
-class AgentRescue(AgentObstacles) : 
+class AgentRescue(KartAgent) : 
     #Prendre le cas en compte où on est étourdi par un item dans is_blocked
-    def __init__(self, env, path_lookahead=3): 
-        super().__init__(env, path_lookahead)  
+    def __init__(self, env, conf, agent): 
+        super().__init__(env)
+        self.conf = conf
+        self.agent = agent
+
         self.last_distance = None
         self.block_counter = 0
         self.unblock_steps = 0
@@ -24,7 +23,7 @@ class AgentRescue(AgentObstacles) :
         if self.last_distance is None :
             self.last_distance = distance_down_track
 
-        if abs(distance_down_track - self.last_distance) < MIN_PROGRESS_THRESHOLD and distance_down_track > 5 and (obs["jumping"] == 0) :
+        if abs(distance_down_track - self.last_distance) < self.conf.min_progress_threshold and distance_down_track > 5 and (obs["jumping"] == 0) :
             self.block_counter += 1
         else:
             self.block_counter = 0
@@ -56,11 +55,11 @@ class AgentRescue(AgentObstacles) :
         Renvoie : action (dict), le dictionnaire d'actions de notre kart
         """
         self.is_blocked(obs)
-        action = super().choose_action(obs)
+        action = self.agent.choose_action(obs)
                 
-        if self.block_counter > BLOCK_COUNTER_THRESHOLD :
+        if self.block_counter > self.conf.block_counter_threshold :
             self.is_braking = True
-            self.unblock_steps = UNBLOCK_STEPS_DEFAULT
+            self.unblock_steps = self.conf.unblock_steps_default
         if self.is_braking : 
             action = self.unblock_action(action)
         return action
