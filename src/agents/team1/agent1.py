@@ -10,10 +10,6 @@ from agents.team1.agent_speed import AgentSpeed
 from agents.team1.agent_obstacles import AgentObstacles
 from agents.team1.agent_rescue import AgentRescue
 from agents.team1.agent_items import AgentItems
-"""
-import math
-from omegaconf import OmegaConf
-"""
 
 class Agent1(KartAgent):
     def __init__(self, env, path_lookahead=3):
