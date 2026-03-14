@@ -30,14 +30,7 @@ class AgentSpeed(KartAgent):
                 virage_serre = True
       
         return virage_serre
-
-    def limit(self, acceleration):
-        if acceleration >= 1:
-            return 1
-        if acceleration <= 0:
-            return 0.1
-        return acceleration
-
+        
     def reaction(self, virage_serre, act, obs):
         act["acceleration"] = max(act["acceleration"], 1)
         msa = obs["max_steer_angle"]
@@ -48,22 +41,22 @@ class AgentSpeed(KartAgent):
 
             segdirection = obs["paths_end"][0] - obs["paths_start"][0]
             if segdirection[1] > 0.05:
-                act["acceleration"] = self.limit(act["acceleration"] + 0.2)
+                act["acceleration"] = np.clip(act["acceleration"], 0.1, 1)      #self.limit(act["acceleration"] + 0.2)
 
             return act
 
         # virage serré
         if msa <= self.msapetit:
             accel = act["acceleration"] - self.frein_virage
-            act["acceleration"] = self.limit(accel)
+            act["acceleration"] = np.clip(accel, 0.1, 1)
 
         elif msa >= self.msagrand:
             accel = act["acceleration"] + self.accel_virage
-            act["acceleration"] = self.limit(accel)
+            act["acceleration"] = np.clip(accel, 0.1, 1)
 
         segdirection = obs["paths_end"][0] - obs["paths_start"][0]
         if segdirection[1] > 0.05:
-            act["acceleration"] = self.limit(act["acceleration"] + 0.2)
+            act["acceleration"] = np.clip(act["acceleration"], 0.1, 1) 
 
         return act
   
