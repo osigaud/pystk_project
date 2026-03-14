@@ -1,19 +1,21 @@
-from .agent_center import AgentCenter
-from .agent_base import ECARTPETIT, ECARTGRAND, MSAPETIT, MSAGRAND, ACCEL_LIGNE_DROITE, FREIN_VIRAGE, ACCEL_VIRAGE, DIST_SEGMENT
+from agents.kart_agent import KartAgent
 import numpy as np
 
+class AgentSpeed(KartAgent):
+    def __init__(self, env, conf, agent, path_lookahead=3):
+        super().__init__(env)
+        self.conf = conf
+        self.agent = agent
+        self.path_lookahead = path_lookahead
 
-class AgentSpeed(AgentCenter):
-    def __init__(self, env, path_lookahead=3):
-        super().__init__(env, path_lookahead)
-        self.ecartpetit = ECARTPETIT #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
-        self.ecartgrand = ECARTGRAND #seuil a partir du quel on considere l'ecart comme grand (virage serré)
-        self.msapetit = MSAPETIT  #seuil a partir duquel max steer angle ne permet pas de bien tourner le volant
-        self.msagrand = MSAGRAND  #seuil a partir duquel max steer angle ne permet de bien tourner le volant
-        self.accel_ligne_droite = ACCEL_LIGNE_DROITE
-        self.frein_virage = FREIN_VIRAGE
-        self.accel_virage = ACCEL_VIRAGE
-        self.dist_segment = DIST_SEGMENT
+        self.ecartpetit = self.conf.ecartpetit #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
+        self.ecartgrand = self.conf.ecartgrand #seuil a partir du quel on considere l'ecart comme grand (virage serré)
+        self.msapetit = self.conf.msapetit  #seuil a partir duquel max steer angle ne permet pas de bien tourner le volant
+        self.msagrand = self.conf.msagrand  #seuil a partir duquel max steer angle ne permet de bien tourner le volant
+        self.accel_ligne_droite = self.conf.accel_ligne_droite
+        self.frein_virage = self.conf.frein_virage
+        self.accel_virage = self.conf.accel_virage
+        self.dist_segment = self.conf.dist_segment
         
     def analyse(self, obs):
         virage_serre = False
@@ -28,7 +30,6 @@ class AgentSpeed(AgentCenter):
                 virage_serre = True
       
         return virage_serre
-        
 
     def limit(self, acceleration):
         if acceleration >= 1:
@@ -67,7 +68,7 @@ class AgentSpeed(AgentCenter):
         return act
   
     def choose_action(self, obs):
-        act = super().choose_action(obs)
+        act = self.agent.choose_action(obs)
         virage_serre = self.analyse(obs)
         act_corr = self.reaction(virage_serre, act, obs)
         return act_corr

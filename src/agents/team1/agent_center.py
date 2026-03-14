@@ -1,13 +1,13 @@
-from .agent_base import AgentInit
-from .agent_base import DIST, AJUST
+from agents.kart_agent import KartAgent
 import numpy as np
 
-
-class AgentCenter(AgentInit):
-    def __init__(self, env, path_lookahead=3):
-        super().__init__(env, path_lookahead)
-        self.dist = DIST
-        self.ajust = AJUST
+class AgentCenter(KartAgent):
+    def __init__(self, env, conf, path_lookahead=3):
+        super().__init__(env)
+        self.conf = conf
+        self.dist = self.conf.dist
+        self.ajust = self.conf.ajust
+        self.path_lookahead = path_lookahead
 
     def path_ajust(self, act, obs):
         """
@@ -28,6 +28,14 @@ class AgentCenter(AgentInit):
         Paramètres : obs
         Renvoie : act (dict), le dictionnaire d'action après correction
         """
-        act = super().choose_action(obs)
-        act_corr = self.path_ajust(act, obs)
+        action = {
+            "acceleration": 0,
+            "steer": 0,
+            "brake": False,
+            "drift": False,
+            "nitro": False,
+            "rescue": False,
+            "fire": False,
+        }
+        act_corr = self.path_ajust(action, obs)
         return act_corr
