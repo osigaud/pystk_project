@@ -21,7 +21,7 @@ class Agent1(KartAgent):
         self.name = "Tasty Crousteam"
 
         path_conf = Path(__file__).resolve().parent
-        path_conf = str(path_conf) + '/configFIleTastyCrousteam.yaml'   #Chemin du fichier de configuration
+        path_conf = str(path_conf) + '/ConfigFileTeam1.yaml'   #Chemin du fichier de configuration
         self.conf = OmegaConf.load(path_conf)                           #Importation du fichier de configuration
 
         self.agentCenter = AgentCenter(env, self.conf, self.path_lookahead)
