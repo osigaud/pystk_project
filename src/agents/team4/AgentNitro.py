@@ -1,10 +1,15 @@
 class AgentNitro:
 
     """
-    Module Nitro : Gère la logique d'activation du nitro
+    Module Agent Expert Nitro : Gère la logique d'activation du nitro
     """
     
     def __init__(self):
+        """Initialise les variables d'instances de l'agent."""
+        pass
+
+    def reset(self) -> None:
+        """Réinitialise les variables d'instances de l'agent expert"""
         pass
     
     def manage_nitro(self,obs : dict,steer : float,energy : float) -> bool:

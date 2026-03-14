@@ -3,6 +3,14 @@ class SpeedController:
     """
     Module SpeedController : Gère la logique d'accélération
     """
+
+    def __init__(self):
+        """Initialise les variables d'instances de l'agent."""
+        pass
+    
+    def reset(self) -> None:
+        """Réinitialise les variables d'instances de l'agent expert"""
+        pass
     
     def manage_speed(self,speed:float,drift:bool,conf:float,obs:dict) -> tuple[float,bool]:
         """

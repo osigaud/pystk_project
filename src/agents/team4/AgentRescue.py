@@ -1,9 +1,12 @@
 class AgentRescue:
     """
-    Module Rescue : Gère la logique de détection de blocage et de réaction au blocage
+    Module Agent Expert Rescue : Gère la logique de détection et de réaction face au blocage
     """
     
     def __init__(self):
+        
+        """Initialise les variables d'instances de l'agent expert"""
+        
         self.agent_positions = []
         """@private"""
         self.times_blocked = 0
@@ -17,22 +20,17 @@ class AgentRescue:
         self.switch_side = False
         """@private"""
 
-    def reset(self):
+    def reset(self) -> None:
 
+        """Réinitialise les variables d'instances de l'agent expert"""
+        
         self.agent_positions = []
-        """@private"""
         self.times_blocked = 0
-        """@private"""
         self.recovery_steer = None
-        """@private"""
         self.recovery_cd = 0
-        """@private"""
         self.recovery_timer = 10 #nombre de frames à garder le même sens
-        """@private"""   
         self.switch_side = False
-        """@private"""
-
-
+        
     def is_stuck(self, distance : float, speed : float) -> bool:
 
         """
@@ -64,16 +62,19 @@ class AgentRescue:
         
         return self.times_blocked >= 7
 
-    def choose_action(self, current_steer : float, speed, distance) -> dict:
+    def choose_action(self, current_steer : float, speed : float, distance : float) -> tuple[bool,dict]:
         """
         Gère la réaction à un blocage
 
         Args:
             
             current_steer(float) : Angle actuel du braquage des roues.
+            speed(float) : Vitesse actuelle de l'agent.
+            distance(float) : Distance parcourue depuis le debut de la course.
         
         Returns:
             
+            bool : Permet de confirmer la détection d'un blocage de l'agent.
             dict : Dictionnaire d'actions à effectué pour sortir d'un blocage.
         """
     

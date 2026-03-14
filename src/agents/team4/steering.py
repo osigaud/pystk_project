@@ -7,8 +7,13 @@ class Steering:
     """
     
     def __init__(self):
+        """Initialise les variables d'instances de l'agent."""
         self.L = 2.5  # On simule un empattement
         """@private"""
+
+    def reset(self) -> None:
+        """Réinitialise les variables d'instances de l'agent expert"""
+        pass
         
     def manage_pure_pursuit(self,gx:float,gz:float,gain:float) -> float:
         """

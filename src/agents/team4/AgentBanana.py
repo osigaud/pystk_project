@@ -1,13 +1,15 @@
-import numpy as np
 from .steering import Steering
 
 class AgentBanana:
 
     """
-    Module Banana : Gère la logique de détection de bananes et de chewing-gum
+    Module Agent Expert Banana : Gère la logique de détection et de réaction face aux bananes et chewing-gum
     """
     
     def __init__(self):
+        
+        """Initialise les variables d'instances de l'agent expert"""
+        
         self.dodge_side = 0
         """@private"""
         self.dodge_timer = 0
@@ -17,22 +19,22 @@ class AgentBanana:
         self.locked_gx = 0.0
         """@private"""
         self.pilotage = Steering()
+        """@private"""
     
-    def reset(self):
+    def reset(self) -> None:
+        
+        """Réinitialise les variables d'instances de l'agent expert"""
+        
         self.dodge_side = 0
-        """@private"""
         self.dodge_timer = 0
-        """@private"""
         self.lock_mode = None
-        """@private"""
         self.locked_gx = 0.0
-        """@private"""
-        self.pilotage = Steering()
-    
+        self.pilotage.reset()
+        
     def banana_detection(self,obs : dict,limit_path : float,center_path : float) -> tuple[str,float,list]:
         """
         
-        Gère la logique de détection des obstacles (bananes et chewing-gums).
+        Gère la logique de détection des obstacles (bananes et chewing-gums)
 
         Args:
                 
@@ -88,15 +90,34 @@ class AgentBanana:
             return "SINGLE",first_x,banana # Cas d'une seule banane
         
     
-    def choose_action(self,obs,gx,gz,acceleration):
+    def choose_action(self,obs : dict,gx : float ,gz : float,acceleration : float) -> tuple[bool,dict]:
+
+        """
+        
+        Gère la logique de réaction à la détection des obstacles (bananes et chewing-gums)
+
+        Args:
+                
+            obs(dict) : Les données de télémétrie fournies par le simulateur.
+            gx(float) : Décalage latéral actuel de la cible.
+            gz(float) : Profondeur actuel de la cible.
+            acceleration(float) : Accéleration de l'agent.
+
+        Returns:
+            
+            bool : Permet de confirmer la présence d'un obstacle et la nécessité de l'esquiver.
+            dict : Le dictionnaire d'actions à réaliser pour esquiver une banane.
+        
+        """
 
         paths_width = obs.get("paths_width",0.0)
         center_path_distance = obs.get("center_path_distance",0.0)
-        limit_path = paths_width[0]/2
+        limit_path = paths_width[0]/2 # Limite de la piste calculée
 
+        # Appel de la fonction de détection
         mode, b_x, banana_list = self.banana_detection(obs,limit_path,center_path_distance)
 
-        gain_volant = 7.0
+        gain_volant = 7.0 # Gain par défaut
 
         if mode == "CLEAR" and self.dodge_timer <= 0:
             self.lock_mode = None # On réinitialise l'état
@@ -147,6 +168,7 @@ class AgentBanana:
             gx = self.locked_gx # On vise le gap calculé pour le mode ligne
             gain_volant = 6.0 # Ajustement du gain pour le mode ligne
 
+        # Appel de la fonction de steering avec les paramètres modifiés.
         steering = self.pilotage.manage_pure_pursuit(gx,gz,gain_volant)
 
         action = {

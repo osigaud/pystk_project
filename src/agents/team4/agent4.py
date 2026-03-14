@@ -18,7 +18,7 @@ __all__ = ["Agent4"]
 
 class Agent4(KartAgent):
     """
-    Module Agent4 : Gère la logique général de pilotage de l'agent
+    Module Agent4 : Agent coordinateur faisant appel aux différents agents experts pour gérer la logique générale de pilotage
     """
 
     def __init__(self, env, path_lookahead=2):
@@ -32,7 +32,7 @@ class Agent4(KartAgent):
         self.isEnd = False
         """@private"""
         self.name = "The Winners"
-        """Nom de notre équipe."""
+        """@private"""
         self.steering = Steering()
         """@private"""
         self.expert_rescue = AgentRescue()
@@ -51,19 +51,21 @@ class Agent4(KartAgent):
     def reset(self) -> None:
         """Réinitialise les variables d'instances de l'agent en début de course."""
         self.obs, _ = self.env.reset()
+        self.isEnd = False
         self.expert_rescue.reset()
         self.expert_banana_dodge.reset()
+        self.steering.reset()
+        self.speedcontroller.reset()
+        self.expert_nitro.reset()
         self.expert_esquive_adv.reset()
         
-
     def endOfTrack(self) -> bool:
         """Indique si la course est fini."""
         return self.isEnd
 
     def choose_action(self,obs : dict) -> dict:
         """
-        Calcule les différentes actions à réaliser en fonction des observations
-        et des conditions reçues.
+        Renvoie les différentes actions à réaliser
 
         Args:
             
@@ -96,17 +98,27 @@ class Agent4(KartAgent):
         speed = float(vel[2])
         energy = float(obs.get("energy", [0.0])[0])
 
+        drift = False
         gain_volant = 7.0  #Gain par défaut
         steering = self.steering.manage_pure_pursuit(gx,gz,gain_volant)
-        acceleration, brake = self.speedcontroller.manage_speed(speed,False,conf,obs) # Appel à la fonction gerer_vitesse
+        acceleration, brake = self.speedcontroller.manage_speed(speed,drift,conf,obs) # Appel à la fonction gerer_vitesse
 
         nitro = self.expert_nitro.manage_nitro(obs,steering,energy) # Appel à la fonction manage_nitro
-        drift = False
-
+        
         # Au depart on avance tout droit pour eviter de se cogner contre les adversaires
         if obs['distance_down_track'] <= 2:
             steering = 0.0
             acceleration = 1.0
+            action = {
+            "acceleration": acceleration,
+            "steer": steering,
+            "brake": False,
+            "drift": False,
+            "nitro": False,
+            "rescue":False,
+            "fire": False,
+            }
+            return action
 
         # Appel en priorité de la fonction rescue
         is_stuck, action_stuck = self.expert_rescue.choose_action(steering,speed,distance)
