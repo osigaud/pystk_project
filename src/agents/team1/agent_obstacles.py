@@ -1,11 +1,12 @@
-from .agent_speed import AgentSpeed
+from agents.kart_agent import KartAgent
 import numpy as np
-from .agent_base import BONUS, OBSTACLES
 
-class AgentObstacles(AgentSpeed) : 
-
-    def __init__(self, env, path_lookahead=3): 
-        super().__init__(env, path_lookahead)
+class AgentObstacles(KartAgent) : 
+    def __init__(self, env, conf, agent, path_lookahead=3): 
+        super().__init__(env)
+        self.conf = conf
+        self.agent = agent
+        self.path_lookahead = path_lookahead
         self.target_obstacle = None
         self.target_item = None
 
@@ -14,8 +15,8 @@ class AgentObstacles(AgentSpeed) :
         Paramètres : obs, action (dict)
         Renvoie : action (dict), le dictionnaire d'actions corrigé après avoir pris en compte les items sur la piste
         """
-        tab_bonus = [i for i in range(len(obs["items_type"])) if obs["items_type"][i] in BONUS]
-        tab_obstacles = [i for i in range(len(obs["items_type"])) if obs["items_type"][i] in OBSTACLES]
+        tab_bonus = [i for i in range(len(obs["items_type"])) if obs["items_type"][i] in self.conf.bonus]
+        tab_obstacles = [i for i in range(len(obs["items_type"])) if obs["items_type"][i] in self.conf.obstacles]
 
         """
         for i in range(len(obs["items_type"])) :
@@ -91,6 +92,6 @@ class AgentObstacles(AgentSpeed) :
         Paramètres : obs
         Renvoie : action (dict), dictionnaire d'actions corrigé après prise en compte des obstacles et bonus
         """
-        action = super().choose_action(obs)
+        action = self.agent.choose_action(obs)
         action = self.observation_next_item(obs, action)
         return action

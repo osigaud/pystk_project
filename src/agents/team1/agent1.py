@@ -7,6 +7,7 @@ from omegaconf import OmegaConf
 from agents.kart_agent import KartAgent
 from agents.team1.agent_center import AgentCenter
 from agents.team1.agent_speed import AgentSpeed
+from agents.team1.agent_obstacles import AgentObstacles
 """
 import math
 from omegaconf import OmegaConf
@@ -25,8 +26,9 @@ class Agent1(KartAgent):
         path_conf = str(path_conf) + '/configFIleTastyCrousteam.yaml'   #Chemin du fichier de configuration
         self.conf = OmegaConf.load(path_conf)                           #Importation du fichier de configuration
 
-        self.agentCenter = AgentCenter(env, self.conf, path_lookahead)
-        self.agentSpeed = AgentSpeed(env, self.conf, self.agentCenter, path_lookahead)
+        self.agentCenter = AgentCenter(env, self.conf, self.path_lookahead)
+        self.agentSpeed = AgentSpeed(env, self.conf, self.agentCenter, self.path_lookahead)
+        self.agentObstacles = AgentObstacles(env, self.conf, self.agentSpeed, self.path_lookahead)
 
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -47,6 +49,6 @@ class Agent1(KartAgent):
             "rescue": False,
             "fire": False,
         }
-        return self.agentSpeed.choose_action(obs)
+        return self.agentObstacles.choose_action(obs)
         return action
         
