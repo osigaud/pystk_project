@@ -1,18 +1,18 @@
-from .agent_rescue import AgentRescue
+from agents.kart_agent import KartAgent
 import numpy as np
 
-class AgentItems(AgentRescue) : 
-
-    def __init__(self, env, path_lookahead=3) :
-        super().__init__(env, path_lookahead) 
+class AgentItems(KartAgent) : 
+    def __init__(self, env, conf, agent) :
+        super().__init__(env)
+        self.conf = conf
+        self.agent = agent 
     
     def observation_item(self, obs, action) : 
         """
         Paramètres : obs, action (dict)
         Renvoie : action (dict), dictionnaire d'actions corrigé après prise en compte des objets tenus
         """
-        current_item = obs["powerup"]
-        
+        current_item = obs["powerup"]        
         action["fire"] = False        
 
         match current_item : 
@@ -22,7 +22,7 @@ class AgentItems(AgentRescue) :
 
             case 1 : 
             #BUBBLEGUM : à compléter
-                action ["fire"] = True
+                action["fire"] = True
                 return action
 
             case 2 : 
@@ -53,7 +53,7 @@ class AgentItems(AgentRescue) :
             case 4 : 
             #ZIPPER : à compléter
                 #if virage_serre = false and self.target_obstacle = None:
-                    #action["fire"] = True               
+                action["fire"] = True               
                 return action
 
             case 5 : 
@@ -96,7 +96,6 @@ class AgentItems(AgentRescue) :
                     action["fire"] = True
                 return action
 
-
         return action
 
     def use_nitro(self, obs, act):
@@ -111,10 +110,8 @@ class AgentItems(AgentRescue) :
         Paramètres : obs
         Renvoie : action (dict), dictionnaire d'actions corrigé
         """
-        action = super().choose_action(obs)
-    
+        action = self.agent.choose_action(obs)
         action = self.observation_item(obs, action)
-        
         action = self.use_nitro(obs, action)
         return action
     

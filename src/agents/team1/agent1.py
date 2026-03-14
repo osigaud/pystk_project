@@ -9,6 +9,7 @@ from agents.team1.agent_center import AgentCenter
 from agents.team1.agent_speed import AgentSpeed
 from agents.team1.agent_obstacles import AgentObstacles
 from agents.team1.agent_rescue import AgentRescue
+from agents.team1.agent_items import AgentItems
 """
 import math
 from omegaconf import OmegaConf
@@ -31,6 +32,7 @@ class Agent1(KartAgent):
         self.agentSpeed = AgentSpeed(env, self.conf, self.agentCenter, self.path_lookahead)
         self.agentObstacles = AgentObstacles(env, self.conf, self.agentSpeed, self.path_lookahead)
         self.agentRescue = AgentRescue(env, self.conf, self.agentObstacles)
+        self.agentItems = AgentItems(env, self.conf, self.agentRescue)
 
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -40,17 +42,4 @@ class Agent1(KartAgent):
         return self.isEnd
 
     def choose_action(self, obs):
-        acceleration = random.random()
-        steering = random.random()
-        action = {
-            "acceleration": 0,
-            "steer": 0,
-            "brake": False,
-            "drift": False,
-            "nitro": False,
-            "rescue": False,
-            "fire": False,
-        }
-        return self.agentRescue.choose_action(obs)
-        return action
-        
+        return self.agentItems.choose_action(obs)
