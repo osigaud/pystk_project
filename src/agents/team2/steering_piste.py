@@ -2,9 +2,9 @@ import numpy as np
 
 
 class SteeringPiste:
-    def __init__(self, correction):
-        self.correction = correction
     
+    def __init__(self, cfg):
+        self.correction = cfg.correction
     
     def correction_centrePiste(self, obs):
         """
