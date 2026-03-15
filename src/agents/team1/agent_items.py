@@ -25,8 +25,6 @@ class AgentItems(KartAgent) :
         current_item = obs["powerup"]        
         action["fire"] = False        
 
-        match current_item : 
-
         if current_item == BUBBLEGUM :
             #BUBBLEGUM : à compléter
             action["fire"] = True
