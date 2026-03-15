@@ -3,6 +3,7 @@ import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 from omegaconf import OmegaConf #ajouté S4
+from .steering_piste import SteeringPiste
 
 
 cfg= OmegaConf.load("../agents/team2/configDemoPilote.yaml")
@@ -11,11 +12,11 @@ class Agent2(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)
         self.path_lookahead = path_lookahead
+        self.steering = SteeringPiste(cfg.correction)
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
         self.name = "DemoPilote " 
-
         self.stuck_steps = 0    
         self.recovery_steps = 0 
         self.en_marche_arriere = False
@@ -28,29 +29,6 @@ class Agent2(KartAgent):
 
     def endOfTrack(self):
         return self.isEnd
-        
-    
-    def correction_centrePiste(self, obs):
-        """
-        Calcule la correction nécessaire pour rester au centre de la piste.
-        """
-        #si paths_start n'existe pas,on renvoie 0 et on veut qu'il y ait au moins 2 points devant le kar
-        if "paths_start" not in obs or len(obs["paths_start"])<3:
-            return 0.0
-        #le point au centre de la piste juste devant le kart
-        point_proche_kart = obs["paths_start"][2]
-        x = point_proche_kart[0] #coordonees du point qui nous indique gche ou drte
-        z = point_proche_kart[2] #coordonnees du pt qui nous indique devant ou derriere
-        if z<=0.0:
-            return 0.0
-        # angle qu'il faut tourner pour atteindre le point
-        angle_vers_centre= np.arctan2(x, z)
-        # if abs(angle_vers_centre)<0.03:
-        #     return 0.0
-        correction = angle_vers_centre * cfg.correction
-        return np.clip(correction, -0.6, 0.6) #np.clip (=barrière de sécurité) sécurise pour que le res ne dépasse pas l'intervalle (= les limites physiques du volant, car un volant ne tourne pas infiniment)
-
-
 
     def detectVirage(self,obs):
         """ 
@@ -179,7 +157,7 @@ class Agent2(KartAgent):
                 self.en_marche_arriere = False
             
             #braquage 
-            correction = self.correction_centrePiste(obs)
+            correction = self.steering.correction_centrePiste(obs)
             braquage_arriere = 0.85 if correction > 0 else -0.85 #braquage 
             
             return {
@@ -237,7 +215,7 @@ class Agent2(KartAgent):
             #fire=False
 
         #Calcul de la correction pour rester au centre de la piste
-        correction_piste = self.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
+        correction_piste = self.steering.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
 
         # ADAPTATION DE L'ACCELERATION SELON LE VIRAGE POUR NE PAS SORTIR DE LA PISTE
         acceleration = self.adapteAcceleration(obs)
