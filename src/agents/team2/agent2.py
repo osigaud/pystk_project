@@ -17,7 +17,8 @@ class Agent2(KartAgent):
         self.name = "DemoPilote " 
 
         self.stuck_steps = 0    
-        self.recovery_steps = 0  
+        self.recovery_steps = 0 
+        self.en_marche_arriere = False
 
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -164,24 +165,48 @@ class Agent2(KartAgent):
                 if dist < 40 and abs(angle) < 15.0: # si l'adversaire est pres de nous, alors utiliser l'item
                     return True
         return False
+    
+    def gerer_recul(self, obs, vitesse):
+        """ Gère la détection de blocage et la marche arrière """
+        phase = obs.get("phase", 0)
+        
+        if vitesse < 0.2 and phase > 2: #si vitesse nulle après le départ
+            self.stuck_steps += 1
+        else:
+            self.stuck_steps = 0
 
+        if self.stuck_steps > 5 and not self.en_marche_arriere: #temps de decision d'activer marche arriere
+            self.en_marche_arriere = True
+            self.recovery_steps = 15 #durée de la marche arriere 
 
-    def choose_action(self, obs):
-        if self.recovery_steps > 0:
+        if self.en_marche_arriere:   #execution de marche arriere
             self.recovery_steps -= 1
+            if self.recovery_steps <= 0:
+                self.en_marche_arriere = False
+            
+            #braquage 
+            correction = self.correction_centrePiste(obs)
+            braquage_arriere = 0.85 if correction > 0 else -0.85 #braquage 
+            
             return {
                 "acceleration": 0.0,
-                "steer": 0.0,
-                "brake": True,  
+                "steer": braquage_arriere,
+                "brake": True, #declencher la marche arriere
                 "drift": False,
                 "nitro": False,
                 "rescue": False,
                 "fire": False,
             }
+        return None
 
+    def choose_action(self, obs):
         velocity = np.array(obs["velocity"])
         speed = np.linalg.norm(velocity)
         
+        action_secours = self.gerer_recul(obs, speed)
+        if action_secours is not None:
+            return action_secours
+            
         phase = obs.get("phase", 0) 
         
         if "paths_start" in obs:
@@ -189,19 +214,7 @@ class Agent2(KartAgent):
         else:
             nodes_path = [] 
 
-
-        if phase > 3:  
-            if speed < 0.2:  
-                self.stuck_steps += 1
-            else:
-                self.stuck_steps = 0
-        
-        if self.stuck_steps > 7:
-            self.recovery_steps = 15
-            self.stuck_steps = 0
-
         angle = 0
-
         
         if len(nodes_path) > self.path_lookahead:
             target_node = nodes_path[self.path_lookahead]
@@ -210,7 +223,6 @@ class Agent2(KartAgent):
             angle = angle_target 
         else:
             steering = 0
-
         
         #eviter les murs/ revenir sur la piste si kart bloqué
         if abs(obs["center_path_distance"])> obs["paths_width"][0]/2:
@@ -230,7 +242,7 @@ class Agent2(KartAgent):
         #else:
             #fire=False
 
-        # Calcul de la correctio pour rester au centre de la piste
+        #Calcul de la correction pour rester au centre de la piste
         correction_piste = self.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
 
         # ADAPTATION DE L'ACCELERATION SELON LE VIRAGE POUR NE PAS SORTIR DE LA PISTE
@@ -240,7 +252,7 @@ class Agent2(KartAgent):
 
         final_steering = np.clip(item_steering+ correction_piste+ steering, -1, 1)
 
-        has_item = obs.get("attachment", 0) != 0 # 0 si il ne possede pas l'item
+        has_item = obs.get("attachment", 0) != 0 #0 si il ne possede pas l'item
         fire = has_item and self.attack_rivals(obs) 
 
         action = {
@@ -252,4 +264,5 @@ class Agent2(KartAgent):
             "rescue": rescue, 
             "fire": fire,
         }
+        
         return action
