@@ -7,62 +7,52 @@ class AgentSpeed(KartAgent):
         self.conf = conf
         self.agent = agent
         self.path_lookahead = path_lookahead
-
-        self.ecartpetit = self.conf.ecartpetit #seuil a partir du quel on considere l'ecart comme petit (ligne droite)o
-        self.ecartgrand = self.conf.ecartgrand #seuil a partir du quel on considere l'ecart comme grand (virage serré)
-        self.msapetit = self.conf.msapetit  #seuil a partir duquel max steer angle ne permet pas de bien tourner le volant
-        self.msagrand = self.conf.msagrand  #seuil a partir duquel max steer angle ne permet de bien tourner le volant
-        self.accel_ligne_droite = self.conf.accel_ligne_droite
-        self.frein_virage = self.conf.frein_virage
-        self.accel_virage = self.conf.accel_virage
-        self.dist_segment = self.conf.dist_segment
         
-    def analyse(self, obs):
+    def detecter_virage(self, obs):
         virage_serre = False
         nbsegments = min(self.path_lookahead, len(obs["paths_start"]))
         for i in range(nbsegments):
-            segdirection = obs["paths_end"][i] - obs["paths_start"][i]
-            diff = segdirection - obs["front"]
-            ecart = float(np.linalg.norm(diff))
-            dist = abs(obs["paths_distance"][i][0] - obs["paths_distance"][0][0])
+            direction_segment = obs["paths_end"][i] - obs["paths_start"][i]
+            diff_direction = direction_segment - obs["front"]
+            ecart_direction = float(np.linalg.norm(diff_direction))
+            distance_segment = abs(obs["paths_distance"][i][0] - obs["paths_distance"][0][0])
                 
-            if ecart >= self.ecartgrand and dist < self.dist_segment:
+            if ecart_direction >= self.conf.ecartgrand and distance_segment < self.conf.dist_segment:
                 virage_serre = True
       
         return virage_serre
         
-    def reaction(self, virage_serre, act, obs):
+    def ajuster_acceleration(self, virage_serre, act, obs):
         act["acceleration"] = max(act["acceleration"], 1)
-        msa = obs["max_steer_angle"]
+        max_steer_angle = obs["max_steer_angle"]
 
         # ligne droite
         if not virage_serre:
-            act["acceleration"] = self.accel_ligne_droite
+            act["acceleration"] = self.conf.accel_ligne_droite
 
-            segdirection = obs["paths_end"][0] - obs["paths_start"][0]
-            if segdirection[1] > 0.05:
+            direction_segment = obs["paths_end"][0] - obs["paths_start"][0]
+            if direction_segment[1] > 0.05:
                 act["acceleration"] = np.clip(act["acceleration"], 0.1, 1)      #self.limit(act["acceleration"] + 0.2)
-
             return act
 
         # virage serré
-        if msa <= self.msapetit:
-            accel = act["acceleration"] - self.frein_virage
-            act["acceleration"] = np.clip(accel, 0.1, 1)
+        if max_steer_angle <= self.conf.max_steer_angle_petit:
+            acceleration_freinee = act["acceleration"] - self.conf.frein_virage
+            act["acceleration"] = np.clip(acceleration_freinee, 0.1, 1)
 
-        elif msa >= self.msagrand:
-            accel = act["acceleration"] + self.accel_virage
-            act["acceleration"] = np.clip(accel, 0.1, 1)
+        elif max_steer_angle >= self.conf.max_steer_angle_grand:
+            acceleration_boostee = act["acceleration"] + self.conf.accel_virage
+            act["acceleration"] = np.clip(acceleration_boostee, 0.1, 1)
 
-        segdirection = obs["paths_end"][0] - obs["paths_start"][0]
-        if segdirection[1] > 0.05:
+        direction_segment = obs["paths_end"][0] - obs["paths_start"][0]
+        if direction_segment[1] > 0.05:
             act["acceleration"] = np.clip(act["acceleration"], 0.1, 1) 
 
         return act
   
     def choose_action(self, obs):
         act = self.agent.choose_action(obs)
-        virage_serre = self.analyse(obs)
-        act_corr = self.reaction(virage_serre, act, obs)
-        return act_corr
+        virage_serre = self.detecter_virage(obs)
+        action_ajustee = self.ajuster_acceleration(virage_serre, act, obs)
+        return action_ajustee
 
