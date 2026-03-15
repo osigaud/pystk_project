@@ -2,6 +2,21 @@ from agents.kart_agent import KartAgent
 import numpy as np
 
 class AgentSpeed(KartAgent):
+    
+    """Agent qui adapte la vitesse en fonction de la forme de la piste dans les prochaines secondes (ligne droite ou virage?).
+
+    Cet agent hérite de AgentCenter (qui gère le maintien au centre de la piste)
+    et ajoute un comportement de gestion de l'accélération selon les
+    segments de piste devant le kart (ligne droite vs virage serré).
+
+    Attributes:
+        ecartpetit (float): Seuil en dessous duquel on considère que l'écart de direction
+            est faible (ligne droite).
+        ecartgrand (float): Seuil à partir duquel l'écart est grand (virage serré).
+        msapetit (float): Seuil bas sur obs["max_steer_angle"] pour moduler l'accélération.
+        msagrand (float): Seuil haut sur obs["max_steer_angle"] pour moduler l'accélération.
+    """
+
     def __init__(self, env, conf, agent, path_lookahead=3):
         super().__init__(env)
         self.conf = conf
@@ -9,6 +24,24 @@ class AgentSpeed(KartAgent):
         self.path_lookahead = path_lookahead
         
     def detecter_virage(self, obs):
+
+        """Analyse la piste devant le kart et classe la situation selon si c'est un virage ou non.
+
+        La méthode inspecte jusqu'à `path_lookahead`(on choisi 3) segments (paths_start/end) et
+        estime un "écart" entre la direction des segments et le vecteur `obs["front"]`.
+        Si un segment proche correspond à un écart élevé, on detecte un virage serré.
+
+        Args:
+            obs (dict): Observations de l’environnement. Clés typiques utilisées :
+                - paths_start (list/array): points de début des segments.
+                - paths_end (list/array): points de fin des segments.
+                - front (array): direction actuelle du kart (vecteur).
+                - paths_distance (list): distances latérales  associees aux segments.
+
+        Returns:
+            bool : virage_serre
+        """
+
         virage_serre = False
         nbsegments = min(self.path_lookahead, len(obs["paths_start"]))
         for i in range(nbsegments):
@@ -23,6 +56,23 @@ class AgentSpeed(KartAgent):
         return virage_serre
         
     def ajuster_acceleration(self, virage_serre, act, obs):
+
+        """Modifie l'action `act` en fonction du contexte.
+
+        Ajuste `act["acceleration"]` selon :
+        - le type de trajectoire ("ligne droite" / "virage serre")
+        - `obs["max_steer_angle"]` (indicateur de la difficulté du virage)
+        - une pente éventuelle dans laquelle il faut accélerer(via segdirection[1])
+
+        Args:
+            virage serre (bool): Résultat de `analyse` ("ligne droite" ou "virage serre").
+            act (dict): Action courante (doit contenir "acceleration").
+            obs (dict): Observations (doit contenir "max_steer_angle", "paths_start/end"...).
+
+        Returns:
+            dict: Action corrigé (accélération bornée via `gap`).
+        """
+
         act["acceleration"] = max(act["acceleration"], 1)
         max_steer_angle = obs["max_steer_angle"]
 

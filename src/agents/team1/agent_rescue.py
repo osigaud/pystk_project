@@ -2,6 +2,16 @@ from agents.kart_agent import KartAgent
 import numpy as np
 
 class AgentRescue(KartAgent) : 
+
+    """Agent de secours chargé de détecter et faire reculer un kart qui est bloqué.
+    
+    Attributes:
+        last_distance (float ou None): Dernière distance mesurée le long de la piste.
+        block_counter (int): Nombre de frames consécutives sans progression significative.
+        unblock_steps (int): Nombre d’actions restantes dans la séquence de déblocage.
+        is_braking (bool): Indique si une phase de déblocage est en cours.
+    """
+
     #Prendre le cas en compte où on est étourdi par un item dans is_blocked
     def __init__(self, env, conf, agent): 
         super().__init__(env)
@@ -14,10 +24,19 @@ class AgentRescue(KartAgent) :
         self.is_braking = False
 
     def is_blocked(self, obs):
+        
+        """Détecte si le kart est bloqué et met à jour le compteur interne.
+
+        on se considère comme bloqué si la progression (`distance_down_track`) varie très peu pendant plusieurs frames, que le kart n’est pas en saut,
+        et qu’il n’est pas affecté par certains items (ex: étourdissement).
+
+        Args:
+            obs (dict): Observations de l’environnement contenant notamment :
+                - distance_down_track
+                - jumping
+                - attachment
         """
-        Paramètres : obs
-        Incrémente self.block_counter si le kart n'a pas bougé
-        """
+
         distance_down_track = obs["distance_down_track"][0]
         attachment = obs["attachment"]
         if self.last_distance is None :
@@ -30,10 +49,20 @@ class AgentRescue(KartAgent) :
             self.last_distance = distance_down_track
 
     def unblock_action(self, act):
+
+        """Applique un recul pour tenter de débloquer le kart.
+
+        Pendant un nombre limité de frames (`unblock_steps`), l’agent force
+        une action de recul afin de sortir d’une situation de blocage.
+
+        Args:
+            act (dict): Action courante.
+
+        Returns:
+            dict: Action modifiée si une phase de déblocage est active,
+                  sinon l’action originale.
         """
-        Paramètres : act (dict)
-        Renvoie : act (dict), modifié si on doit reculer
-        """
+
         if self.unblock_steps > 0 : 
             self.unblock_steps -= 1
             return {
@@ -50,10 +79,21 @@ class AgentRescue(KartAgent) :
             return act
     
     def choose_action(self, obs):
+
+        """Choisit une action et déclenche un déblocage si nécessaire.
+
+        Étapes :
+        1) Vérifie si le kart est bloqué.
+        2) Récupère l’action normale (centre + obstacles).
+        3) Si blocage est prolongé, lance un recul.
+
+        Args:
+            obs (dict): Observations de l’environnement.
+
+        Returns:
+            dict: Action finale appliquée au kart.
         """
-        Paramètres : obs
-        Renvoie : action (dict), le dictionnaire d'actions de notre kart
-        """
+
         self.is_blocked(obs)
         action = self.agent.choose_action(obs)
                 

@@ -2,6 +2,15 @@ from agents.kart_agent import KartAgent
 import numpy as np
 
 class AgentObstacles(KartAgent) : 
+
+    """Agent qui gere les obstacles et les bonus en corrigeant la trajectoire.
+    
+    Attributes:
+        target_obstacle (int | None): Index de l'obstacle actuellement ciblé .
+        target_item (int | None): Index du bonus actuellement ciblé.
+    """
+
+
     def __init__(self, env, conf, agent, path_lookahead=3): 
         super().__init__(env)
         self.conf = conf
@@ -11,9 +20,20 @@ class AgentObstacles(KartAgent) :
         self.target_item = None
 
     def observation_next_item(self, obs, action) : 
-        """
-        Paramètres : obs, action (dict)
-        Renvoie : action (dict), le dictionnaire d'actions corrigé après avoir pris en compte les items sur la piste
+        """Analyse les items visibles (bonus/obstacles) et corrige l'action soit en s'en approchant ou soit en esquivant.
+
+        1. repère les indices des items bonus et obstacles via `obs["items_type"]`
+        2. applique d'abord l'évitement des obstacles
+        3. puis (si possible) l'alignement vers un bonus
+
+        Args:
+            obs (dict): Observations de l’environnement. Clés utilisées typiquement :
+                - items_type (list[int] | list[str]): type de chaque item détecté.
+                - items_position (list[array]): vecteur position de chaque item (x, y, z) dans le repère du kart.
+            action (dict): Dictionnaire d'action courant (au minimum "steer").
+
+        Returns:
+            dict: Action corrigée après prise en compte des bonus et obstacles.
         """
         tab_bonus = [i for i in range(len(obs["items_type"])) if obs["items_type"][i] in self.conf.bonus]
         tab_obstacles = [i for i in range(len(obs["items_type"])) if obs["items_type"][i] in self.conf.obstacles]
@@ -36,9 +56,19 @@ class AgentObstacles(KartAgent) :
         return action
 
     def dodge_obstacle(self, obs, action, index) : 
-        """
-        Paramètres : obs, action (dict), index
-        Renvoie : action (dict), après avoir pris en compte le prochain obstacle (sauf si on a un SHIELD équipé)
+        """Évite un obstacle donné (sauf si un shield est actif).
+
+        Conserve une cible (`target_obstacle`) pour éviter de changer
+        d'obstacle ciblé à chaque frame. Si l'obstacle n'est plus pertinent
+        (trop proche, hors zone, ou autre), la cible est remise a None.
+
+        Args:
+            obs (dict): Observations (utilise `items_position`, `attachment`, `attachment_time_left`).
+            action (dict): Action courante (modifie "steer").
+            index (int): Index de l'obstacle dans `obs["items_type"]` / `obs["items_position"]`.
+
+        Returns:
+            dict: Action corrigée (steer modifié pour dévier de l'obstacle).
         """
         if self.target_obstacle is None : 
             self.target_obstacle = index
@@ -60,9 +90,17 @@ class AgentObstacles(KartAgent) :
         return action
 
     def take_bonus(self, obs, action, index) :
-        """
-        Paramètres : obs, action (dict), index
-        Renvoie : action (dict), après avoir pris en compte le prochain bonus pour se diriger vers celui-ci
+        """Se dirige vers un bonus (item) s'il n'y a pas d'autre priorité et s'il est pertinent de le récupérer.
+
+        Même principe que dodge obstacles on conserve une cible pour éviter de changer de direction à chaque frame.
+
+        Args:
+            obs (dict): Observations (utilise `items_position`, `paths_end`).
+            action (dict): Action courante (modifie "steer").
+            index (int): Index du bonus dans `obs["items_type"]` / `obs["items_position"]`.
+
+        Returns:
+            dict: Action corrigée (steer orienté vers l'item si conditions remplies).
         """
         if self.target_item is None : 
             self.target_item = index

@@ -12,15 +12,29 @@ PARACHUTE = 9
 
 
 class AgentItems(KartAgent) : 
+
+    """Agent qui gère l'utilisation des objets et du nitro."""
+
     def __init__(self, env, conf, agent) :
         super().__init__(env)
         self.conf = conf
         self.agent = agent 
     
     def observation_item(self, obs, action) : 
-        """
-        Paramètres : obs, action (dict)
-        Renvoie : action (dict), dictionnaire d'actions corrigé après prise en compte des objets tenus
+        """Détermine si l'objet que nous avons doit être utilisé.
+
+        - certains objets sont utilisés immédiatement,
+        - d'autres seulement si un adversaire est devant,
+        - d'autres encore si un adversaire est suffisamment proche dans un rayon autour du kart.
+
+        Args:
+            obs (dict): Observations de l'environnement. Clés utilisées :
+                - powerup : objet actuellement détenu
+                - karts_position : positions relatives des autres karts
+            action (dict): Action courante à modifier.
+
+        Returns:
+            dict: Action corrigée avec la clé `fire` mise à jour.
         """
         current_item = obs["powerup"]        
         action["fire"] = False        
@@ -104,6 +118,22 @@ class AgentItems(KartAgent) :
     return action
 
     def use_nitro(self, obs, act):
+
+        """Active le nitro si le niveau d'énergie est suffisant.
+
+        Vérifie la quantité d'énergie disponivble dans
+        `obs["energy"]`. Si elle dépasse un certain seuil, l'action
+        `nitro` est activée.
+
+        Args:
+            obs (dict): Observations de l'environnement. Clé utilisée :
+                - energy : quantité d'énergie disponible
+            act (dict): Action courante à modifier.
+
+        Returns:
+            dict: Action corrigée avec la clé `nitro` éventuellement activée.
+        """
+
         nit = obs["energy"]
         virage_serre = False
         if nit > 0.05 :
