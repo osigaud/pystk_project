@@ -4,6 +4,7 @@ from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 from omegaconf import OmegaConf #ajouté S4
 from .steering_piste import SteeringPiste
+from .react_items import ReactionItems
 
 
 cfg= OmegaConf.load("../agents/team2/configDemoPilote.yaml")
@@ -13,6 +14,7 @@ class Agent2(KartAgent):
         super().__init__(env)
         self.path_lookahead = path_lookahead
         self.steering = SteeringPiste(cfg.correction)
+        self.items_steering = ReactionItems(cfg.angle_evite_n,cfg.angle_evite_p)
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
@@ -82,47 +84,6 @@ class Agent2(KartAgent):
                 #0.02
                 acceleration = acceleration - 0.01
         return acceleration 
-
-    def reaction_items(self, obs):
-        """
-        permet d'eviter les 'bad' items et se diriger les 'good' items 
-        """
-        items_pos = obs.get('items_position', [])            
-        items_type = obs.get('items_type', [])
-        steering_adjustment = 0.0
-
-        GOOD_ITEM_IDS = [0, 2, 3, 6]  # BONUS_BOX, NITRO_BIG, NITRO_SMALL, EASTER_EGG
-        best_good_dist = 1000.0 # tres grand nombre qui sert comme point de base
-
-        angle_evite = 0.0
-        dist_min_evite = 15.0
-
-        for i, pos in enumerate(items_pos):#le sert à faire le lien entre la position de l'item qu'on regarde et son type
-            pos = np.array(pos)
-            dist = np.linalg.norm(pos)
-
-            # items derriere ou trop loin => ignorer
-            
-            if pos[2] < 0 or dist > 25.0:
-                continue
-
-            item_type = items_type[i] if i < len(items_type) else None
-
-            # prendre le meilleur "good" item le plus proche
-            if item_type in GOOD_ITEM_IDS:
-                if dist < best_good_dist:
-                    best_good_dist = dist
-                    angle = np.arctan2(pos[0], pos[2])
-                    #modification parce que correction centre piste etait largement plus importante que steering adjustement
-                    steering_adjustment = float(np.clip(angle * 5, -0.8, 0.8))#adapter cette partie aux differentes pistes
-            else:
-                # éviter les bad items proches
-                if dist < dist_min_evite:
-                    angle_evite = cfg.angle_evite_n if pos[0] > 0 else cfg.angle_evite_p
-
-        if abs(angle_evite) > 0:
-            return angle_evite #evite bad item
-        return steering_adjustment #se dirige vers good items
 
 
     def attack_rivals(self, obs):
@@ -220,7 +181,7 @@ class Agent2(KartAgent):
         # ADAPTATION DE L'ACCELERATION SELON LE VIRAGE POUR NE PAS SORTIR DE LA PISTE
         acceleration = self.adapteAcceleration(obs)
         
-        item_steering = self.reaction_items(obs)
+        item_steering = self.items_steering.reaction_items(obs)
 
         final_steering = np.clip(item_steering+ correction_piste+ steering, -1, 1)
 
