@@ -91,25 +91,19 @@ class Agent2(KartAgent):
         else : 
             proche_virage = liste_virage[0]
             curvature = proche_virage["curvature"]
-            #print (curvature) # permet d afficher la variation des angles pour determiner les courbures 
             if curvature > cfg.virages.drift:
-                #drift = True
                 #0.27
                 acceleration = acceleration - 0.20
             elif curvature > cfg.virages.serrer.i1 and curvature <=cfg.virages.serrer.i2: # virage serré 
                 #0.10
                 acceleration= acceleration - 0.05
-                #drift = False 
             elif curvature > cfg.virages.moyen.i1 and curvature <= cfg.virages.moyen.i2:  #virage moyen 
                 #0.05
                 acceleration = acceleration - 0.02
-                #drift = False
             else :
                 #0.02
                 acceleration = acceleration - 0.01
-                #drift = False
-        return acceleration #drift 
-    #on travaillera sur les drifts apres depuis cette fonction 
+        return acceleration 
 
     def reaction_items(self, obs):
         """
