@@ -1,14 +1,14 @@
 from agents.kart_agent import KartAgent
 import numpy as np
-case 1 : BUBBLEMGUM
-case 2 : CAKE
-case 3 : BOWLING
-case 4 : ZIPPER
-case 5 : PLUNGER
-case 6 : SWITCH
-case 7 : SWATTER
-case 8 : RUBBERBALL
-case 9 : PARACHUTE
+BUBBLEMGUM = case 1
+CAKE = case 2
+BOWLING = case 3
+ZIPPER = case 4
+PLUNGER = case 5
+SWITCH = case 6
+SWATTER = case 7
+RUBBERBALL = case 8
+PARACHUTE = case 9
 
 
 class AgentItems(KartAgent) : 
