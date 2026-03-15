@@ -2,9 +2,9 @@ import numpy as np
 
 
 class ReactionItems : 
-    def __init__(self,angle_negative, angle_positive) : 
-        self.angle_n = angle_negative
-        self.angle_p = angle_positive
+    def __init__(self,cfg) : 
+        self.angle_n = cfg.angle_evite_n
+        self.angle_p = cfg.angle_evite_p
         
     def reaction_items(self, obs):
         """

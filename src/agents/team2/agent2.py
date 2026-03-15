@@ -9,14 +9,14 @@ from .rival_attack import AttackRivals
 from .kart_rescue import StuckControl
 
 
-cfg= OmegaConf.load("../agents/team2/configDemoPilote.yaml")
+cfg = OmegaConf.load("../agents/team2/configDemoPilote.yaml")
 
 class Agent2(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)
         self.path_lookahead = path_lookahead
-        self.steering = SteeringPiste(cfg.correction)
-        self.items_steering = ReactionItems(cfg.angle_evite_n,cfg.angle_evite_p)
+        self.steering = SteeringPiste(cfg)
+        self.items_steering = ReactionItems(cfg)
         self.attack_rival = AttackRivals()
         self.rescue_kart = StuckControl()
         self.agent_positions = []
