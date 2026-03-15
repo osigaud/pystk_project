@@ -55,7 +55,7 @@ class Agent2(KartAgent):
             angle1 = np.arctan2(x1, z1)
             angle2 = np.arctan2(x2, z2)
 
-            curvature = angle1 - angle2
+            curvature = abs(angle1 - angle2)
 
             if curvature > cfg.curvature :  # seuil à ajuster
                 virages.append({ "index": i, "curvature": curvature })
@@ -72,7 +72,7 @@ class Agent2(KartAgent):
             acceleration = cfg.acceleration.sans_virage  # conduite normale on pourrait augmenter légèrement l'accélération -> à décider 
         else : 
             proche_virage = liste_virage[0]
-            curvature = proche_virage["curvature"]
+            curvature = abs(proche_virage["curvature"])
             if curvature > cfg.virages.drift:
                 #0.27
                 acceleration = acceleration - 0.20
@@ -120,7 +120,7 @@ class Agent2(KartAgent):
             rescue=False
 
         #utiliser les boost: (nitro->pour activer bouteille bleu, fire->pour activer les cadeaux)
-        if obs["energy"][0]>0:
+        if obs["energy"][0]>0 and abs(steering) < 0.4:
             nitro=True
         else: 
             nitro=False
