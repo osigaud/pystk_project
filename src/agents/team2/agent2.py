@@ -6,6 +6,7 @@ from omegaconf import OmegaConf #ajouté S4
 from .steering_piste import SteeringPiste
 from .react_items import ReactionItems
 from .rival_attack import AttackRivals
+from .kart_rescue import StuckControl
 
 
 cfg= OmegaConf.load("../agents/team2/configDemoPilote.yaml")
@@ -17,14 +18,13 @@ class Agent2(KartAgent):
         self.steering = SteeringPiste(cfg.correction)
         self.items_steering = ReactionItems(cfg.angle_evite_n,cfg.angle_evite_p)
         self.attack_rival = AttackRivals()
+        self.rescue_kart = StuckControl()
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
         self.name = "DemoPilote " 
-        self.stuck_steps = 0    
-        self.recovery_steps = 0 
-        self.en_marche_arriere = False
 
+        
     def reset(self):
         self.obs, _ = self.env.reset()
         self.agent_positions = []
@@ -87,45 +87,12 @@ class Agent2(KartAgent):
                 acceleration = acceleration - 0.01
         return acceleration 
     
-    
-    def gerer_recul(self, obs, vitesse):
-        """ Gère la détection de blocage et la marche arrière """
-        phase = obs.get("phase", 0)
-        
-        if vitesse < 0.2 and phase > 2: #si vitesse nulle après le départ
-            self.stuck_steps += 1
-        else:
-            self.stuck_steps = 0
-
-        if self.stuck_steps > 5 and not self.en_marche_arriere: #temps de decision d'activer marche arriere
-            self.en_marche_arriere = True
-            self.recovery_steps = 15 #durée de la marche arriere 
-
-        if self.en_marche_arriere:   #execution de marche arriere
-            self.recovery_steps -= 1
-            if self.recovery_steps <= 0:
-                self.en_marche_arriere = False
-            
-            #braquage 
-            correction = self.steering.correction_centrePiste(obs)
-            braquage_arriere = 0.85 if correction > 0 else -0.85 #braquage 
-            
-            return {
-                "acceleration": 0.0,
-                "steer": braquage_arriere,
-                "brake": True, #declencher la marche arriere
-                "drift": False,
-                "nitro": False,
-                "rescue": False,
-                "fire": False,
-            }
-        return None
 
     def choose_action(self, obs):
         velocity = np.array(obs["velocity"])
         speed = np.linalg.norm(velocity)
         
-        action_secours = self.gerer_recul(obs, speed)
+        action_secours = self.rescue_kart.gerer_recul(obs, speed, self.steering)
         if action_secours is not None:
             return action_secours
             
