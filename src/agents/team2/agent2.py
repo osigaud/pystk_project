@@ -60,7 +60,7 @@ class Agent2(KartAgent):
         """
         
         acceleration= 1.0
-        curvature=self.detectVirage(obs)
+        curvature=abs(self.detectVirage(obs))
 
         if curvature > cfg.virages.drift:
                 #0.27
