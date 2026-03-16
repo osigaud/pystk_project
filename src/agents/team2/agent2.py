@@ -35,7 +35,8 @@ class Agent2(KartAgent):
         return self.isEnd
 
     def detectVirage(self,obs):
-        """ le but est de calculer l'angle qui definit les virages
+        """ le but est de calculer l'angle qui definit les virages devant le kart
+            ->la fonction renvoie un angle en radian 
         """
         noeuds_piste= obs["paths_start"]
         path_lookahead = 5
