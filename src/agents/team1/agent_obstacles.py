@@ -16,8 +16,6 @@ class AgentObstacles(KartAgent) :
         self.conf = conf
         self.agent = agent
         self.path_lookahead = path_lookahead
-        self.target_obstacle = None
-        self.target_item = None
 
     def observation_next_item(self, obs, action) : 
         """Analyse les items visibles (bonus/obstacles) et corrige l'action soit en s'en approchant ou soit en esquivant.
@@ -35,24 +33,12 @@ class AgentObstacles(KartAgent) :
         Returns:
             dict: Action corrigée après prise en compte des bonus et obstacles.
         """
-        tab_bonus = [i for i in range(len(obs["items_type"])) if obs["items_type"][i] in self.conf.bonus]
-        tab_obstacles = [i for i in range(len(obs["items_type"])) if obs["items_type"][i] in self.conf.obstacles]
-
-        """
         for i in range(len(obs["items_type"])) :
-            nextitem_type = obs["items_type"][i]
-            #if nextitem_vector[2] < 17 and nextitem_vector[2] > 3 and abs(nextitem_vector[1]) < 10 : 
-            if nextitem_type in BONUS : 
-                action = self.take_bonus(obs, action)
-            elif nextitem_type in OBSTACLES : 
-                return action
-                action = self.dodge_obstacle(obs, action)
-        """
-        for index in tab_obstacles :
-            action = self.dodge_obstacle(obs, action, index)
-
-        for index in tab_bonus : 
-            action = self.take_bonus(obs, action, index)
+            vecteur_item = obs["items_position"][i]
+            type_item = obs["items_type"][i]
+            if (3 < vecteur_item[self.conf.z] < 15) and (abs(vecteur_item[self.conf.y]) < 1) and (abs(vecteur_item[self.conf.x]) < 1.5) :
+                if type_item in self.conf.obstacles : 
+                    action = self.dodge_obstacle(obs, action, i)
         return action
 
     def dodge_obstacle(self, obs, action, index) : 
@@ -70,23 +56,12 @@ class AgentObstacles(KartAgent) :
         Returns:
             dict: Action corrigée (steer modifié pour dévier de l'obstacle).
         """
-        if self.target_obstacle is None : 
-            self.target_obstacle = index
-
-        item_vector = obs["items_position"][index]
-        if -1 < item_vector[2] < 1 or not ((abs(item_vector[0]) < 3.5) and (0 < item_vector[2] < 20) and (abs(item_vector[1]) < 10)): 
-            self.target_obstacle = None
-
-        if (self.target_obstacle == index):
-            if (obs["attachment"] == 6 and obs["attachment_time_left"] > 2) : 
-                #6 : BUBBLEGUM_SHIELD
-                #à tester ici quand on aura un shield activé
-                return action
-    
-            if item_vector[0] >= 0 : 
-                action["steer"] = action["steer"] - 1
-            else : 
-                action["steer"] = action["steer"] + 1
+        vecteur_item = obs["items_position"][index]
+        if vecteur_item[self.conf.x] >= 0 : 
+            action["steer" ] -= 1
+        else : 
+            action["steer"] += 1
+        action["steer"] = np.clip(action["steer"], -1, 1) 
         return action
 
     def take_bonus(self, obs, action, index) :
@@ -106,7 +81,7 @@ class AgentObstacles(KartAgent) :
             self.target_item = index
 
         item_vector = obs["items_position"][index]
-        if item_vector[2] < 3 or not((abs(item_vector[0]) < 3) and (3 < item_vector[2] < 16) and (abs(item_vector[1]) < 10)) : 
+        if item_vector[2] < 3 or not((abs(item_vector[self.conf.x]) < 3) and (3 < item_vector[self.conf.z] < 16) and (abs(item_vector[self.conf.y]) < 10)) : 
             self.target_item = None
 
         next_node = obs["paths_end"][self.path_lookahead]
