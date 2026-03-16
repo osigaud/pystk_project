@@ -12,6 +12,7 @@ acceleration:
   sans_virage: 1.0   #acceleration avant de rencontrer un virage
 
 virages:
+<<<<<<< Updated upstream
   drift: 0.1   #seuil necessitant un drift (tres serrer)
   serrer:       #intervale viarges serres
     i1: 0.05
@@ -19,6 +20,15 @@ virages:
   moyen:        #intervale viarges moyen
     i1: 0 
     i2: 0.05  
+=======
+  drift: 0.4  #seuil necessitant un drift (tres serrer)
+  serrer:       #intervale viarges serres
+    i1: 0.20
+    i2: 0.40 
+  moyen:        #intervale viarges moyen
+    i1: 0.07 
+    i2: 0.20 
+>>>>>>> Stashed changes
   
 
 # pour la fonction reaction_items
