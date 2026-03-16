@@ -50,7 +50,7 @@ class Agent2(KartAgent):
         dz = z2 - z1
 
         angle= np.arctan2(dx,dz) #angle entre les vecteurs dx et dz en radian
-        print("angle:",angle)
+        #print("angle:",angle)
 
         return angle
 
@@ -68,7 +68,7 @@ class Agent2(KartAgent):
             acceleration = 0.80
         elif curvature > cfg.virages.serrer.i1 and curvature <=cfg.virages.serrer.i2: # virage serré 
                 #0.10
-            acceleration= 0.90
+            acceleration= 0.85
         elif curvature > cfg.virages.moyen.i1 and curvature <= cfg.virages.moyen.i2:  #virage moyen 
                 #0.05
             acceleration = 0.95

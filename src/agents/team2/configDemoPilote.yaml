@@ -12,10 +12,10 @@ acceleration:
   sans_virage: 1.0   #acceleration avant de rencontrer un virage
 
 virages:
-  drift: 0.2   #seuil necessitant un drift (tres serrer)
+  drift: 0.1   #seuil necessitant un drift (tres serrer)
   serrer:       #intervale viarges serres
-    i1: 0.08
-    i2: 0.2 
+    i1: 0.05
+    i2: 0.1 
   moyen:        #intervale viarges moyen
     i1: 0 
     i2: 0.05  
