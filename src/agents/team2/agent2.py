@@ -60,21 +60,21 @@ class Agent2(KartAgent):
         les virages serrés, les virages moyens et les lignes droites --> cette fonction a fait appel à detectVirage() 
         """
         
-        acceleration= 1.0
+        acceleration = 1.0
         curvature=abs(self.detectVirage(obs))
 
         if curvature > cfg.virages.drift:
                 #0.27
-            acceleration = acceleration - 0.20
+            acceleration = 0.80
         elif curvature > cfg.virages.serrer.i1 and curvature <=cfg.virages.serrer.i2: # virage serré 
                 #0.10
-            acceleration= acceleration - 0.05
+            acceleration= 0.90
         elif curvature > cfg.virages.moyen.i1 and curvature <= cfg.virages.moyen.i2:  #virage moyen 
                 #0.05
-            acceleration = acceleration - 0.02
+            acceleration = 0.95
         else :
                 #0.02
-            acceleration = acceleration - 0.01
+            acceleration = 1.0
         return acceleration 
     
 
