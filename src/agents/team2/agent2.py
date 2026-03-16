@@ -35,7 +35,7 @@ class Agent2(KartAgent):
         return self.isEnd
 
     def detectVirage(self,obs):
-        """ le but est de calculer les virages
+        """ le but est de calculer l'angle qui definit les virages
         """
         noeuds_piste= obs["paths_start"]
         path_lookahead = 5
