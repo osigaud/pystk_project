@@ -21,6 +21,10 @@ class Agent5(KartAgent):
         """
         Initialise l'agent complet en chargeant la configuration YAML et en 
         emboîtant les différents pilotes les uns dans les autres.
+
+        Args:
+            env (obj): L'environnement de simulation SuperTuxKart.
+            path_lookahead (int): Nombre de points de cheminement à anticiper (défaut: 3).
         """
         super().__init__(env)
         self.path_lookahead = path_lookahead
@@ -54,7 +58,12 @@ class Agent5(KartAgent):
         #self.rescue = Agent5Rescue(env, self.brain, self.conf, path_lookahead)
 
     def endOfTrack(self):
-        """Indique si le kart a atteint la fin de la piste."""
+        """
+        Indique si le kart a atteint la fin de la piste.
+
+        Returns:
+            bool: True si la fin de la piste est atteinte, False sinon.
+        """
         return self.isEnd
 
     def reset(self):
@@ -66,5 +75,11 @@ class Agent5(KartAgent):
         Méthode d'entrée principale du simulateur. 
         Elle délègue la décision à la couche supérieure du 'cerveau' qui 
         redescend ensuite la hiérarchie des wrappers.
+
+        Args:
+            obs (dict): Dictionnaire contenant les observations de l'environnement (vitesse, position, etc.).
+
+        Returns:
+            dict: Dictionnaire d'actions (steer, acceleration, brake, drift, nitro, etc.).
         """
         return self.brain.choose_action(obs)
