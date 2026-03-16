@@ -18,7 +18,7 @@ class AgentCenter(KartAgent):
         self.ajust = self.conf.ajust
         self.path_lookahead = path_lookahead
 
-    def path_ajust(self, act, obs):
+    def path_ajust(self, obs, action):
         """
         Ajuste la direction du kart pour suivre le centre de la piste.
 
@@ -31,14 +31,14 @@ class AgentCenter(KartAgent):
             dict: Dictionnaire des actions corrigé avec une valeur de
                 "steer" comprise entre -1 et 1.
         """
-        steer = act["steer"]
+        steer = action["steer"]
         center = obs["paths_end"][2]
         if (center[2] > 20 and abs(obs["center_path_distance"]) < 3) : 
             steer = 0
         elif abs(center[0]) > self.dist : 
             steer += self.ajust * center[0]
-        act["steer"] = np.clip(steer, -1, 1)
-        return act
+        action["steer"] = np.clip(steer, -1, 1)
+        return action
     
     def choose_action(self, obs):
         """
@@ -59,5 +59,5 @@ class AgentCenter(KartAgent):
             "rescue": False,
             "fire": False,
         }
-        act_corr = self.path_ajust(action, obs)
+        act_corr = self.path_ajust(obs, action)
         return act_corr
