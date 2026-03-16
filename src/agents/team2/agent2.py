@@ -33,12 +33,6 @@ class Agent2(KartAgent):
         """
         Calcule la correction nécessaire pour rester au centre de la piste.
         """
-        #si paths_start n'existe pas,on renvoie 0
-        if "paths_start" not in obs or len(obs["paths_start"]) == 0:
-            return 0.0
-        #le point au centre de la piste juste devant le kart
-        point_proche_kart = obs["paths_start"][0]
-
         #si paths_start n'existe pas,on renvoie 0 et on veut qu'il y ait au moins 2 points devant le kar
         if "paths_start" not in obs or len(obs["paths_start"])<3:
             return 0.0
@@ -50,7 +44,6 @@ class Agent2(KartAgent):
             return 0.0
         # angle qu'il faut tourner pour atteindre le point
         angle_vers_centre= np.arctan2(x, z)
-
         # if abs(angle_vers_centre)<0.03:
         #     return 0.0
         correction = angle_vers_centre * cfg.correction
@@ -100,14 +93,6 @@ class Agent2(KartAgent):
             #print (curvature) # permet d afficher la variation des angles pour determiner les courbures 
             if curvature > cfg.virages.drift:
                 #drift = True
-
-                acceleration = acceleration - 0.27
-            elif curvature > cfg.virages.serrer.i1 and curvature <=cfg.virages.serrer.i2: # virage serré 
-                acceleration= acceleration - 0.10
-                #drift = False 
-            elif curvature > cfg.virages.moyen.i1 and curvature <= cfg.virages.moyen.i2:  #virage moyen 
-                acceleration = acceleration - 0.05
-
                 #0.27
                 acceleration = acceleration - 0.20
             elif curvature > cfg.virages.serrer.i1 and curvature <=cfg.virages.serrer.i2: # virage serré 
@@ -146,7 +131,7 @@ class Agent2(KartAgent):
             # items derriere ou trop loin => ignorer
             
             if pos[2] < 0 or dist > 25.0:
-                continue  
+                continue
 
             item_type = items_type[i] if i < len(items_type) else None
 
@@ -155,8 +140,6 @@ class Agent2(KartAgent):
                 if dist < best_good_dist:
                     best_good_dist = dist
                     angle = np.arctan2(pos[0], pos[2])
-                    steering_adjustment = float(np.clip(angle * 2, -0.5, 0.5))#adapter cette partie aux differentes pistes
-
                     #modification parce que correction centre piste etait largement plus importante que steering adjustement
                     steering_adjustment = float(np.clip(angle * 5, -0.8, 0.8))#adapter cette partie aux differentes pistes
             else:
@@ -242,21 +225,10 @@ class Agent2(KartAgent):
             nitro=False
             
         #utiliser les cadeaux attrapés
-<<<<<<< HEAD
-
-=======
->>>>>>> 2af66f71a4c0c01c766e2f436eb4857061331cb9
         #if obs["items_type"][0]==0:
             #fire=True
         #else:
             #fire=False
-<<<<<<< HEAD
-        if obs["items_type"][0]==0:
-            fire=True
-        else:
-            fire=False
-=======
->>>>>>> 2af66f71a4c0c01c766e2f436eb4857061331cb9
 
         # Calcul de la correctio pour rester au centre de la piste
         correction_piste = self.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
@@ -280,7 +252,4 @@ class Agent2(KartAgent):
             "rescue": rescue, 
             "fire": fire,
         }
-
         return action
-
-        
