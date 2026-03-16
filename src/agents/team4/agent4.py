@@ -8,6 +8,7 @@ from .AgentBanana import AgentBanana
 from .AgentEsquiveAdv import AgentEsquiveAdv
 from omegaconf import OmegaConf
 from pathlib import Path
+from .useItems import useItems
 
 BASE_DIR = Path(__file__).resolve().parent # On obtient le chemin absolu vers notre fichier agent4
 CONFIG_PATH = BASE_DIR / "configuration.yaml" # On dit que notre fichier de config se trouve aussi ici
@@ -45,6 +46,7 @@ class Agent4(KartAgent):
         """@private"""
         self.expert_banana_dodge = AgentBanana()
         """@private"""
+        self.use_items = useItems()
         #print(OmegaConf.to_yaml(conf))
         
         
@@ -140,7 +142,8 @@ class Agent4(KartAgent):
         road_straight = abs(points[2][0]) < 0.8
         if road_straight and abs(steering) <= epsilon:
             steering = 0.0
-        
+
+        fire, steering = self.use_items.use_items(obs, steering)
         action = {
             "acceleration": acceleration,
             "steer": steering,
@@ -148,6 +151,6 @@ class Agent4(KartAgent):
             "drift": False,
             "nitro": nitro,
             "rescue":False,
-            "fire": False,
+            "fire": fire,
         }
         return action
