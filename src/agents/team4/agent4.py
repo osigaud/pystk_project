@@ -6,6 +6,7 @@ from .speed import SpeedController
 from .AgentNitro import AgentNitro
 from .AgentBanana import AgentBanana
 from .AgentEsquiveAdv import AgentEsquiveAdv
+from .AgentDrift import AgentDrift
 from omegaconf import OmegaConf
 from pathlib import Path
 from .useItems import useItems
@@ -46,7 +47,10 @@ class Agent4(KartAgent):
         """@private"""
         self.expert_banana_dodge = AgentBanana()
         """@private"""
+        self.expert_drift = AgentDrift()
+        """@private"""
         self.use_items = useItems()
+        """@private"""
         #print(OmegaConf.to_yaml(conf))
         
         
@@ -60,6 +64,7 @@ class Agent4(KartAgent):
         self.speedcontroller.reset()
         self.expert_nitro.reset()
         self.expert_esquive_adv.reset()
+        self.expert_drift.reset()
         
     def endOfTrack(self) -> bool:
         """Indique si la course est fini."""
@@ -103,8 +108,8 @@ class Agent4(KartAgent):
         drift = False
         gain_volant = 7.0  #Gain par défaut
         steering = self.steering.manage_pure_pursuit(gx,gz,gain_volant)
+        drift, modified_steer = self.expert_drift.choose_action(obs,steering,vel)
         acceleration, brake = self.speedcontroller.manage_speed(speed,drift,conf,obs) # Appel à la fonction gerer_vitesse
-
         nitro = self.expert_nitro.manage_nitro(obs,steering,energy) # Appel à la fonction manage_nitro
         
         # Au depart on avance tout droit pour eviter de se cogner contre les adversaires
@@ -146,7 +151,7 @@ class Agent4(KartAgent):
         fire, steering = self.use_items.use_items(obs, steering)
         action = {
             "acceleration": acceleration,
-            "steer": steering,
+            "steer": modified_steer,
             "brake": brake,
             "drift": False,
             "nitro": nitro,

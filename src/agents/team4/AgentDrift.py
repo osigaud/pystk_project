@@ -13,7 +13,7 @@ class AgentDrift:
         self.cooldown = 0
         """@private"""
 
-    def reset(self):
+    def reset(self) -> None:
         
         """Réinitialise les variables d'instances de l'agent expert"""
         
