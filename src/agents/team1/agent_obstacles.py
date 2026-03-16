@@ -36,9 +36,12 @@ class AgentObstacles(KartAgent) :
         for i in range(len(obs["items_type"])) :
             vecteur_item = obs["items_position"][i]
             type_item = obs["items_type"][i]
-            if (3 < vecteur_item[self.conf.z] < 15) and (abs(vecteur_item[self.conf.y]) < 1) and (abs(vecteur_item[self.conf.x]) < 1.5) :
-                if type_item in self.conf.obstacles : 
+            if (2 < vecteur_item[self.conf.z] < 15) and (abs(vecteur_item[self.conf.y]) < 1) :
+                if (abs(vecteur_item[self.conf.x]) < 1.5) and type_item in self.conf.obstacles : 
                     action = self.dodge_obstacle(obs, action, i)
+                    return action
+                #elif (abs(vecteur_item[self.conf.x]) < 3) and type_item in self.conf.bonus: 
+                    #action = self.take_bonus(obs, action, i)
         return action
 
     def dodge_obstacle(self, obs, action, index) : 
@@ -77,27 +80,15 @@ class AgentObstacles(KartAgent) :
         Returns:
             dict: Action corrigée (steer orienté vers l'item si conditions remplies).
         """
-        if self.target_item is None : 
-            self.target_item = index
-
-        item_vector = obs["items_position"][index]
-        if item_vector[2] < 3 or not((abs(item_vector[self.conf.x]) < 3) and (3 < item_vector[self.conf.z] < 16) and (abs(item_vector[self.conf.y]) < 10)) : 
-            self.target_item = None
-
+        vecteur_item = obs["items_position"][index]
         next_node = obs["paths_end"][self.path_lookahead]
-        node_item_gap_vector = next_node - item_vector #vecteur pour mesurer l'écart entre l'item et le prochain noeud
-        #si l'écart est trop grand, on ne détourne pas du chemin de base
-
-        if (self.target_item == index) and (node_item_gap_vector[2] <= (next_node[2] - 1)) and (self.target_obstacle is None) :
-            """
-            next_node = obs["paths_end"][0]
-            node_item_gap_vector = next_node - item_vector
-            if 0 < node_item_gap_vector[2] < next_node[2] : #optimisation ici ? 
-            if abs(item_vector[0] - action["steer"]) < 0.1 :
-                return action
-            else : 
-            """
-            action["steer"] = item_vector[0]
+        #si l'item n'est pas dans le même sens que le prochain virage
+        if vecteur_item[self.conf.x] * next_node[self.conf.x] < 0 : 
+            return action
+        
+        steer = vecteur_item[self.conf.x]
+        steer = np.clip(steer, -1, 1)
+        action["steer"] = steer
         return action
         
     def choose_action(self, obs) : 
