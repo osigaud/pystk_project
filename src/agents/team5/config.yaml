@@ -4,26 +4,26 @@ pilot:
   
   # Réglages du cerveau
   brain:
-    kp: 10  # Puissance du braquage.
+    kp: 6  # Puissance du braquage.
     # Augmenter si le kart ne tourne pas assez dans les virages serrés
     # Diminuer si le kart oscille trop violemment gauche/droite
     
-    kd: 7 # Stabilité.
+    kd: 3 # Stabilité.
     # Augmenter si le volant tremble trop en ligne droite
     # Diminuer si la direction semble "molle" ou réagit en retard
 
   # Navigation et Vision
   navigation:
-    lookahead_meters: 8   # Distance de visée (en mètres, Le kart regarde ce point pour décider où tourner)
+    lookahead_meters: 6   # Distance de visée (en mètres, Le kart regarde ce point pour décider où tourner)
 
-    lookahead_max: 10.5 # Plafond maximal de la visée (mètres)
+    lookahead_max: 13 # Plafond maximal de la visée (mètres)
     # Limite la distance de regard pour ne pas que le kart voie trop loin
 
     min_dist_safety: 1      # Distance minimale de sécurité
     
     apex_offset: 0.65
     
-    lookahead_speed_factor: 0.15 # Facteur d'anticipation lié à la vitesse
+    lookahead_speed_factor: 0.25 # Facteur d'anticipation lié à la vitesse
     # Plus cette valeur est haute, plus le kart regarde loin quand il prend de la vitesse
     # Augmenter pour anticiper les virages plus tôt
     # Diminuer si le kart commence à tourner trop tôt
@@ -33,7 +33,7 @@ pilot:
   # Gestion de la vitesse
   speed_control:
     default_accel: 1.0       # Accélération en ligne droite (0.0 à 1.0)
-    cornering_accel: 0.4     # Accélération dans les virages serrés
+    cornering_accel: 0.3     # Accélération dans les virages serrés
     steering_threshold: 0.6  # A partir de quel angle de volant considère-t-on qu'on est dans un virage ?
     hairpin_threshold: 0.90   # Seuil pour détecter l'épingle
     hairpin_accel: 0.3        # Accélération en épingle
@@ -50,12 +50,12 @@ pilot:
 # PARAMÈTRES DE LA BANANE (Agent5Banana)
 banana:
   detection:
-    max_distance: 12
-    safety_width: 1.25
+    max_distance: 10
+    safety_width: 1.15
 
   avoidance:
-    steering_force: 0.75
-    acceleration: 0.4
+    steering_force: 0.70
+    acceleration: 0.5
 
   # Bordures de sécurité
   edge_safety:
@@ -85,13 +85,13 @@ drift:
   far_target_threshold: 4  # Seuil de décalage latéral de la piste au loin
   # Augmenter si le kart drift trop souvent dans des virages légers
   
-  steer_trigger: 0.95        # Seuil d'angle du volant (0.0 à 1.0)
+  steer_trigger: 0.5       # Seuil d'angle du volant (0.0 à 1.0)
   # Si le pilote braque plus fort que ce seuil, on considère que c'est une épingle
   
-  confirmation_frames: 5     # Nombre de frames de validation
+  confirmation_frames: 4     # Nombre de frames de validation
   # Le virage doit être détecté pendant X frames avant de lancer le drift
 
-  min_speed: 10.0            # Vitesse minimale pour autoriser le drift (m/s)
+  min_speed: 9.0            # Vitesse minimale pour autoriser le drift (m/s)
   # Empêche le kart de drifter s'il est trop lent
   
   max_dist_center: 4       # Sécurité bord de piste (mètres)
@@ -103,4 +103,4 @@ drift:
   cooldown_frames: 15        # Temps de repos forcé après un drift
   # Empêche le kart de recommencer à drifter immédiatement
 
-  drift_accel: 0.9           # Accélération maintenue pendant le drift
+  drift_accel: 1.0           # Accélération maintenue pendant le drift
