@@ -8,12 +8,18 @@ class Agent5Banana(KartAgent):
     """
     Agent 'Donkey Bombs Banana'.
     Ce wrapper est responsable de la détection et de l'évitement des obstacles 
-    (bananes et autres objets fixes) sur la trajectoire du kart.
+    (bananes et autres objets fixes) sur la trajectoire du kart, ainsi que du 
+    maintien du kart à l'intérieur des limites de la piste
     """
     def __init__(self, env, pilot_agent, conf, path_lookahead=3):
         """
-        Initialise le module d'évitement avec les paramètres de détection et de force 
-        de braquage définis dans le fichier de configuration.
+        Initialise le module d'évitement avec les paramètres de détection.
+
+        Args:
+            env (obj): L'environnement de simulation
+            pilot_agent (obj): L'agent pilote enveloppé (celui qui gère la conduite de base)
+            conf (OmegaConf): Objet de configuration contenant les seuils d'évitement
+            path_lookahead (int): Nombre de points de cheminement à anticiper
         """
         super().__init__(env)
         self.path_lookahead = path_lookahead
@@ -27,14 +33,18 @@ class Agent5Banana(KartAgent):
 
 
     def reset(self):
-        """Réinitialise le pilote interne."""
+        """Réinitialise le pilote interne"""
         self.pilot.reset()
 
     def position_track(self, obs):
         """
-        Calcule le point de visée dynamique. 
-        Utilisé ici pour définir la droite de trajectoire théorique afin de calculer 
-        la distance perpendiculaire des obstacles.
+        Calcule le point de visée dynamique pour définir la trajectoire théorique
+
+        Args:
+            obs (dict): Les observations courantes du simulateur
+
+        Returns:
+            tuple: (target_x, target_z) représentant les coordonnées du point cible
         """
         # La fonction analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique.
         paths = obs['paths_end']
@@ -66,8 +76,16 @@ class Agent5Banana(KartAgent):
 
     def edge_safety(self, obs):
         """
-        La fonction fait en sorte de ne pas trop s'éloigner du centre (dans un diamètre déterminé dans 
-        le fichier de configuration).
+        Vérifie si le kart s'éloigne trop du centre de la piste et génère une correction
+
+        Args:
+            obs (dict): Les observations courantes du simulateur
+
+        Returns:
+            tuple: (edge_detected, steering, acceleration)
+                - edge_detected (bool): True si une correction est nécessaire
+                - steering (float): Valeur de braquage corrective
+                - acceleration (float): Valeur d'accélération ajustée
         """
         dist_center = obs["center_path_distance"]
 
@@ -91,9 +109,16 @@ class Agent5Banana(KartAgent):
 
     def detect_banana(self, obs):
         """
-        Scanne les objets environnants et identifie les menaces (types 1, 4, 5).
-        Calcule la distance perpendiculaire de chaque obstacle par rapport à la droite 
-        Kart-Cible. Si un objet est trop proche, génère une commande d'évitement.
+        Identifie les menaces et calcule une manoeuvre d'esquive perpendiculaire
+
+        Args:
+            obs (dict): Les observations courantes du simulateur
+
+        Returns:
+            tuple: (danger_detected, steering, acceleration)
+                - danger_detected (bool): True si une banane est sur la trajectoire
+                - steering (float): Force de braquage pour éviter l'objet
+                - acceleration (float): Accélération pendant l'esquive
         """
         items_pos = np.array(obs["items_position"])
         items_type = obs["items_type"]
@@ -137,10 +162,14 @@ class Agent5Banana(KartAgent):
 
     def choose_action(self, obs):
         """
-        Arbitre entre la conduite normale et la manœuvre d'évitement.
-        Si un danger est détecté, la priorité est donnée à l'esquive.
+        Sélectionne l'action en fonction des priorités : 1. Bananes, 2. Bordures, 3. Conduite
+
+        Args:
+            obs (dict): Les observations courantes du simulateur
+
+        Returns:
+            dict: Le dictionnaire d'actions final
         """
-        '''La fonction choisit quelles actions le kart doit choisir en fonction des observation de detect_banana() et renvoie les actions choisies'''
         # Priorité aux évitement de bananes
         danger, steer, accel = self.detect_banana(obs)
         if danger:
