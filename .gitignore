@@ -29,3 +29,4 @@ src/utils/__pycache__/
 
 
 src/main/*
+src/pystk2_gymnasium/*
