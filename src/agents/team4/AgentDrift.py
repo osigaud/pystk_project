@@ -2,7 +2,7 @@ import numpy as np
 
 class AgentDrift:    
     
-    """Module Agent Expert Drift : Gère la logique d'activation du drift'"""
+    """Module Agent Expert Drift : Gère la logique d'activation du drift"""
     
     def __init__(self):
         

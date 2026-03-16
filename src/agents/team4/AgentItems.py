@@ -2,7 +2,7 @@ from .steering import Steering
 
 class AgentItems:
     
-    """Module Agent Expert Item : Gère la logique d'utilisation des différents items'"""
+    """Module Agent Expert Item : Gère la logique d'utilisation des différents items"""
     
     def __init__(self):
         
