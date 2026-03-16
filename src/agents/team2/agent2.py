@@ -53,7 +53,6 @@ class Agent2(KartAgent):
 
         return angle
 
-
     def adapteAcceleration(self,obs):
         """
         le but va etre d'adpater l'acclération dans diverses situations dont notamment 
