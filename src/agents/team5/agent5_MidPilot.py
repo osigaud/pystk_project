@@ -33,23 +33,17 @@ class Agent5Mid(KartAgent):
         self.ahead_dist = self.conf.pilot.navigation.lookahead_meters
 
         self.last_error = 0.0   # Contient l'erreur de l'angle précédent 
-        self.stuck_counter = 0  # Compte le temps passé bloqué contre un mur si kart bloqué
-        self.last_distance = 0.0
-        self.is_rescuing = False
 
         self.lookahead_factor = self.conf.pilot.navigation.lookahead_speed_factor
         self.lookahead_max = self.conf.pilot.navigation.lookahead_max
         self.hairpin_threshold = self.conf.pilot.speed_control.hairpin_threshold
         self.hairpin_accel = self.conf.pilot.speed_control.hairpin_accel
         self.hairpin_brake_speed = self.conf.pilot.speed_control.hairpin_brake_speed
-        self.rescue_duration = self.conf.pilot.rescue.rescue_duration
 
     def reset(self):
         """Réinitialise les variables d'état de l'agent au début d'une course"""
         self.obs, _ = self.env.reset()
-        self.stuck_counter = 0
         self.last_error = 0.0
-        self.is_rescuing = False
 
     def position_track(self, obs):
         """
@@ -152,42 +146,6 @@ class Agent5Mid(KartAgent):
         # On commence par la vitesse d'accélération par défaut configurée
         accel = self.conf.pilot.speed_control.default_accel
         brake = False
-
-        if self.is_rescuing :
-            self.stuck_counter += 1
-            # On recule pendant X frames
-            if self.stuck_counter < self.rescue_duration :
-                accel = 0.0
-                brake = True
-                steering = -steering # On inverse le volant pour s'extraire
-                return accel, brake, steering
-            else:
-                # Reset des paramètres maintenant que notre mission "rescue" a été accomplie
-                self.is_rescuing = False
-                self.stuck_counter = 0
-                self.last_distance = dist_now   # last_distance est la distance par rapport à la ligne de départ de la frame précédente
-
-        
-        # Structure conditionnel nous permettant d'activer is_rescuing :
-        # On commence par vérifier si on a dépassé la ligne de départ
-        elif dist_now > self.conf.pilot.rescue.active_after_meters :
-
-            # On calcule de combien on a avancé depuis la frame précédente
-            # On utilise une petite marge (ex : 0.01) car même bloqué, le kart peut trembler et donc causer de "légers déplacements"
-            if abs(dist_now - self.last_distance) < self.conf.pilot.rescue.stuck_diff_dist_epsilon :
-                self.stuck_counter += 1
-            else:
-                self.stuck_counter = 0
-
-            # Mise à jour de la mémoire pour la prochaine frame 
-            self.last_distance = dist_now 
-
-            if self.stuck_counter > self.conf.pilot.rescue.stuck_frames_limit:
-                self.is_rescuing = True
-                self.stuck_counter = 0
-        else:
-            # Si on roule, on reset le compteur de blocage
-            self.stuck_counter = 0
 
         # Virage standard : on ralentit un peu si le volant dépasse un certain seuil
         if abs(steering) > self.conf.pilot.speed_control.steering_threshold:

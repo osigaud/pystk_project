@@ -10,6 +10,8 @@ from .agent5_NitroPilot import Agent5Nitro
 from .agent5_ItemPilot import Agent5Item
 from omegaconf import OmegaConf 
 import os
+from .agent5_RescuePilot import Agent5Rescue
+
 
 class Agent5(KartAgent):
     """
@@ -50,10 +52,13 @@ class Agent5(KartAgent):
         self.drift = Agent5Drift(env, self.nitro, self.conf, path_lookahead)
 
         # On l'enveloppe dans l'agent qui esquive les bananes
-        self.brain = Agent5Banana(env, self.drift, self.conf, path_lookahead)
+        self.banana = Agent5Banana(env, self.drift, self.conf, path_lookahead)
+
+        # On l'enveloppe dans l'agent qui s'occupe de quand le kart est bloqué
+        self.brain = Agent5Rescue(env, self.banana, self.conf, path_lookahead)
         
         # On crée le pilot qui gère les items
-        self.item = Agent5Item(env, self.brain, self.conf, path_lookahead)
+        # self.item = Agent5Item(env, self.brain, self.conf, path_lookahead)
 
         #self.rescue = Agent5Rescue(env, self.brain, self.conf, path_lookahead)
 
