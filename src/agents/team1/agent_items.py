@@ -115,7 +115,7 @@ class AgentItems(KartAgent) :
                 action["fire"] = True
             return action
 
-    return action
+        return action
 
     def use_nitro(self, obs, act):
 
