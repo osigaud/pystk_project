@@ -42,10 +42,10 @@
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt><a href="#Agent5Drift">Agent5Drift</a>(env,&nbsp;pilot_agent,&nbsp;conf,&nbsp;path_lookahead=3)<br>
 &nbsp;<br>
-Agent&nbsp;'Donkey&nbsp;Drift'.<br>
-Ce&nbsp;wrapper&nbsp;gère&nbsp;spécifiquement&nbsp;les&nbsp;phases&nbsp;de&nbsp;dérapage&nbsp;contrôlé&nbsp;(drift)&nbsp;dans&nbsp;les&nbsp;épingles.<br>
+Agent&nbsp;'Donkey&nbsp;Drift'<br>
+Ce&nbsp;wrapper&nbsp;gère&nbsp;spécifiquement&nbsp;les&nbsp;phases&nbsp;de&nbsp;dérapage&nbsp;contrôlé&nbsp;(drift)&nbsp;dans&nbsp;les&nbsp;épingles<br>
 Il&nbsp;utilise&nbsp;une&nbsp;double&nbsp;anticipation&nbsp;(regard&nbsp;lointain&nbsp;pour&nbsp;l'entrée,&nbsp;regard&nbsp;proche&nbsp;pour&nbsp;la&nbsp;sortie)<br>
-pour&nbsp;optimiser&nbsp;la&nbsp;trajectoire&nbsp;et&nbsp;conserver&nbsp;une&nbsp;vitesse&nbsp;de&nbsp;sortie&nbsp;élevée.<br>&nbsp;</tt></td></tr>
+pour&nbsp;optimiser&nbsp;la&nbsp;trajectoire&nbsp;et&nbsp;conserver&nbsp;une&nbsp;vitesse&nbsp;de&nbsp;sortie&nbsp;élevée<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="team5.agent5_DriftPilot.html#Agent5Drift">Agent5Drift</a></dd>
@@ -54,12 +54,25 @@ pour&nbsp;optimiser&nbsp;la&nbsp;trajectoire&nbsp;et&nbsp;conserver&nbsp;une&nbs
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="Agent5Drift-__init__"><strong>__init__</strong></a>(self, env, pilot_agent, conf, path_lookahead=3)</dt><dd><tt>Initialise&nbsp;l'agent&nbsp;de&nbsp;drift&nbsp;avec&nbsp;les&nbsp;paramètres&nbsp;de&nbsp;seuils&nbsp;de&nbsp;détection,<br>
-de&nbsp;sécurité&nbsp;et&nbsp;de&nbsp;physique&nbsp;de&nbsp;glisse&nbsp;définis&nbsp;dans&nbsp;le&nbsp;fichier&nbsp;YAML.</tt></dd></dl>
+<dl><dt><a name="Agent5Drift-__init__"><strong>__init__</strong></a>(self, env, pilot_agent, conf, path_lookahead=3)</dt><dd><tt>Initialise&nbsp;l'agent&nbsp;de&nbsp;drift&nbsp;avec&nbsp;les&nbsp;paramètres&nbsp;de&nbsp;configuration<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;env&nbsp;(obj):&nbsp;L'environnement&nbsp;de&nbsp;simulation&nbsp;SuperTuxKart<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pilot_agent&nbsp;(obj):&nbsp;L'agent&nbsp;pilote&nbsp;enveloppé&nbsp;(MidPilot&nbsp;ou&nbsp;NitroPilot)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;conf&nbsp;(OmegaConf):&nbsp;Configuration&nbsp;contenant&nbsp;les&nbsp;paramètres&nbsp;de&nbsp;drift&nbsp;(seuils,&nbsp;cooldown)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;path_lookahead&nbsp;(int):&nbsp;Nombre&nbsp;de&nbsp;points&nbsp;de&nbsp;cheminement&nbsp;à&nbsp;anticiper</tt></dd></dl>
 
-<dl><dt><a name="Agent5Drift-choose_action"><strong>choose_action</strong></a>(self, obs)</dt><dd><tt>Arbitre&nbsp;l'activation&nbsp;du&nbsp;drift&nbsp;en&nbsp;analysant&nbsp;la&nbsp;courbure&nbsp;de&nbsp;la&nbsp;piste&nbsp;à&nbsp;longue&nbsp;distance.<br>
-Si&nbsp;le&nbsp;drift&nbsp;est&nbsp;actif,&nbsp;il&nbsp;remplace&nbsp;les&nbsp;commandes&nbsp;du&nbsp;pilote&nbsp;par&nbsp;des&nbsp;paramètres&nbsp;de&nbsp;glisse.<br>
-Sinon,&nbsp;il&nbsp;laisse&nbsp;le&nbsp;contrôle&nbsp;au&nbsp;pilote&nbsp;de&nbsp;base&nbsp;(MidPilot).</tt></dd></dl>
+<dl><dt><a name="Agent5Drift-choose_action"><strong>choose_action</strong></a>(self, obs)</dt><dd><tt>Arbitre&nbsp;l'activation&nbsp;du&nbsp;drift&nbsp;en&nbsp;analysant&nbsp;la&nbsp;courbure&nbsp;de&nbsp;la&nbsp;piste<br>
+&nbsp;<br>
+La&nbsp;méthode&nbsp;utilise&nbsp;une&nbsp;logique&nbsp;à&nbsp;deux&nbsp;niveaux&nbsp;:<br>
+1.&nbsp;Entrée&nbsp;:&nbsp;Détectée&nbsp;par&nbsp;`far_target_x`&nbsp;et&nbsp;confirmée&nbsp;sur&nbsp;`confirm_limit`&nbsp;frames<br>
+2.&nbsp;Sortie&nbsp;:&nbsp;Déclenchée&nbsp;quand&nbsp;`near_target_x`&nbsp;repasse&nbsp;sous&nbsp;un&nbsp;seuil&nbsp;ou&nbsp;si&nbsp;le&nbsp;kart&nbsp;dévie&nbsp;trop<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;obs&nbsp;(dict):&nbsp;Dictionnaire&nbsp;des&nbsp;observations&nbsp;(vitesse,&nbsp;chemins,&nbsp;position)<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dict:&nbsp;Action&nbsp;finale&nbsp;modifiée&nbsp;(ou&nbsp;non)&nbsp;par&nbsp;la&nbsp;logique&nbsp;de&nbsp;dérapage</tt></dd></dl>
 
 <dl><dt><a name="Agent5Drift-reset"><strong>reset</strong></a>(self)</dt><dd><tt>Réinitialise&nbsp;l'état&nbsp;du&nbsp;drift&nbsp;et&nbsp;le&nbsp;pilote&nbsp;interne.</tt></dd></dl>
 
