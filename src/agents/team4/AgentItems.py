@@ -1,9 +1,37 @@
 from .steering import Steering
 
-class useItems:
+class AgentItems:
+    
+    """Module Agent Expert Item : Gère la logique d'utilisation des différents items'"""
+    
     def __init__(self):
+        
+        """Initialise les variables d'instances de l'agent expert"""
+        
         self.steerer = Steering()
-    def use_items(self, obs, steer):
+        """@private"""
+    
+    def reset(self):
+        pass
+    
+    def use_items(self, obs : dict, steer : float) -> tuple[bool,float]:
+        
+        """
+        
+        Gère la logique d'utilisation d'items
+
+        Args:
+                
+            obs(dict) : Les données de télémétrie fournies par le simulateur.
+            steer(float) : Angle de braquage actuel des roues.
+
+        Returns:
+            
+            bool : Autorise l'utilisation d'items.
+            float : Angle de braquage des roues modifié.
+        
+        """
+        
         item = int(obs.get("powerup", 0))
 
         # Bubblegum Cake Switch

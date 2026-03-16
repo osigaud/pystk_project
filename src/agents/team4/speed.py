@@ -36,7 +36,7 @@ class SpeedController:
         #print("décal x = ",a)
         
         if drift:
-            return 0.6
+            return 0.6, False
         if a < 6.0 and speed > conf.vitesse_seuil:
             return 1.0, False
         
