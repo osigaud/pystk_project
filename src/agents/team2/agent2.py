@@ -35,56 +35,46 @@ class Agent2(KartAgent):
         return self.isEnd
 
     def detectVirage(self,obs):
-        """ 
-        permet de creer un dictionnaire pour faciliter la detection des differents types de virages à partir de deux noeuds 
+        """ le but est de calculer les virages
         """
-        nodes_path = obs["paths_start"] #liste des neoud de la piste
-        nb_nodes = len(nodes_path)
+        noeuds_piste= obs["paths_start"]
         path_lookahead = 5
+        noeud_cour= noeuds_piste[0]
+        noeud_loin= noeuds_piste[path_lookahead]
 
-        virages = [] #liste resultat pour stocker les virages detectes
+        x1, z1 = noeud_cour[0], noeud_cour[2] #coordonnees pour angle
+        x2, z2 = noeud_loin[0], noeud_loin[2]
 
-        for i in range (nb_nodes - path_lookahead): #boucle pour le second (noeud loin=anticipation)
+        dx = x2 - x1 #coordonnées vecteur
+        dz = z2 - z1
 
-            curr_node = nodes_path[i] #le premier noeud qu'on rgd (noeud proche)
-            lookahead_node = nodes_path[i+path_lookahead] #noeud loin
+        angle= np.arctan2(dx,dz) #angle entre les vecteurs dx et dz en radian
+        print("angle:",angle)
 
-            x1, z1 = curr_node[0], curr_node[2] #coordonnees pour angle
-            x2, z2 = lookahead_node[0], lookahead_node[2]
+        return angle
 
-            angle1 = np.arctan2(x1, z1)
-            angle2 = np.arctan2(x2, z2)
-
-            curvature = abs(angle1 - angle2)
-
-            if curvature > cfg.curvature :  # seuil à ajuster
-                virages.append({ "index": i, "curvature": curvature })
-
-        return virages
 
     def adapteAcceleration(self,obs):
-        """le but va etre d'adpater l'acclération dans diverses situations dont notamment 
-        les virages serrés, les virages moyens et les lignes droites --> cette fonction a fait appel à detectViragz """
+        """
+        le but va etre d'adpater l'acclération dans diverses situations dont notamment 
+        les virages serrés, les virages moyens et les lignes droites --> cette fonction a fait appel à detectVirage() 
+        """
         
-        liste_virage=self.detectVirage(obs)
         acceleration= 1.0
-        if len(liste_virage) < 1 :  # s'il n'y a pas de virage 
-            acceleration = cfg.acceleration.sans_virage  # conduite normale on pourrait augmenter légèrement l'accélération -> à décider 
-        else : 
-            proche_virage = liste_virage[0]
-            curvature = abs(proche_virage["curvature"])
-            if curvature > cfg.virages.drift:
+        curvature=self.detectVirage(obs)
+
+        if curvature > cfg.virages.drift:
                 #0.27
-                acceleration = acceleration - 0.20
-            elif curvature > cfg.virages.serrer.i1 and curvature <=cfg.virages.serrer.i2: # virage serré 
+            acceleration = acceleration - 0.20
+        elif curvature > cfg.virages.serrer.i1 and curvature <=cfg.virages.serrer.i2: # virage serré 
                 #0.10
-                acceleration= acceleration - 0.05
-            elif curvature > cfg.virages.moyen.i1 and curvature <= cfg.virages.moyen.i2:  #virage moyen 
+            acceleration= acceleration - 0.05
+        elif curvature > cfg.virages.moyen.i1 and curvature <= cfg.virages.moyen.i2:  #virage moyen 
                 #0.05
-                acceleration = acceleration - 0.02
-            else :
+            acceleration = acceleration - 0.02
+        else :
                 #0.02
-                acceleration = acceleration - 0.01
+            acceleration = acceleration - 0.01
         return acceleration 
     
 
