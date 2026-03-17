@@ -55,8 +55,8 @@ class AgentDrift:
         speed = np.linalg.norm(vel)
 
         # Virage confirmé si les X progressent de façon monotone et dépassent un seuil minimal
-        is_curve_right = x1 > x0 and x2 > x1 and x3 > x2 and x4 >x3 and x2 > self.c.x_seuil
-        is_curve_left  = x1 < x0 and x2 < x1 and x3 < x2 and x4 < x3 and x2 < -self.c.x_seuil
+        is_curve_right = x1 > x0 and x2 > x1 and x3 > x2 and x4 >x3 and x2 > self.c.x_seuil and steer > 0
+        is_curve_left  = x1 < x0 and x2 < x1 and x3 < x2 and x4 < x3 and x2 < -self.c.x_seuil and steer < 0
 
         # Si un virage est detecté, que la vitesse est assez grande et qu'on depasse un angle de braquage, on peut drift
         if (is_curve_right or is_curve_left) and speed >= self.c.speed_seuil and abs(steer) >= self.c.steer_seuil:
