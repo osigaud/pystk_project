@@ -2,14 +2,12 @@ import numpy as np
 import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
-from omegaconf import OmegaConf #ajouté S4
+from omegaconf import OmegaConf 
 from .steering_piste import SteeringPiste
 from .react_items import ReactionItems
 from .rival_attack import AttackRivals
 from .kart_rescue import StuckControl
-from .anticipe_kart import AnticipeKart
-
-
+from .acceleration_kart import AccelerationControl
 
 cfg = OmegaConf.load("../agents/team2/configDemoPilote.yaml")
 
@@ -21,7 +19,7 @@ class Agent2(KartAgent):
         self.items_steering = ReactionItems(cfg)
         self.attack_rival = AttackRivals()
         self.rescue_kart = StuckControl(cfg)
-        self.anticipe = AnticipeKart()
+        self.acceleration = AccelerationControl(cfg)
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
@@ -36,29 +34,6 @@ class Agent2(KartAgent):
 
     def endOfTrack(self):
         return self.isEnd
-
-    def adapteAcceleration(self,obs):
-        """
-        le but va etre d'adpater l'acclération dans diverses situations dont notamment 
-        les virages serrés, les virages moyens et les lignes droites --> cette fonction a fait appel à detectVirage() 
-        """
-        acceleration = 1.0
-        curvature=abs(self.anticipe.detectVirage(obs))
-
-        if curvature > cfg.virages.drift:
-                #0.27
-            acceleration = 0.80
-        elif curvature > cfg.virages.serrer.i1 and curvature <=cfg.virages.serrer.i2: # virage serré 
-                #0.10
-            acceleration= 0.85
-        elif curvature > cfg.virages.moyen.i1 and curvature <= cfg.virages.moyen.i2:  #virage moyen 
-                #0.05
-            acceleration = 0.95
-        else :
-                #0.02
-            acceleration = 1.0
-        return acceleration 
-    
 
     def choose_action(self, obs):
         velocity = np.array(obs["velocity"])
@@ -101,7 +76,7 @@ class Agent2(KartAgent):
         correction_piste = self.steering.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
 
         # ADAPTATION DE L'ACCELERATION SELON LE VIRAGE POUR NE PAS SORTIR DE LA PISTE
-        acceleration = self.adapteAcceleration(obs)
+        acceleration = self.acceleration.adapteAcceleration(obs)
         
         item_steering = self.items_steering.reaction_items(obs)
 

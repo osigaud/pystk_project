@@ -18,7 +18,7 @@ class AnticipeKart :
         dz = z2 - z1
 
         angle= np.arctan2(dx,dz) #angle entre les vecteurs dx et dz en radian
-        print("angle:",angle)
+        #print("angle:",angle)
 
         return angle
     
