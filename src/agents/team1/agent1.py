@@ -10,6 +10,7 @@ from agents.team1.agent_speed import AgentSpeed
 from agents.team1.agent_obstacles import AgentObstacles
 from agents.team1.agent_rescue import AgentRescue
 from agents.team1.agent_items import AgentItems
+from agents.team1.agent_drift import AgentDrift
 
 class Agent1(KartAgent):
     def __init__(self, env, path_lookahead=3):
@@ -29,7 +30,7 @@ class Agent1(KartAgent):
         self.agentObstacles = AgentObstacles(env, self.conf, self.agentSpeed, self.path_lookahead)
         self.agentRescue = AgentRescue(env, self.conf, self.agentObstacles)
         self.agentItems = AgentItems(env, self.conf, self.agentRescue)
-        #self.AgentDrift = AgentDrift(env, self.conf, self.agentItems)
+        self.AgentDrift = AgentDrift(env, self.conf, self.agentItems)
 
     def reset(self):
         self.obs, _ = self.env.reset()
