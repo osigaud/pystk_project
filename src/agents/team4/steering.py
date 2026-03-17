@@ -1,12 +1,13 @@
 import math
 import numpy as np
+from omegaconf import DictConfig
 
 class Steering:
     """
     Module Steering : Gère la logique de direction
     """
     
-    def __init__(self,config):
+    def __init__(self,config : DictConfig) -> None:
         """Initialise les variables d'instances de l'agent."""
         
         self.c = config

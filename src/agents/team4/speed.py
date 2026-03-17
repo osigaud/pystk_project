@@ -1,10 +1,12 @@
+from omegaconf import DictConfig
+
 class SpeedController:
     
     """
     Module SpeedController : Gère la logique d'accélération
     """
 
-    def __init__(self,config):
+    def __init__(self,config : DictConfig) -> None:
         """Initialise les variables d'instances de l'agent."""
         
         self.c = config

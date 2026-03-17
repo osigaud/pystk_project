@@ -1,9 +1,11 @@
+from omegaconf import DictConfig
+
 class AgentRescue:
     """
     Module Agent Expert Rescue : Gère la logique de détection et de réaction face au blocage
     """
     
-    def __init__(self,config):
+    def __init__(self,config : DictConfig) -> None:
         
         """Initialise les variables d'instances de l'agent expert"""
         

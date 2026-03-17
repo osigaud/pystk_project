@@ -1,4 +1,5 @@
 from .steering import Steering
+from omegaconf import DictConfig
 
 class AgentBanana:
 
@@ -6,7 +7,7 @@ class AgentBanana:
     Module Agent Expert Banana : Gère la logique de détection et de réaction face aux bananes et chewing-gum
     """
     
-    def __init__(self,config,config_pilote):
+    def __init__(self,config : DictConfig ,config_pilote : DictConfig) -> None:
         
         """Initialise les variables d'instances de l'agent expert"""
         

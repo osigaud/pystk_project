@@ -29,7 +29,7 @@ class Agent4(KartAgent):
         self.conf = OmegaConf.load(str(CONFIG_PATH)) # On charge le fichier de config
         """@private"""
         self.c = self.conf.main_agent
-        """@pprivate"""
+        """@private"""
         self.path_lookahead = self.c.path_lookahead
         """@private"""
         self.obs = None
@@ -157,7 +157,7 @@ class Agent4(KartAgent):
             "acceleration": acceleration,
             "steer": modified_steer,
             "brake": brake,
-            "drift": False,
+            "drift": drift,
             "nitro": nitro,
             "rescue":False,
             "fire": fire,

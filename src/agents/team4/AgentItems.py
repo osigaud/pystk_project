@@ -1,10 +1,11 @@
 from .steering import Steering
+from omegaconf import DictConfig
 
 class AgentItems:
     
     """Module Agent Expert Item : Gère la logique d'utilisation des différents items"""
     
-    def __init__(self,config,config_pilote):
+    def __init__(self,config : DictConfig ,config_pilote : DictConfig) -> None:
         
         """Initialise les variables d'instances de l'agent expert"""
         

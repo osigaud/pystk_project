@@ -1,4 +1,5 @@
 from .steering import Steering
+from omegaconf import DictConfig
 
 class AgentEsquiveAdv:
 
@@ -6,7 +7,7 @@ class AgentEsquiveAdv:
     Module Agent Expert Esquive Adversaire : Gère la logique de détection d'adversaires et de dépassement
     """
     
-    def __init__(self,config,config_pilote):
+    def __init__(self,config : DictConfig ,config_pilote : DictConfig) -> None:
         
         """Initialise les variables d'instances de l'agent expert"""
         

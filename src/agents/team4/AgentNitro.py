@@ -1,10 +1,12 @@
+from omegaconf import DictConfig
+
 class AgentNitro:
 
     """
     Module Agent Expert Nitro : Gère la logique d'activation du nitro
     """
     
-    def __init__(self,config):
+    def __init__(self,config : DictConfig) -> None:
         """Initialise les variables d'instances de l'agent."""
         
         self.c = config
