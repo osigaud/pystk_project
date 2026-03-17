@@ -1,4 +1,4 @@
-from .agent_items import AgentItems
+from agents.kart_agent import KartAgent
 import numpy as np
 
 #Agent qui derape quand la courbe est serree (virage serre)

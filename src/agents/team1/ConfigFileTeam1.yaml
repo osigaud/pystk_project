@@ -1,12 +1,24 @@
 # Fichier de configuration TastyCrousteam 
 # contient les paramètres et les variables utilisés dans le programme
 
+#agent 
+nom d'équipe : TastyCrousteam
+
+#coordonnées 
+x : 0
+y : 1
+z : 2
+
+
+#AgentCenter
 # distance à partir de laquelle on considère notre distance par rapport au centre trop élevée
 dist : 0.673833673012193
 
 # à quel point on ajuste la direction
 ajust : 0.6386812473361506
 
+
+#AgentSpeed
 # seuil à partir duquel on considère l'écart entre le front du kart et la direction du segment
 ecartpetit : 2.9
 ecartgrand : 3
@@ -27,13 +39,8 @@ accel_virage : 0.5
 #distance a partir de laquelle on reagit a un segment
 dist_segment : 6
 
-#agent 
-nom d'équipe : TastyCrousteam
 
-#coordonnées 
-x : 0
-y : 1
-z : 2
+
 
 #items bonus
 bonus:
@@ -55,7 +62,12 @@ max : 0.9
 small : 0.2
 big : 0.3
 
-#Variables pour AgentRescue
+
+
+#AgentRescue
 min_progress_threshold : 0.5
 block_counter_threshold : 18
 unblock_steps_default : 6
+
+
+#AgentDrift

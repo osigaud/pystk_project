@@ -29,6 +29,7 @@ class Agent1(KartAgent):
         self.agentObstacles = AgentObstacles(env, self.conf, self.agentSpeed, self.path_lookahead)
         self.agentRescue = AgentRescue(env, self.conf, self.agentObstacles)
         self.agentItems = AgentItems(env, self.conf, self.agentRescue)
+        #self.AgentDrift = AgentDrift(env, self.conf, self.agentItems)
 
     def reset(self):
         self.obs, _ = self.env.reset()
