@@ -1,5 +1,7 @@
 acceleration:
   sans_virage: 1.0
+# pour la fonction reaction_items
+
 angle_evite_n: -0.61
 angle_evite_p: 0.61
 correction: 0.504447548795972
@@ -13,12 +15,6 @@ virages:
     i1: 0 
     i2: 0.05  
   
-
-# pour la fonction reaction_items
-
-angle_evite_p :  0.61
-angle_evite_n :  -0.61
-
 
 #pour la fonction gerer recul
 
