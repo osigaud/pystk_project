@@ -10,9 +10,10 @@ import numpy as np
 from datetime import datetime
 from pathlib import Path
 from dataclasses import dataclass
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from omegaconf import OmegaConf
 
+# Permet la parallélisation des courses.
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
 SRC_DIR = Path(__file__).resolve().parents[2]
@@ -33,7 +34,7 @@ from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 5
-NB_RACES = 5
+NB_RACES = 5   # Nombre de courses à chaque fois qu'on lance multi_track_race_team5
 MAX_STEPS = 1300
 
 # Get the current timestamp
@@ -198,12 +199,16 @@ def main_loop(cfg=None, race_jobs=1):
     else:
         cfg_dict = OmegaConf.to_container(cfg, resolve=True) if cfg is not None else None
 
+        # On crée un pool de processus en parallèle
         with ProcessPoolExecutor(max_workers=race_jobs) as executor:
+
+            # Chaque tâche correspond à UNE course parmis toutes les NB_RACES courses d'une recherche
             futures = [
                 executor.submit(single_race_worker, cfg_dict)
                 for _ in range(NB_RACES)
             ]
 
+            # "as_completed" permet de traiter les courses dès qu'elles se terminent
             for j, future in enumerate(as_completed(futures)):
                 print(f"race terminée : {j}")
                 race_data = future.result()
