@@ -110,16 +110,11 @@ class Agent2(KartAgent):
             rescue=False
 
         #utiliser les boost: (nitro->pour activer bouteille bleu, fire->pour activer les cadeaux)
-        if obs["energy"][0]>0 and abs(steering) < 0.4:
+        if obs["energy"][0]>0 and abs(steering) < 0.2:
             nitro=True
         else: 
             nitro=False
             
-        #utiliser les cadeaux attrapés
-        #if obs["items_type"][0]==0:
-            #fire=True
-        #else:
-            #fire=False
 
         #Calcul de la correction pour rester au centre de la piste
         correction_piste = self.steering.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
