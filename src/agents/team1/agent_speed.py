@@ -48,7 +48,7 @@ class AgentSpeed(KartAgent):
             direction_segment = obs["paths_end"][i] - obs["paths_start"][i]
             diff_direction = direction_segment - obs["front"]
             ecart_direction = float(np.linalg.norm(diff_direction))
-            distance_segment = abs(obs["paths_distance"][i][0] - obs["paths_distance"][0][0])
+            distance_segment = abs(obs["paths_distance"][i][self.conf.x] - obs["paths_distance"][0][self.conf.x])
                 
             if ecart_direction >= self.conf.ecartgrand and distance_segment < self.conf.dist_segment:
                 virage_serre = True

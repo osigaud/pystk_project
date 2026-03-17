@@ -33,9 +33,9 @@ class AgentCenter(KartAgent):
         """
         steer = action["steer"]
         center = obs["paths_end"][2]
-        if (center[2] > 20 and abs(obs["center_path_distance"]) < 3) : 
+        if (center[self.conf.z] > 20 and abs(obs["center_path_distance"]) < 3) : 
             steer = 0
-        elif abs(center[0]) > self.dist : 
+        elif abs(center[self.conf.x]) > self.dist : 
             steer += self.ajust * center[0]
         action["steer"] = np.clip(steer, -1, 1)
         return action

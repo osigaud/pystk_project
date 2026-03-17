@@ -47,6 +47,7 @@ class AgentObstacles(KartAgent) :
     def dodge_obstacle(self, obs, action, index) : 
         """Évite un obstacle donné (sauf si un shield est actif).
 
+<<<<<<< HEAD
         Conserve une cible (`target_obstacle`) pour éviter de changer
         d'obstacle ciblé à chaque frame. Si l'obstacle n'est plus pertinent
         (trop proche, hors zone, ou autre), la cible est remise a None.

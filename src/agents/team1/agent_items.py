@@ -45,44 +45,40 @@ class AgentItems(KartAgent) :
             return action
 
         if current_item == CAKE :
-            #CAKE : à compléter
             premier_kart = obs["karts_position"][0]
-            if premier_kart[2]<0:
+            if premier_kart[self.conf.z]<0:
                 action["fire"] = False
                 return action 
             for kart in obs["karts_position"]:
-                if kart[2]>=0 and kart[2]<60:
+                if kart[self.conf.z]>=0 and kart[self.conf.z]<60:
                    action["fire"] = True
                    return action
             return action
             
         if current_item == BOWLING :
-            #BOWLING : à compléter
             premier_kart = obs["karts_position"][0]
-            if premier_kart[2]<0:
+            if premier_kart[self.conf.z]<0:
                 action["fire"] = False
             if self.target_item != None : 
                 action ["fire"] = True
             for kart in obs["karts_position"]:
-                if kart[2]>=0 and kart[2]<=25:         #optimiser valeurs
-                    if abs(kart[0]) <= 3:
+                if kart[self.conf.z]>=0 and kart[self.conf.z]<=25:         #optimiser valeurs
+                    if abs(kart[self.conf.x]) <= 3:
                         action["fire"] = True                
             return action
 
         if current_item == ZIPPER : 
-            #ZIPPER : à compléter
             #if virage_serre = false and self.target_obstacle = None:
             action["fire"] = True         	      
             return action
 
         if current_item == PLUNGER :
-            #PLUNGER : à compléter
             premier_kart = obs["karts_position"][0]
-            if premier_kart[2]<0:
+            if premier_kart[self.conf.z]<0:
                 action["fire"] = False
             for kart in obs["karts_position"]:
-                if kart[2]>=0 and kart[2]<25:
-                    if abs(kart[0]) <= 3:
+                if kart[self.conf.z]>=0 and kart[self.conf.z]<25:
+                    if abs(kart[self.conf.x]) <= 3:
                         action["fire"] = True 
             return action
 
@@ -97,21 +93,19 @@ class AgentItems(KartAgent) :
         if current_item == SWATTER :
             #SWATTER : à compléter
             for kart in obs["karts_position"]:
-                if abs(kart[2])<=10 and abs(kart[0])<=10 and abs(kart[1])<=5:
+                if abs(kart[self.conf.z])<=10 and abs(kart[self.conf.x])<=10 and abs(kart[self.conf.y])<=5:
                     action["fire"] = True
             return action
 
         if current_item == RUBBERBALL :
-            #RUBBERBALL : à compléter
             premier_kart = obs["karts_position"][0]
-            if premier_kart[2] > 0:
+            if premier_kart[self.conf.z] > 0:
                 action["fire"] = True
             return action
 
         if current_item == PARACHUTE :
-            #PARACHUTE : à compléter
             premier_kart = obs["karts_position"][0]
-            if premier_kart[2] > 0:
+            if premier_kart[self.conf.z] > 0:
                 action["fire"] = True
             return action
 
@@ -149,4 +143,3 @@ class AgentItems(KartAgent) :
         action = self.observation_item(obs, action)
         action = self.use_nitro(obs, action)
         return action
-    
