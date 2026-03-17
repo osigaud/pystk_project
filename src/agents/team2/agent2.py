@@ -18,7 +18,7 @@ class Agent2(KartAgent):
         self.steering = SteeringPiste(cfg)
         self.items_steering = ReactionItems(cfg)
         self.attack_rival = AttackRivals()
-        self.rescue_kart = StuckControl()
+        self.rescue_kart = StuckControl(cfg)
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
