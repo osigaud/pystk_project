@@ -5,10 +5,24 @@ angle_evite_p: 0.61
 correction: 0.504447548795972
 curvature: 0.4265392236049711
 virages:
-  drift: 2.8
-  moyen:
-    i1: 0.85
-    i2: 1.8
-  serrer:
-    i1: 1.8
-    i2: 2.8
+  drift: 0.1   #seuil necessitant un drift (tres serrer)
+  serrer:       #intervale viarges serres
+    i1: 0.05
+    i2: 0.1 
+  moyen:        #intervale viarges moyen
+    i1: 0 
+    i2: 0.05  
+  
+
+# pour la fonction reaction_items
+
+angle_evite_p :  0.61
+angle_evite_n :  -0.61
+
+
+#pour la fonction gerer recul
+
+vitesse : 0.2
+steps : 5
+recovery : 15
+braquage : 0.85

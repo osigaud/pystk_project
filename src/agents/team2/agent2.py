@@ -18,7 +18,7 @@ class Agent2(KartAgent):
         self.steering = SteeringPiste(cfg)
         self.items_steering = ReactionItems(cfg)
         self.attack_rival = AttackRivals()
-        self.rescue_kart = StuckControl()
+        self.rescue_kart = StuckControl(cfg)
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
@@ -50,7 +50,7 @@ class Agent2(KartAgent):
         dz = z2 - z1
 
         angle= np.arctan2(dx,dz) #angle entre les vecteurs dx et dz en radian
-        print("angle:",angle)
+        #print("angle:",angle)
 
         return angle
 
@@ -60,21 +60,21 @@ class Agent2(KartAgent):
         les virages serrés, les virages moyens et les lignes droites --> cette fonction a fait appel à detectVirage() 
         """
         
-        acceleration= 1.0
+        acceleration = 1.0
         curvature=abs(self.detectVirage(obs))
 
         if curvature > cfg.virages.drift:
                 #0.27
-            acceleration = acceleration - 0.20
+            acceleration = 0.80
         elif curvature > cfg.virages.serrer.i1 and curvature <=cfg.virages.serrer.i2: # virage serré 
                 #0.10
-            acceleration= acceleration - 0.05
+            acceleration= 0.85
         elif curvature > cfg.virages.moyen.i1 and curvature <= cfg.virages.moyen.i2:  #virage moyen 
                 #0.05
-            acceleration = acceleration - 0.02
+            acceleration = 0.95
         else :
                 #0.02
-            acceleration = acceleration - 0.01
+            acceleration = 1.0
         return acceleration 
     
 
@@ -110,16 +110,11 @@ class Agent2(KartAgent):
             rescue=False
 
         #utiliser les boost: (nitro->pour activer bouteille bleu, fire->pour activer les cadeaux)
-        if obs["energy"][0]>0 and abs(steering) < 0.4:
+        if obs["energy"][0]>0 and abs(steering) < 0.2:
             nitro=True
         else: 
             nitro=False
             
-        #utiliser les cadeaux attrapés
-        #if obs["items_type"][0]==0:
-            #fire=True
-        #else:
-            #fire=False
 
         #Calcul de la correction pour rester au centre de la piste
         correction_piste = self.steering.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
