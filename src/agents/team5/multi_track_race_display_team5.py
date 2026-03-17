@@ -10,6 +10,9 @@ import numpy as np
 from datetime import datetime
 from pathlib import Path
 from dataclasses import dataclass
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from omegaconf import OmegaConf
+
 
 
 SRC_DIR = Path(__file__).resolve().parents[2]
@@ -30,7 +33,7 @@ from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 5
-NB_RACES = 1
+NB_RACES = 5
 MAX_STEPS = 1300
 
 # Get the current timestamp
@@ -92,12 +95,12 @@ agents_specs = [
     AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.ON) for i in range(MAX_TEAMS)
 ]
 
-def create_race():
+def create_race(cfg=None):
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)
+        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode=None, num_kart=MAX_TEAMS)
     else:
-        env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
+        env = STKRaceMultiEnv(agents=agents_specs, render_mode=None, num_kart=MAX_TEAMS)
 
     # Instantiate the agents.
 
@@ -108,7 +111,7 @@ def create_race():
     agents.append(Agent2(env, path_lookahead=3))
     agents.append(Agent3(env, path_lookahead=3))
     agents.append(Agent4(env, path_lookahead=3))
-    agents.append(Agent5(env, path_lookahead=3))
+    agents.append(Agent5(env, path_lookahead=3, cfg=None))
     np.random.shuffle(agents)
 
     for i in range(MAX_TEAMS):
@@ -118,26 +121,29 @@ def create_race():
     return env, agents, names
 
 
-def single_race(env, agents, names, scores):
+def single_race(cfg=None):
+    env, agents, names = create_race(cfg)
     obs, _ = env.reset()
     done = False
     steps = 0
     nb_finished = 0
     positions = []
+
     for i in range(MAX_TEAMS):
         agents[i].steps = MAX_STEPS
+
     while not done and steps < MAX_STEPS:
         actions = {}
         env.world_update()
+
         for i in range(MAX_TEAMS):
-            str = f"{i}"
+            key = f"{i}"
             try:
-                actions[str] = agents[i].choose_action(obs[str])
+                actions[key] = agents[i].choose_action(obs[key])
             except Exception as e:
                 print(f"Team {i+1} error: {e}")
-                actions[str] = default_action
+                actions[key] = default_action
 
-            # check if agents have finished the race
             kart = env.world.karts[i]
             if kart.has_finished_race and not agents[i].isEnd:
                 print(f"{names[i]} has finished the race at step {steps}")
@@ -147,38 +153,62 @@ def single_race(env, agents, names, scores):
 
         obs, _, _, _, info = env.step(actions)
 
-        # prepare data to display leaderboard
         pos = np.zeros(MAX_TEAMS)
         for i in range(MAX_TEAMS):
-            str = f"{i}"
-            pos[i] = info['infos'][str]['position']
-        steps = steps + 1
-        done = (nb_finished == 5)
+            key = f"{i}"
+            pos[i] = info["infos"][key]["position"]
+
+        steps += 1
+        done = (nb_finished == MAX_TEAMS)
         positions.append(pos)
+
     pos_avg = np.array(positions).mean(axis=0)
     pos_std = np.array(positions).std(axis=0)
+
+    race_data = []
     for i in range(MAX_TEAMS):
         if not agents[i].isEnd:
-            # Voiture bloquée ou n'a pas fini → pénalité max
-            scores.append(names[i], 5, 5, MAX_STEPS)
+            race_data.append((names[i], 5, 5, MAX_STEPS))
         else:
-            scores.append(names[i], pos_avg[i], pos_std[i], agents[i].steps)
-        agents[i].isEnd = False  # reset pour la prochaine course
+            race_data.append((names[i], pos_avg[i], pos_std[i], agents[i].steps))
+
+    env.close()
     print("race duration:", steps)
+    return race_data
 
-def main_loop():
+def single_race_worker(cfg_dict):
+    cfg = OmegaConf.create(cfg_dict) if cfg_dict is not None else None
+    return single_race(cfg)
+
+def main_loop(cfg=None, race_jobs=1):
     scores = Scores()
-    #unsatisfactory: first call just to init the names
-    env, agents, names = create_race()
-    for i in range(MAX_TEAMS):
-        scores.init(names[i])
 
-    for j in range(NB_RACES):
-        print(f"race : {j}")
-        env, agents, names = create_race()
-        single_race(env, agents, names, scores)
+    env, agents, names = create_race(cfg)
+    env.close()
 
-        env.close()
+    for name in names:
+        scores.init(name)
+
+    if race_jobs == 1:
+        for j in range(NB_RACES):
+            print(f"race : {j}")
+            race_data = single_race(cfg)
+            for name, pos, pos_std, steps in race_data:
+                scores.append(name, pos, pos_std, steps)
+    else:
+        cfg_dict = OmegaConf.to_container(cfg, resolve=True) if cfg is not None else None
+
+        with ProcessPoolExecutor(max_workers=race_jobs) as executor:
+            futures = [
+                executor.submit(single_race_worker, cfg_dict)
+                for _ in range(NB_RACES)
+            ]
+
+            for j, future in enumerate(as_completed(futures)):
+                print(f"race terminée : {j}")
+                race_data = future.result()
+                for name, pos, pos_std, steps in race_data:
+                    scores.append(name, pos, pos_std, steps)
 
     print("final scores:")
     return scores

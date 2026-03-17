@@ -19,7 +19,7 @@ class Agent5(KartAgent):
     Cette classe agit comme un orchestrateur (Wrapper global) qui assemble les différents 
     modules de pilotage (Mid, Nitro, Drift, Banana, Item) selon une hiérarchie de priorité.
     """
-    def __init__(self, env, path_lookahead=3):
+    def __init__(self, env, path_lookahead=3, cfg=None):
         """
         Initialise l'agent complet en chargeant la configuration YAML et en 
         emboîtant les différents pilotes les uns dans les autres.
@@ -36,11 +36,15 @@ class Agent5(KartAgent):
         # On trouve le chemin de notre fichier actuel
         current_dir = os.path.dirname(os.path.abspath(__file__))
 
+
+        
         # On créer le chemin /src/agent/team5/config.yaml
-        config_path = os.path.join(current_dir, "config.yaml")
+        config_path = os.path.join(current_dir, "config_opti.yaml")
 
         # On charge le fichier conf avec ce chemin
         self.conf = OmegaConf.load(config_path)
+        if cfg is not None:
+            self.conf = cfg
         
         # On crée le Pilote qui suit la piste 
         self.pilot = Agent5Mid(env, self.conf, path_lookahead)

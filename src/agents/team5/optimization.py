@@ -10,10 +10,9 @@ from multi_track_race_display_team5 import main_loop
 os.environ["PYTHONWARNINGS"] = "ignore"
 warnings.filterwarnings("ignore")
 
-
 BASE_DIR = Path(__file__).resolve().parent
-CONFIG_PATH = BASE_DIR / "config_opti.yaml"
-
+BASE_CONFIG_PATH = BASE_DIR / "config.yaml"
+OUTPUT_CONFIG_PATH = BASE_DIR / "config_opti.yaml"
 
 def objective(trial):
     params = {
@@ -66,12 +65,11 @@ def objective(trial):
     }
 
 
-    cfg = OmegaConf.load(CONFIG_PATH)
+    cfg = OmegaConf.load(BASE_CONFIG_PATH)
     for key, val in params.items():
         OmegaConf.update(cfg, key, val)
-    OmegaConf.save(cfg, CONFIG_PATH)
 
-    scores = main_loop()
+    scores = main_loop(cfg, race_jobs=2)
 
     donkey_positions = scores.dict["Donkey Bombs"][0]
     mean_position = np.mean(donkey_positions)
@@ -80,7 +78,7 @@ def objective(trial):
 
 if __name__ == "__main__":
     study = optuna.create_study(direction="minimize")
-    study.optimize(objective, n_trials=3, show_progress_bar=True)
+    study.optimize(objective, n_trials=5, show_progress_bar=True, n_jobs=2)
 
     print(f"\nMeilleur score : {study.best_value:.3f}")
     print(f"Meilleurs paramètres : {study.best_params}")
@@ -136,11 +134,10 @@ if __name__ == "__main__":
     }
 
     
-    cfg = OmegaConf.load(CONFIG_PATH)
+    cfg = OmegaConf.load(BASE_CONFIG_PATH)
     for key, val in mapping.items():
         OmegaConf.update(cfg, key, best_params[val])
-    OmegaConf.save(cfg, CONFIG_PATH)
-    print("config.yaml mis à jour avec les meilleurs paramètres.")
-        
+    OmegaConf.save(cfg, OUTPUT_CONFIG_PATH)
+    print(f"{OUTPUT_CONFIG_PATH.name} mis à jour avec les meilleurs paramètres.")        
 
         
