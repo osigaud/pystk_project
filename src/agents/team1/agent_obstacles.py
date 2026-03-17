@@ -47,7 +47,6 @@ class AgentObstacles(KartAgent) :
     def dodge_obstacle(self, obs, action, index) : 
         """Évite un obstacle donné (sauf si un shield est actif).
 
-<<<<<<< HEAD
         Conserve une cible (`target_obstacle`) pour éviter de changer
         d'obstacle ciblé à chaque frame. Si l'obstacle n'est plus pertinent
         (trop proche, hors zone, ou autre), la cible est remise a None.
@@ -61,10 +60,15 @@ class AgentObstacles(KartAgent) :
             dict: Action corrigée (steer modifié pour dévier de l'obstacle).
         """
         vecteur_item = obs["items_position"][index]
-        if vecteur_item[self.conf.x] >= 0 : 
-            action["steer" ] -= 1
-        else : 
-            action["steer"] += 1
+        next_node = obs["paths_end"][self.path_lookahead]
+        sign_next_node = -1 if next_node[self.conf.x] < 0 else 1
+        if abs(next_node[self.conf.x]) > 10 : #si on est sur un virage
+            action["steer"] += 1 * sign_next_node
+        else :
+            if vecteur_item[self.conf.x] >= 0 : 
+                action["steer" ] -= 1
+            else : 
+                action["steer"] += 1
         action["steer"] = np.clip(action["steer"], -1, 1) 
         return action
 
