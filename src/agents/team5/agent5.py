@@ -10,6 +10,8 @@ from .agent5_NitroPilot import Agent5Nitro
 from .agent5_ItemPilot import Agent5Item
 from omegaconf import OmegaConf 
 import os
+from .agent5_RescuePilot import Agent5Rescue
+
 
 class Agent5(KartAgent):
     """
@@ -21,6 +23,10 @@ class Agent5(KartAgent):
         """
         Initialise l'agent complet en chargeant la configuration YAML et en 
         emboîtant les différents pilotes les uns dans les autres.
+
+        Args:
+            env (obj): L'environnement de simulation SuperTuxKart.
+            path_lookahead (int): Nombre de points de cheminement à anticiper (défaut: 3).
         """
         super().__init__(env)
         self.path_lookahead = path_lookahead
@@ -46,15 +52,23 @@ class Agent5(KartAgent):
         self.drift = Agent5Drift(env, self.nitro, self.conf, path_lookahead)
 
         # On l'enveloppe dans l'agent qui esquive les bananes
-        self.brain = Agent5Banana(env, self.drift, self.conf, path_lookahead)
+        self.banana = Agent5Banana(env, self.drift, self.conf, path_lookahead)
+
+        # On l'enveloppe dans l'agent qui s'occupe de quand le kart est bloqué
+        self.brain = Agent5Rescue(env, self.banana, self.conf, path_lookahead)
         
         # On crée le pilot qui gère les items
-        self.item = Agent5Item(env, self.brain, self.conf, path_lookahead)
+        # self.item = Agent5Item(env, self.brain, self.conf, path_lookahead)
 
         #self.rescue = Agent5Rescue(env, self.brain, self.conf, path_lookahead)
 
     def endOfTrack(self):
-        """Indique si le kart a atteint la fin de la piste."""
+        """
+        Indique si le kart a atteint la fin de la piste.
+
+        Returns:
+            bool: True si la fin de la piste est atteinte, False sinon.
+        """
         return self.isEnd
 
     def reset(self):
@@ -66,5 +80,11 @@ class Agent5(KartAgent):
         Méthode d'entrée principale du simulateur. 
         Elle délègue la décision à la couche supérieure du 'cerveau' qui 
         redescend ensuite la hiérarchie des wrappers.
+
+        Args:
+            obs (dict): Dictionnaire contenant les observations de l'environnement (vitesse, position, etc.).
+
+        Returns:
+            dict: Dictionnaire d'actions (steer, acceleration, brake, drift, nitro, etc.).
         """
         return self.brain.choose_action(obs)

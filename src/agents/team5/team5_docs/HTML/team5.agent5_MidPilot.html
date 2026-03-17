@@ -43,9 +43,9 @@
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt><a href="#Agent5Mid">Agent5Mid</a>(env,&nbsp;conf,&nbsp;path_lookahead=3)<br>
 &nbsp;<br>
-Agent&nbsp;de&nbsp;base&nbsp;'Donkey&nbsp;Bombs&nbsp;Mid'.<br>
-Responsable&nbsp;du&nbsp;suivi&nbsp;de&nbsp;piste&nbsp;principal&nbsp;en&nbsp;utilisant&nbsp;un&nbsp;contrôle&nbsp;PD&nbsp;(Proportionnel-Dérivé)<br>
-et&nbsp;une&nbsp;gestion&nbsp;d'anticipation&nbsp;dynamique&nbsp;basée&nbsp;sur&nbsp;la&nbsp;vitesse&nbsp;du&nbsp;kart.<br>&nbsp;</tt></td></tr>
+Agent&nbsp;de&nbsp;base&nbsp;'Donkey&nbsp;Bombs&nbsp;Mid'<br>
+Responsable&nbsp;du&nbsp;suivi&nbsp;de&nbsp;piste&nbsp;principal&nbsp;en&nbsp;utilisant&nbsp;un&nbsp;contrôle&nbsp;Proportionnel-Dérivé<br>
+et&nbsp;une&nbsp;gestion&nbsp;d'anticipation&nbsp;dynamique&nbsp;basée&nbsp;sur&nbsp;la&nbsp;vitesse&nbsp;du&nbsp;kart<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="team5.agent5_MidPilot.html#Agent5Mid">Agent5Mid</a></dd>
@@ -55,21 +55,60 @@ et&nbsp;une&nbsp;gestion&nbsp;d'anticipation&nbsp;dynamique&nbsp;basée&nbsp;sur
 <hr>
 Methods defined here:<br>
 <dl><dt><a name="Agent5Mid-__init__"><strong>__init__</strong></a>(self, env, conf, path_lookahead=3)</dt><dd><tt>Initialise&nbsp;l'agent&nbsp;avec&nbsp;les&nbsp;paramètres&nbsp;de&nbsp;configuration&nbsp;YAML.<br>
-Définit&nbsp;les&nbsp;gains&nbsp;du&nbsp;contrôleur&nbsp;(Kp,&nbsp;Kd)&nbsp;et&nbsp;les&nbsp;distances&nbsp;de&nbsp;visée&nbsp;(lookahead).</tt></dd></dl>
+Définit&nbsp;les&nbsp;gains&nbsp;du&nbsp;contrôleur&nbsp;(Kp,&nbsp;Kd)&nbsp;et&nbsp;les&nbsp;distances&nbsp;de&nbsp;visée&nbsp;(lookahead)<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;env&nbsp;(obj):&nbsp;L'environnement&nbsp;de&nbsp;simulation&nbsp;SuperTuxKart<br>
+&nbsp;&nbsp;&nbsp;&nbsp;conf&nbsp;(OmegaConf):&nbsp;Objet&nbsp;de&nbsp;configuration&nbsp;chargé&nbsp;depuis&nbsp;le&nbsp;YAML<br>
+&nbsp;&nbsp;&nbsp;&nbsp;path_lookahead&nbsp;(int):&nbsp;Nombre&nbsp;de&nbsp;points&nbsp;de&nbsp;cheminement&nbsp;à&nbsp;anticiper&nbsp;(défaut:&nbsp;3)</tt></dd></dl>
 
-<dl><dt><a name="Agent5Mid-choose_action"><strong>choose_action</strong></a>(self, obs)</dt><dd><tt>Méthode&nbsp;principale&nbsp;orchestrant&nbsp;la&nbsp;lecture&nbsp;de&nbsp;la&nbsp;piste,&nbsp;le&nbsp;braquage&nbsp;et&nbsp;la&nbsp;vitesse.<br>
-Retourne&nbsp;le&nbsp;dictionnaire&nbsp;d'actions&nbsp;final.</tt></dd></dl>
+<dl><dt><a name="Agent5Mid-choose_action"><strong>choose_action</strong></a>(self, obs)</dt><dd><tt>Méthode&nbsp;principale&nbsp;orchestrant&nbsp;la&nbsp;lecture&nbsp;de&nbsp;la&nbsp;piste,&nbsp;le&nbsp;braquage&nbsp;et&nbsp;la&nbsp;vitesse<br>
+Retourne&nbsp;le&nbsp;dictionnaire&nbsp;d'actions&nbsp;final<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;obs&nbsp;(dict):&nbsp;Dictionnaire&nbsp;contenant&nbsp;les&nbsp;observations&nbsp;de&nbsp;l'environnement<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dict:&nbsp;Dictionnaire&nbsp;d'actions&nbsp;(acceleration,&nbsp;steer,&nbsp;brake,&nbsp;drift,&nbsp;nitro,&nbsp;rescue,&nbsp;fire)</tt></dd></dl>
 
-<dl><dt><a name="Agent5Mid-compute_turning"><strong>compute_turning</strong></a>(self, x, z)</dt><dd><tt>Calcule&nbsp;l'angle&nbsp;du&nbsp;volant&nbsp;(steering)&nbsp;en&nbsp;fonction&nbsp;des&nbsp;distances&nbsp;(x,&nbsp;z).<br>
-Utilise&nbsp;un&nbsp;gain&nbsp;Proportionnel&nbsp;(Kp)&nbsp;pour&nbsp;la&nbsp;direction&nbsp;et&nbsp;un&nbsp;gain&nbsp;Dérivé&nbsp;(Kd)&nbsp;comme&nbsp;amortisseur.</tt></dd></dl>
+<dl><dt><a name="Agent5Mid-compute_turning"><strong>compute_turning</strong></a>(self, x, z)</dt><dd><tt>Calcule&nbsp;l'angle&nbsp;du&nbsp;volant&nbsp;(steering)&nbsp;en&nbsp;fonction&nbsp;des&nbsp;distances&nbsp;(x,&nbsp;z)<br>
+Utilise&nbsp;un&nbsp;gain&nbsp;Proportionnel&nbsp;(Kp)&nbsp;pour&nbsp;la&nbsp;direction&nbsp;et&nbsp;un&nbsp;gain&nbsp;Dérivé&nbsp;(Kd)&nbsp;comme&nbsp;amortisseur<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;(float):&nbsp;Écart&nbsp;latéral&nbsp;par&nbsp;rapport&nbsp;au&nbsp;point&nbsp;cible<br>
+&nbsp;&nbsp;&nbsp;&nbsp;z&nbsp;(float):&nbsp;Distance&nbsp;frontale&nbsp;par&nbsp;rapport&nbsp;au&nbsp;point&nbsp;cible<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;tuple:&nbsp;(steering_normalise,&nbsp;z)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;steering_normalise&nbsp;(float):&nbsp;Valeur&nbsp;de&nbsp;braquage&nbsp;limitée&nbsp;entre&nbsp;-1&nbsp;et&nbsp;1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;z&nbsp;(float):&nbsp;Distance&nbsp;frontale&nbsp;ajustée&nbsp;(sécurité&nbsp;minimale)</tt></dd></dl>
 
-<dl><dt><a name="Agent5Mid-manage_speed"><strong>manage_speed</strong></a>(self, obs, steering, z)</dt><dd><tt>Gère&nbsp;l'accélération,&nbsp;le&nbsp;freinage&nbsp;et&nbsp;la&nbsp;logique&nbsp;de&nbsp;sauvetage&nbsp;(rescue).<br>
-Réduit&nbsp;la&nbsp;vitesse&nbsp;en&nbsp;virage&nbsp;et&nbsp;gère&nbsp;les&nbsp;épingles&nbsp;serrées&nbsp;(hairpin).</tt></dd></dl>
+<dl><dt><a name="Agent5Mid-manage_speed"><strong>manage_speed</strong></a>(self, obs, steering, z)</dt><dd><tt>Gère&nbsp;l'accélération,&nbsp;le&nbsp;freinage&nbsp;et&nbsp;la&nbsp;logique&nbsp;de&nbsp;sauvetage&nbsp;(rescue)<br>
+Réduit&nbsp;la&nbsp;vitesse&nbsp;en&nbsp;virage&nbsp;et&nbsp;gère&nbsp;les&nbsp;épingles&nbsp;serrées&nbsp;(hairpin)<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;obs&nbsp;(dict):&nbsp;Dictionnaire&nbsp;contenant&nbsp;les&nbsp;observations&nbsp;de&nbsp;l'environnement<br>
+&nbsp;&nbsp;&nbsp;&nbsp;steering&nbsp;(float):&nbsp;Valeur&nbsp;de&nbsp;braquage&nbsp;actuelle&nbsp;calculée<br>
+&nbsp;&nbsp;&nbsp;&nbsp;z&nbsp;(float):&nbsp;Distance&nbsp;frontale&nbsp;au&nbsp;point&nbsp;cible<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;tuple:&nbsp;(accel,&nbsp;brake,&nbsp;steering)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;accel&nbsp;(float):&nbsp;Valeur&nbsp;d'accélération&nbsp;calculée<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;brake&nbsp;(bool):&nbsp;Indique&nbsp;si&nbsp;le&nbsp;frein&nbsp;doit&nbsp;être&nbsp;activé<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;steering&nbsp;(float):&nbsp;Valeur&nbsp;de&nbsp;braquage&nbsp;potentiellement&nbsp;modifiée&nbsp;(ex:&nbsp;rescue)</tt></dd></dl>
 
-<dl><dt><a name="Agent5Mid-position_track"><strong>position_track</strong></a>(self, obs)</dt><dd><tt>Analyse&nbsp;les&nbsp;noeuds&nbsp;devant&nbsp;et&nbsp;renvoie&nbsp;le&nbsp;vecteur&nbsp;(x,&nbsp;z)&nbsp;du&nbsp;point&nbsp;cible&nbsp;situé&nbsp;à&nbsp;une&nbsp;distance&nbsp;dynamique.<br>
-La&nbsp;distance&nbsp;de&nbsp;visée&nbsp;(lookahead)&nbsp;augmente&nbsp;proportionnellement&nbsp;à&nbsp;la&nbsp;vitesse.</tt></dd></dl>
+<dl><dt><a name="Agent5Mid-position_track"><strong>position_track</strong></a>(self, obs)</dt><dd><tt>Analyse&nbsp;les&nbsp;noeuds&nbsp;devant&nbsp;et&nbsp;renvoie&nbsp;le&nbsp;vecteur&nbsp;(x,&nbsp;z)&nbsp;du&nbsp;point&nbsp;cible&nbsp;situé&nbsp;à&nbsp;une&nbsp;distance&nbsp;dynamique<br>
+La&nbsp;distance&nbsp;de&nbsp;visée&nbsp;(lookahead)&nbsp;augmente&nbsp;proportionnellement&nbsp;à&nbsp;la&nbsp;vitesse<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;obs&nbsp;(dict):&nbsp;Dictionnaire&nbsp;contenant&nbsp;les&nbsp;observations&nbsp;de&nbsp;l'environnement<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;tuple:&nbsp;(target_vector[0],&nbsp;target_vector[2])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;target_vector[0]&nbsp;(float):&nbsp;Écart&nbsp;latéral&nbsp;(x)&nbsp;du&nbsp;point&nbsp;cible<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;target_vector[2]&nbsp;(float):&nbsp;Distance&nbsp;frontale&nbsp;(z)&nbsp;du&nbsp;point&nbsp;cible</tt></dd></dl>
 
-<dl><dt><a name="Agent5Mid-reset"><strong>reset</strong></a>(self)</dt><dd><tt>Réinitialise&nbsp;les&nbsp;variables&nbsp;d'état&nbsp;de&nbsp;l'agent&nbsp;au&nbsp;début&nbsp;d'une&nbsp;course.</tt></dd></dl>
+<dl><dt><a name="Agent5Mid-reset"><strong>reset</strong></a>(self)</dt><dd><tt>Réinitialise&nbsp;les&nbsp;variables&nbsp;d'état&nbsp;de&nbsp;l'agent&nbsp;au&nbsp;début&nbsp;d'une&nbsp;course</tt></dd></dl>
 
 <hr>
 Methods inherited from <a href="agents.kart_agent.html#KartAgent">agents.kart_agent.KartAgent</a>:<br>
