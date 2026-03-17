@@ -19,6 +19,14 @@ class AgentItems(KartAgent) :
         super().__init__(env)
         self.conf = conf
         self.agent = agent 
+
+    def is_bonus_close(selv, obs) :
+        """Renvoie True si on est très proche d'une boîte cadeau, False sinon"""
+        next_item = obs["items_position"][0]
+        if obs["items_type"][0] == 0 : #BONUS BOX
+            if abs(next_item[self.conf.x]) < 2 and next_item[self.conf.z] < 3 and abs(next_item[self.conf.y]) < 3 :
+                return True
+        return False
     
     def observation_item(self, obs, action) : 
         """Détermine si l'objet que nous avons doit être utilisé.
@@ -40,7 +48,6 @@ class AgentItems(KartAgent) :
         action["fire"] = False        
 
         if current_item == BUBBLEGUM :
-            #BUBBLEGUM : à compléter
             action["fire"] = True
             return action
 
@@ -59,7 +66,7 @@ class AgentItems(KartAgent) :
             premier_kart = obs["karts_position"][0]
             if premier_kart[self.conf.z]<0:
                 action["fire"] = False
-            if self.target_item != None : 
+            if self.is_bonus_close(obs) : 
                 action ["fire"] = True
             for kart in obs["karts_position"]:
                 if kart[self.conf.z]>=0 and kart[self.conf.z]<=25:         #optimiser valeurs
@@ -83,15 +90,13 @@ class AgentItems(KartAgent) :
             return action
 
         if current_item == SWITCH :
-            #SWITCH : à compléter
-            if self.target_item != None:
+            if self.is_bonus_close(obs):
                 action["fire"] = False
             else: 
                 action["fire"] = True
             return action
 
         if current_item == SWATTER :
-            #SWATTER : à compléter
             for kart in obs["karts_position"]:
                 if abs(kart[self.conf.z])<=10 and abs(kart[self.conf.x])<=10 and abs(kart[self.conf.y])<=5:
                     action["fire"] = True
