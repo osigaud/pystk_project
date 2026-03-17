@@ -30,7 +30,7 @@ powerup:
   radar_zmin_swatter : 2.0
   radar_zmax_ball : 25.0
   radar_zmax_swatter : 5.0
-  gain_steer : 0.7
+  gain_steer : 7.0
   steer_allow_zipper : 0.4
   rate_steer : 0.8
   rate_target : 0.2
