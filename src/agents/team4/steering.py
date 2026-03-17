@@ -6,9 +6,12 @@ class Steering:
     Module Steering : Gère la logique de direction
     """
     
-    def __init__(self):
+    def __init__(self,config):
         """Initialise les variables d'instances de l'agent."""
-        self.L = 2.5  # On simule un empattement
+        
+        self.c = config
+        """@private"""
+        self.L = self.c.empattement  # On simule un empattement
         """@private"""
 
     def reset(self) -> None:

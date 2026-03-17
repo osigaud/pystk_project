@@ -6,21 +6,23 @@ class AgentBanana:
     Module Agent Expert Banana : Gère la logique de détection et de réaction face aux bananes et chewing-gum
     """
     
-    def __init__(self):
+    def __init__(self,config,config_pilote):
         
         """Initialise les variables d'instances de l'agent expert"""
         
+        self.c = config
+        """@private"""
         self.dodge_side = 0
         """@private"""
-        self.dodge_timer = 0
+        self.dodge_timer = self.c.dodge_timer_basic
         """@private"""
         self.lock_mode = None
         """@private"""
         self.locked_gx = 0.0
         """@private"""
-        self.pilotage = Steering()
+        self.pilotage = Steering(config_pilote)
         """@private"""
-    
+        
     def reset(self) -> None:
         
         """Réinitialise les variables d'instances de l'agent expert"""
@@ -65,7 +67,7 @@ class AgentBanana:
                 if dist_obj_centre > limit_path: # Si l'objet est hors des limites de la piste, on ne le prend pas en compte
                     continue
 
-                if -2.0 <= pos_x <= 2.0 and 0.0 <= pos_z <= 17.0: # Si la banana est dans notre radar, on l'ajoute dans notre liste
+                if -self.c.radar_x <= pos_x <= self.c.radar_x and self.c.radar_zmin <= pos_z <= self.c.radar_zmax: # Si la banana est dans notre radar, on l'ajoute dans notre liste
                     banana.append((pos_x,pos_z))
 
         banana.sort(key=lambda x: x[1]) # On trie la liste par ordre croissant selon la profondeur
@@ -81,7 +83,7 @@ class AgentBanana:
             second = banana[1] # On récupère la seconde
             x = second[0]
             z = second[1]
-            if abs(z-first_z) <= 2.0: # Si les bananes forment une ligne (un barrage)
+            if abs(z-first_z) <= self.c.seuil_ligne: # Si les bananes forment une ligne (un barrage)
                 gap_x = (x+first_x)/2.0
                 return "LIGNE", gap_x, banana
             else:
@@ -117,7 +119,7 @@ class AgentBanana:
         # Appel de la fonction de détection
         mode, b_x, banana_list = self.banana_detection(obs,limit_path,center_path_distance)
 
-        gain_volant = 7.0 # Gain par défaut
+        gain_volant = self.c.default_gain # Gain par défaut
 
         if mode == "CLEAR" and self.dodge_timer <= 0:
             self.lock_mode = None # On réinitialise l'état
@@ -128,7 +130,7 @@ class AgentBanana:
             #print(banana_list)
             
             #Sécurité pour éviter de sortir de la piste
-            if (limit_path - abs(center_path_distance)) <= 1.5 :
+            if (limit_path - abs(center_path_distance)) <= self.c.seuil_limite_path :
                 #print("choix par limite de bord")
                 #print(limit_path, center_path_distance)
                 
@@ -148,12 +150,12 @@ class AgentBanana:
             # Utilisation d'un compteur pour maintenir le cap d'esquive sur x frames
             if self.dodge_timer == 0 or (self.lock_mode == "SINGLE" and self.dodge_side != new_side):
                 self.lock_mode = "SINGLE"
-                self.dodge_timer = 10
+                self.dodge_timer = self.c.dodge_timer_start
                 self.dodge_side = new_side
 
         elif mode == "LIGNE": #Si on a capte un mode ligne
             self.lock_mode = "LIGNE"
-            self.dodge_timer = 0
+            self.dodge_timer = self.c.dodge_timer_basic
             self.locked_gx = b_x
             #print(banana_list)
             #print("Esquive Ligne")
@@ -161,12 +163,12 @@ class AgentBanana:
         if self.dodge_timer >0: # On est dans le mode Single
             #print("Esquive SINGLE")
             self.dodge_timer -= 1 # On decremente le compteur
-            gx += 3.0 * self.dodge_side # On cree le decalage pour le cas single
+            gx += self.c.decalage_lateral * self.dodge_side # On cree le decalage pour le cas single
             
         elif (mode == "SINGLE" or mode == "LIGNE") and self.lock_mode == "LIGNE":
             #print("Esquive LIGNE")
             gx = self.locked_gx # On vise le gap calculé pour le mode ligne
-            gain_volant = 6.0 # Ajustement du gain pour le mode ligne
+            gain_volant = self.c.adjusted_gain # Ajustement du gain pour le mode ligne
 
         # Appel de la fonction de steering avec les paramètres modifiés.
         steering = self.pilotage.manage_pure_pursuit(gx,gz,gain_volant)

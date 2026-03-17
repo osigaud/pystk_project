@@ -4,15 +4,17 @@ class SpeedController:
     Module SpeedController : Gère la logique d'accélération
     """
 
-    def __init__(self):
+    def __init__(self,config):
         """Initialise les variables d'instances de l'agent."""
-        pass
+        
+        self.c = config
+        """@private"""
     
     def reset(self) -> None:
         """Réinitialise les variables d'instances de l'agent expert"""
         pass
     
-    def manage_speed(self,speed:float,drift:bool,conf:float,obs:dict) -> tuple[float,bool]:
+    def manage_speed(self,speed:float,drift:bool,obs:dict) -> tuple[float,bool]:
         """
         Gère l'accélération.
 
@@ -20,7 +22,6 @@ class SpeedController:
             
             speed(float) : Vitesse de l'agent.
             drift(bool) : Booléen disant si l'agent drift ou non.
-            conf(float) : Valeur representant un seuil de vitesse.
             obs(dict) : Les données fournies par le simulateur.
         
         Returns:
@@ -36,17 +37,18 @@ class SpeedController:
         #print("décal x = ",a)
         
         if drift:
-            return 0.6, False
-        if a < 6.0 and speed > conf.vitesse_seuil:
-            return 1.0, False
+            return self.c.acceleration_drift, False
         
-        if a > 10.0 and speed > conf.vitesse_seuil:
-            return 0.05, True
+        if a < self.c.seuil_decalage_low and speed > self.c.vitesse_seuil:
+            return self.c.acceleration_max, False
+        
+        if a > self.c.seuil_decalage_max and speed > self.c.vitesse_seuil:
+            return self.c.acceleration_czero, True
 
-        if (a > 5.0 and a < 8.0) and speed > (conf.vitesse_seuil - 2):
-            return 0.55, False
+        if (a > self.c.seuil_decalage_min and a < self.c.seuil_decalage_mid) and speed > (self.c.vitesse_seuil - 2):
+            return self.c.acceleration_mid, False
 
-        if (a > 8.0 and a < 10.0) and speed > (conf.vitesse_seuil - 1):
-            return 0.3, True
+        if (a > self.c.seuil_decalage_mid and a < self.c.seuil_decalage_max) and speed > (self.c.vitesse_seuil - 1):
+            return self.c.acceleration_low, True
 
-        return 1.0, False
+        return self.c.acceleration_max, False

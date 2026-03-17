@@ -3,10 +3,12 @@ class AgentRescue:
     Module Agent Expert Rescue : Gère la logique de détection et de réaction face au blocage
     """
     
-    def __init__(self):
+    def __init__(self,config):
         
         """Initialise les variables d'instances de l'agent expert"""
         
+        self.c = config
+        """@private"""
         self.agent_positions = []
         """@private"""
         self.times_blocked = 0
@@ -15,7 +17,7 @@ class AgentRescue:
         """@private"""
         self.recovery_cd = 0
         """@private"""
-        self.recovery_timer = 10 #nombre de frames à garder le même sens
+        self.recovery_timer = self.c.recovery_timer #nombre de frames à garder le même sens
         """@private"""   
         self.switch_side = False
         """@private"""
@@ -28,7 +30,7 @@ class AgentRescue:
         self.times_blocked = 0
         self.recovery_steer = None
         self.recovery_cd = 0
-        self.recovery_timer = 10 #nombre de frames à garder le même sens
+        self.recovery_timer = self.c.recovery_timer #nombre de frames à garder le même sens
         self.switch_side = False
         
     def is_stuck(self, distance : float, speed : float) -> bool:
@@ -48,19 +50,19 @@ class AgentRescue:
         
         self.agent_positions.append(distance)
         
-        if len(self.agent_positions) >= 20 and distance > 10.0:
+        if len(self.agent_positions) >= self.c.seuil_agent_position and distance > self.c.seuil_distance:
             
             delta = self.agent_positions[-1] - self.agent_positions[-7]
-            if abs(delta) < 3 and speed < 0.30:
+            if abs(delta) < self.c.seuil_delta and speed < self.c.seuil_speed:
                 self.times_blocked += 1
             else:
                 self.times_blocked = 0
 
-            if self.times_blocked > 14:
+            if self.times_blocked > self.c.seuil_blocked:
                 self.times_blocked = 0
                 self.recovery_side = -1
         
-        return self.times_blocked >= 7
+        return self.times_blocked >= self.c.seuil_blocked_trigger
 
     def choose_action(self, current_steer : float, speed : float, distance : float) -> tuple[bool,dict]:
         """

@@ -4,13 +4,15 @@ class AgentDrift:
     
     """Module Agent Expert Drift : Gère la logique d'activation du drift"""
     
-    def __init__(self):
+    def __init__(self,config):
         
         """Initialise les variables d'instances de l'agent expert"""
         
         self.timer = 0
         """@private"""
         self.cooldown = 0
+        """@private"""
+        self.c = config
         """@private"""
 
     def reset(self) -> None:
@@ -50,10 +52,10 @@ class AgentDrift:
         speed = np.linalg.norm(vel)
 
         # Virage confirmé si les X progressent de façon monotone et dépassent un seuil minimal
-        is_curve_right = x1 > x0 and x2 > x1 and x3 > x2 and x4 >x3 and x2 > 3.0
-        is_curve_left  = x1 < x0 and x2 < x1 and x3 < x2 and x4 < x3 and x2 < -3.0
+        is_curve_right = x1 > x0 and x2 > x1 and x3 > x2 and x4 >x3 and x2 > self.c.x_seuil
+        is_curve_left  = x1 < x0 and x2 < x1 and x3 < x2 and x4 < x3 and x2 < -self.c.x_seuil
 
-        if (is_curve_right or is_curve_left) and speed >= 12 and abs(steer) >= 0.5:
+        if (is_curve_right or is_curve_left) and speed >= self.c.speed_seuil and abs(steer) >= self.c.steer_seuil:
             return True
 
         return False
@@ -79,13 +81,13 @@ class AgentDrift:
         trigger = self.must_drift(obs, steer, vel)
         
         if trigger and self.timer <= 0 and self.cooldown <= 0:
-            self.timer = 15
+            self.timer = self.c.timer_start
 
         if self.timer > 0:
-            adjusted_steer = steer * 0.6
+            adjusted_steer = steer * self.c.coefficient_steer
             self.timer -= 1
             if self.timer == 0:
-                self.cooldown = 15 
+                self.cooldown = self.c.cooldown_start 
             return True, adjusted_steer
         
         if self.cooldown > 0:

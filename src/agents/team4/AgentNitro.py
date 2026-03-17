@@ -4,9 +4,11 @@ class AgentNitro:
     Module Agent Expert Nitro : Gère la logique d'activation du nitro
     """
     
-    def __init__(self):
+    def __init__(self,config):
         """Initialise les variables d'instances de l'agent."""
-        pass
+        
+        self.c = config
+        """@private"""
 
     def reset(self) -> None:
         """Réinitialise les variables d'instances de l'agent expert"""
@@ -37,7 +39,7 @@ class AgentNitro:
         
         nit = False
         # On active le nitro si on s'est assure qu'aucun virage serre n'arrive
-        if (energy > 0.5 and abs(steer) < 0.45 and abs(target_now)<=5 and abs(target_soon) <= 5 and target_late <= 7):
+        if (energy > self.c.seuil_energy and abs(steer) < self.c.seuil_steer and abs(target_now)<= self.c.seuil_target_now and abs(target_soon) <= self.c.seuil_target_soon and target_late <= self.c.seuil_target_late):
             nit = True
         return nit
 

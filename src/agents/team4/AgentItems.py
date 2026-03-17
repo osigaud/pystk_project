@@ -4,15 +4,20 @@ class AgentItems:
     
     """Module Agent Expert Item : Gère la logique d'utilisation des différents items"""
     
-    def __init__(self):
+    def __init__(self,config,config_pilote):
         
         """Initialise les variables d'instances de l'agent expert"""
         
-        self.steerer = Steering()
+        self.steerer = Steering(config_pilote)
+        """@private"""
+        self.c = config
         """@private"""
     
     def reset(self):
-        pass
+
+        """Réinitialise les variables d'instances de l'agent expert"""
+        
+        self.steerer.reset()
     
     def use_items(self, obs : dict, steer : float) -> tuple[bool,float]:
         
@@ -40,23 +45,23 @@ class AgentItems:
 
         # Zipper
         if item == 4:
-            if (abs(steer) < 0.4):
+            if (abs(steer) < self.c.steer_allow_zipper):
                 return True, steer
 
         # Swatter
         if item == 7:
             for kart in obs.get("karts_position", []):
                 x, z = float(kart[0]), float(kart[2])
-                if -0.4 <= x <= 0.4 and 2.0 <= z <= 5.0:
+                if -self.c.radar_xswatter <= x <= self.c.radar_xswatter and self.c.radar_zmin_swatter <= z <= self.c.radar_zmax_swatter:
                     return True, steer
 
         # Bowling Ball, Plunger, RubberBall, Parachute, Anvil
         if item in (3, 5, 8, 9, 10):
             for kart in obs.get("karts_position", []):
                 x, z = float(kart[0]), float(kart[2])
-                if -0.8 <= x <= 0.8 and 2.0 <= z <= 25.0:
-                    target = self.steerer.manage_pure_pursuit(x, z, 0.7)
-                    new_steer = float(0.8 * steer + 0.2 * target)
+                if -self.c.radar_xball <= x <= self.c.radar_xball and self.c.radar_zmin_ball <= z <= self.c.radar_zmax_ball:
+                    target = self.steerer.manage_pure_pursuit(x, z, self.c.gain_steer)
+                    new_steer = float(self.c.rate_steer * steer + self.c.rate_target * target)
                     return True, new_steer
 
         # Nothing

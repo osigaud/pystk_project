@@ -6,11 +6,13 @@ class AgentEsquiveAdv:
     Module Agent Expert Esquive Adversaire : Gère la logique de détection d'adversaires et de dépassement
     """
     
-    def __init__(self):
+    def __init__(self,config,config_pilote):
         
         """Initialise les variables d'instances de l'agent expert"""
         
-        self.pilotage = Steering()
+        self.c = config
+        """@private"""
+        self.pilotage = Steering(config_pilote)
         """@private"""
     
     def reset(self) -> None:
@@ -40,7 +42,7 @@ class AgentEsquiveAdv:
 
         adv=kart_pos[0]
         devant=False
-        if -0.8 <= adv[0] <=0.8 and  0.1<= adv[2]<=1.3:
+        if -self.c.radar_x <= adv[0] <=self.c.radar_x and  self.c.radar_zmin<= adv[2]<=self.c.radar_zmax:
             devant=True
 
         return devant,adv[0],adv[2]
@@ -70,11 +72,11 @@ class AgentEsquiveAdv:
             
         if danger_adv:
             if a_x >= 0:
-                gx -= 2.0 # On se décale à gauche 
+                gx -= self.c.decalage_lateral # On se décale à gauche 
             else:
-                gx += 2.0 # On se décale à droite
+                gx += self.c.decalage_lateral # On se décale à droite
             
-            gain_volant = 7.0
+            gain_volant = self.c.default_gain
             steering = self.pilotage.manage_pure_pursuit(gx,gz,gain_volant)
             action = {
             "acceleration": acceleration,
