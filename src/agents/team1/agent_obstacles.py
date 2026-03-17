@@ -91,6 +91,26 @@ class AgentObstacles(KartAgent) :
         steer = np.clip(steer, -1, 1)
         action["steer"] = steer
         return action
+
+    def evite_ennemi(self, obs, action) :
+        """Dévie légèrement le kart si on est collé à un kart ennemi en face
+
+        Args:
+            obs (dict): Observations (utilise `karts_position`).
+            action (dict): Action courante (modifie "steer").
+        
+        Returns:
+            dict: Action corrigée (steer dévié d'un possible kart en face de nous).
+        """
+        for kart in obs["karts_position"] :
+            if abs(kart[self.conf.x]) < 0.8 and 0 < kart[self.conf.z] < 1 :
+                if action["steer"] >= 0 :
+                    action["steer"] += 0.3
+                else :
+                    action["steer"] -= 0.3
+                action["steer"] = np.clip(action["steer"], -1, 1)
+                return action
+        return action
         
     def choose_action(self, obs) : 
         """
@@ -99,4 +119,5 @@ class AgentObstacles(KartAgent) :
         """
         action = self.agent.choose_action(obs)
         action = self.observation_next_item(obs, action)
+        action = self.evite_ennemi(obs, action)
         return action
