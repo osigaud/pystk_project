@@ -112,7 +112,7 @@ class Agent4(KartAgent):
         drift = False
         gain_volant = self.c.default_gain  #Gain par défaut
         steering = self.steering.manage_pure_pursuit(gx,gz,gain_volant)
-        drift, modified_steer = self.expert_drift.choose_action(obs,steering,vel)
+        #drift, modified_steer = self.expert_drift.choose_action(obs,steering,vel)
         acceleration, brake = self.speedcontroller.manage_speed(speed,drift,obs) # Appel à la fonction gerer_vitesse
         nitro = self.expert_nitro.manage_nitro(obs,steering,energy) # Appel à la fonction manage_nitro
         
@@ -155,7 +155,7 @@ class Agent4(KartAgent):
         fire, steering = self.expert_items.use_items(obs, steering)
         action = {
             "acceleration": acceleration,
-            "steer": modified_steer,
+            "steer": steering,
             "brake": brake,
             "drift": drift,
             "nitro": nitro,

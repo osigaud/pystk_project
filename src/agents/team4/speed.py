@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 from omegaconf import DictConfig
-
-=======
 import numpy as np
->>>>>>> 03d7bd9 (Upgrade/implementation speed manager)
+
 class SpeedController:
     
     """
