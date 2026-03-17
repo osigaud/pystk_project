@@ -25,3 +25,11 @@ virages:
 
 angle_evite_p :  0.61
 angle_evite_n :  -0.61
+
+
+#pour la fonction gerer recul
+
+vitesse : 0.2
+steps : 5
+recovery : 15
+braquage : 0.85
