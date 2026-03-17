@@ -7,6 +7,8 @@ from .steering_piste import SteeringPiste
 from .react_items import ReactionItems
 from .rival_attack import AttackRivals
 from .kart_rescue import StuckControl
+from .anticipe_kart import AnticipeKart
+
 
 
 cfg = OmegaConf.load("../agents/team2/configDemoPilote.yaml")
@@ -19,6 +21,7 @@ class Agent2(KartAgent):
         self.items_steering = ReactionItems(cfg)
         self.attack_rival = AttackRivals()
         self.rescue_kart = StuckControl(cfg)
+        self.anticipe = AnticipeKart()
         self.agent_positions = []
         self.obs = None
         self.isEnd = False
@@ -34,34 +37,13 @@ class Agent2(KartAgent):
     def endOfTrack(self):
         return self.isEnd
 
-    def detectVirage(self,obs):
-        """ le but est de calculer l'angle qui definit les virages devant le kart
-            ->la fonction renvoie un angle en radian 
-        """
-        noeuds_piste= obs["paths_start"]
-        path_lookahead = 5
-        noeud_cour= noeuds_piste[0]
-        noeud_loin= noeuds_piste[path_lookahead]
-
-        x1, z1 = noeud_cour[0], noeud_cour[2] #coordonnees pour angle
-        x2, z2 = noeud_loin[0], noeud_loin[2]
-
-        dx = x2 - x1 #coordonnées vecteur
-        dz = z2 - z1
-
-        angle= np.arctan2(dx,dz) #angle entre les vecteurs dx et dz en radian
-        #print("angle:",angle)
-
-        return angle
-
     def adapteAcceleration(self,obs):
         """
         le but va etre d'adpater l'acclération dans diverses situations dont notamment 
         les virages serrés, les virages moyens et les lignes droites --> cette fonction a fait appel à detectVirage() 
         """
-        
         acceleration = 1.0
-        curvature=abs(self.detectVirage(obs))
+        curvature=abs(self.anticipe.detectVirage(obs))
 
         if curvature > cfg.virages.drift:
                 #0.27
@@ -115,7 +97,6 @@ class Agent2(KartAgent):
         else: 
             nitro=False
             
-
         #Calcul de la correction pour rester au centre de la piste
         correction_piste = self.steering.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
 
