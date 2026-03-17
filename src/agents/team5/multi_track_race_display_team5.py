@@ -98,7 +98,7 @@ agents_specs = [
 def create_race(cfg=None):
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode=None, num_kart=MAX_TEAMS)
+        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode=None, num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
     else:
         env = STKRaceMultiEnv(agents=agents_specs, render_mode=None, num_kart=MAX_TEAMS)
 
@@ -111,7 +111,7 @@ def create_race(cfg=None):
     agents.append(Agent2(env, path_lookahead=3))
     agents.append(Agent3(env, path_lookahead=3))
     agents.append(Agent4(env, path_lookahead=3))
-    agents.append(Agent5(env, path_lookahead=3, cfg=None))
+    agents.append(Agent5(env, path_lookahead=3, cfg=None))   # On donne le fichier de configuration chargé en mémoire à notre Agent5
     np.random.shuffle(agents)
 
     for i in range(MAX_TEAMS):

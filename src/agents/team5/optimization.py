@@ -4,12 +4,15 @@ import os
 import warnings
 from omegaconf import OmegaConf
 from pathlib import Path
+
+# On importe la fonction qui permet de lancer des courses dans le fichier multi_track afin de récupérer et d'extraire les scores de notre kart
 from multi_track_race_display_team5 import main_loop
 
 #Pour éviter les conflits avec python
 os.environ["PYTHONWARNINGS"] = "ignore"
 warnings.filterwarnings("ignore")
 
+# Paths de nos deux fichiers config. 
 BASE_DIR = Path(__file__).resolve().parent
 BASE_CONFIG_PATH = BASE_DIR / "config.yaml"
 OUTPUT_CONFIG_PATH = BASE_DIR / "config_opti.yaml"
@@ -65,25 +68,41 @@ def objective(trial):
     }
 
 
+    # On charge en mémoire le fichier config de base "config.yaml"
     cfg = OmegaConf.load(BASE_CONFIG_PATH)
     for key, val in params.items():
-        OmegaConf.update(cfg, key, val)
+        # On applique les paramètres de la recherche actuelle à notre fichier config.yaml chargé en mémoire. 
+        # On ne modifie pas le fichier config.yaml sur disque mais uniquement en mémoire, uniquement pour la recherche
+        # La sauvegarde se fera à la fin de toutes les recherches (en sauvegardant les meilleurs paramètres) dans un autre fichier ("config_opti.yaml")
+        OmegaConf.update(cfg, key, val)   
 
+    # On lance une course et on récupère les dicitonnaire, contenant les infos de chaque team sur toutes les courses lancées
+    # race_jobs permet de spécifier le nombre de coeurs utilisés pour paralléliser les courses lancées quand on éxécute le main_loop()
+    # En tout, en parallélise les recherches ET les courses lancées.
+    # Note : Soyez raisonables avec les valeurs de race_jobs et de n_jobs (tout en bas, pour la recherche avec optuna) pour éviter les crasher lors des recherches.
     scores = main_loop(cfg, race_jobs=2)
 
-    donkey_positions = scores.dict["Donkey Bombs"][0]
-    mean_position = np.mean(donkey_positions)
+    # On récupère la liste des scores sur différentes courses de notre kart.
+    # Cette liste des scores se situe dans une liste qui est elle même une valeur du dictionnaire "scores"
+    donkey_positions = scores.dict["Donkey Bombs"][0]  
+    
+    mean_position = np.mean(donkey_positions)   # On calcule la position moyenne de notre kart sur les NB_RACES lancées dans multi_track_race
     print(f"Position moyenne : {mean_position:.1f}")
     return mean_position
 
 if __name__ == "__main__":
+
+    # On crée une étude/recherche
     study = optuna.create_study(direction="minimize")
+
+    # Puis on lance cette recherche
+    # n_trials : nombre de recherches à lancer. Chaque recherche s'accompagne de son lot de paramètres à évaluer sur le multi_track_race.
     study.optimize(objective, n_trials=5, show_progress_bar=True, n_jobs=2)
 
     print(f"\nMeilleur score : {study.best_value:.3f}")
     print(f"Meilleurs paramètres : {study.best_params}")
 
-    best_params = study.best_params
+    best_params = study.best_params  # On récupère le groupe de paramètres
     mapping = {
         # Brain
         "pilot.brain.kp": "kp",
@@ -134,9 +153,13 @@ if __name__ == "__main__":
     }
 
     
+    # On écrit dans le fichier config_opti.yaml les meilleurs paramètres.
     cfg = OmegaConf.load(BASE_CONFIG_PATH)
     for key, val in mapping.items():
         OmegaConf.update(cfg, key, best_params[val])
+
+    # On enregistre dans le fichier config_opti.yaml les meilleurs paramètres.
+    # C'est incroyable comment la technologie a évolué au fil du temps...
     OmegaConf.save(cfg, OUTPUT_CONFIG_PATH)
     print(f"{OUTPUT_CONFIG_PATH.name} mis à jour avec les meilleurs paramètres.")        
 
