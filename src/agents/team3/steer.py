@@ -70,6 +70,25 @@ class Steer(KartAgent):
         self.prev_err = err
         steer = max(-1.0, min(p_k * err + d_k * drv, 1.0))
 
+        k=3
+        if speed>15: 
+            k=4
+
+        decalage_x = abs(obs["paths_start"][k][0])
+        #print("speed", speed)
+        #print("decalage_x", decalage_x)
+
+        if(abs(decalage_x)>26.5):
+            if speed>18: 
+                brake=True 
+                acceleration=0.0
+
+            if 12<speed<17:
+                if acceleration>0.70:
+                    acceleration=0.70
+
+
+
         action = {
             "acceleration": 1.0,
             "steer": steer,
