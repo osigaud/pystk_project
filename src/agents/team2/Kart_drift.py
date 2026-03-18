@@ -135,3 +135,14 @@ class Kart_drift(Agent2):
         return acceleration, drift #on renvoie un tuple
  
  
+    #utiliser les cadeaux attrapés
+        #if obs["items_type"][0]==0:
+            #fire=True
+        #else:
+            #fire=False
+
+    #eviter les murs/ revenir sur la piste si kart bloqué
+        if abs(obs["center_path_distance"])> obs["paths_width"][0]/2:
+            rescue=True
+        else:
+            rescue=False
