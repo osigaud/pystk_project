@@ -8,6 +8,7 @@ from .agent5_BananaPilot import Agent5Banana
 #from .agent5_Rescue import Agent5Rescue
 from .agent5_NitroPilot import Agent5Nitro
 from .agent5_ItemPilot import Agent5Item
+from .agent5_AvoidKart import Agent5AvoidKart
 from omegaconf import OmegaConf 
 import os
 from .agent5_RescuePilot import Agent5Rescue
@@ -55,8 +56,11 @@ class Agent5(KartAgent):
         # On créer le pilote qui drift sur la piste
         self.drift = Agent5Drift(env, self.nitro, self.conf, path_lookahead)
 
+        # On l'enveloppe dans l'agent qui evite les karts
+        self.avoidkart = Agent5AvoidKart(env, self.drift, self.conf, path_lookahead)
+
         # On l'enveloppe dans l'agent qui esquive les bananes
-        self.banana = Agent5Banana(env, self.drift, self.conf, path_lookahead)
+        self.banana = Agent5Banana(env, self.avoidkart, self.conf, path_lookahead)
 
         # On l'enveloppe dans l'agent qui s'occupe de quand le kart est bloqué
         self.brain = Agent5Rescue(env, self.banana, self.conf, path_lookahead)
