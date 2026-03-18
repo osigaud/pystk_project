@@ -1,5 +1,8 @@
 from agents.kart_agent import KartAgent
 import numpy as np
+
+from agents.team1.agent_speed import AgentSpeed
+
 BUBBLEGUM = 1
 CAKE = 2
 BOWLING = 3
@@ -20,7 +23,7 @@ class AgentItems(KartAgent) :
         self.conf = conf
         self.agent = agent 
 
-    def is_bonus_close(selv, obs) :
+    def is_bonus_close(self, obs) :
         """Renvoie True si on est très proche d'une boîte cadeau, False sinon"""
         next_item = obs["items_position"][0]
         if obs["items_type"][0] == 0 : #BONUS BOX
@@ -132,9 +135,8 @@ class AgentItems(KartAgent) :
         Returns:
             dict: Action corrigée avec la clé `nitro` éventuellement activée.
         """
-
         nit = obs["energy"]
-        virage_serre = False
+        virage_serre = AgentSpeed.detecter_virage(self.conf, obs)
         if nit > 0.05 :
             act["nitro"] = True
         return act 
