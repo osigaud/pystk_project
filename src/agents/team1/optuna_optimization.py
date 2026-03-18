@@ -146,9 +146,9 @@ def main_loop():
     return scores
 """
 
-def run_once(dist, ajust):
+def run_once(dist, ajust, speed_threshold, steer_threshold, stop_drift_speed):
 
-    env, agents, names = create_race(dist, ajust)
+    env, agents, names = create_race(dist, ajust, speed_threshold, steer_threshold, stop_drift_speed )
     obs, _ = env.reset()
     done = False
     steps = 0
@@ -179,8 +179,13 @@ def objective(trial):
 
     dist = trial.suggest_float("dist", 0.2, 1.5)
     ajust = trial.suggest_float("ajust", 0.08, 0.9)
-
-    score = run_once(dist, ajust)
+    
+    #tester AgentDrift
+    speed_threshold = trial.suggest_float("speed_threshold",5.0, 15.0) 
+    steer_threshold = trial.suggest_float("steer_threshold", 0.1, 0.5) 
+    stop_drift_speed = trial.suggest_float("stop_drift_speed", 2.0, 8.0)
+    
+    score = run_once(dist, ajust, speed_threshold, steer_threshold, stop_drift_speed )
 
     return score  # plus petit = meilleure position
 

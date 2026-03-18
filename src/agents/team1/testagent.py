@@ -13,7 +13,6 @@ from dataclasses import dataclass
 # Append the "src" folder to sys.path.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src"))) #Changement du path ici pour que ce soit adapté
 
-from agents.team1.agent_base import AgentInit 
 from agents.team1.agent_center import AgentCenter
 from agents.team1.agent_speed import AgentSpeed
 from agents.team1.agent_obstacles import AgentObstacles
@@ -59,7 +58,6 @@ class Scores:
                     f"""<td>{np.array(self.dict[k][1]).mean():.2f}</td>"""
                     "</tr>"
                 )
-            
 
 default_action = {
             "acceleration": 0.0,
@@ -95,7 +93,7 @@ def create_race():
     names = []
 
     agents.append(Agent1(env, path_lookahead=3))
-    agents.append(AgentSpeed(env, path_lookahead=3)) 
+    agents.append(Agent1(env, path_lookahead=3)) 
     
     #Pour pas que ça mélange la liste d'agents et qu'on puisse récupérer les données de notre agent plus facilement
     #np.random.shuffle(agents) 
@@ -161,7 +159,6 @@ def main_loop():
     scores.display_mean()
     return scores
 
-
 def output_html(output: Path, scores: Scores):
     # Use https://github.com/tofsjonas/sortable?tab=readme-ov-file#1-link-to-jsdelivr
     with output.open("wt") as fp:
@@ -197,8 +194,6 @@ def output_html(output: Path, scores: Scores):
 """
         )
         fp.write("""</body>""")
-
-
 
 if __name__ == "__main__":
     scores = main_loop()

@@ -5,15 +5,20 @@ from agents.kart_agent import KartAgent
 
 class Agent5Mid(KartAgent):
     """
-    Agent de base 'Donkey Bombs Mid'.
-    Responsable du suivi de piste principal en utilisant un contrôle PD (Proportionnel-Dérivé)
-    et une gestion d'anticipation dynamique basée sur la vitesse du kart.
+    Agent de base 'Donkey Bombs Mid'
+    Responsable du suivi de piste principal en utilisant un contrôle Proportionnel-Dérivé
+    et une gestion d'anticipation dynamique basée sur la vitesse du kart
     """
-    # AGENT DE BASE : Sa seule responsabilité est de suivre la piste avec anticipation.
+    # AGENT DE BASE : Sa seule responsabilité est de suivre la piste avec anticipation
     def __init__(self, env, conf, path_lookahead=3):
         """
         Initialise l'agent avec les paramètres de configuration YAML.
-        Définit les gains du contrôleur (Kp, Kd) et les distances de visée (lookahead).
+        Définit les gains du contrôleur (Kp, Kd) et les distances de visée (lookahead)
+
+        Args:
+            env (obj): L'environnement de simulation SuperTuxKart
+            conf (OmegaConf): Objet de configuration chargé depuis le YAML
+            path_lookahead (int): Nombre de points de cheminement à anticiper (défaut: 3)
         """
         super().__init__(env)
         self.path_lookahead = path_lookahead
@@ -28,30 +33,32 @@ class Agent5Mid(KartAgent):
         self.ahead_dist = self.conf.pilot.navigation.lookahead_meters
 
         self.last_error = 0.0   # Contient l'erreur de l'angle précédent 
-        self.stuck_counter = 0  # Compte le temps passé bloqué contre un mur si kart bloqué
-        self.last_distance = 0.0
-        self.is_rescuing = False
 
         self.lookahead_factor = self.conf.pilot.navigation.lookahead_speed_factor
         self.lookahead_max = self.conf.pilot.navigation.lookahead_max
         self.hairpin_threshold = self.conf.pilot.speed_control.hairpin_threshold
         self.hairpin_accel = self.conf.pilot.speed_control.hairpin_accel
         self.hairpin_brake_speed = self.conf.pilot.speed_control.hairpin_brake_speed
-        self.rescue_duration = self.conf.pilot.rescue.rescue_duration
 
     def reset(self):
-        """Réinitialise les variables d'état de l'agent au début d'une course."""
+        """Réinitialise les variables d'état de l'agent au début d'une course"""
         self.obs, _ = self.env.reset()
-        self.stuck_counter = 0
         self.last_error = 0.0
-        self.is_rescuing = False
 
     def position_track(self, obs):
         """
-        Analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique.
-        La distance de visée (lookahead) augmente proportionnellement à la vitesse.
+        Analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique
+        La distance de visée (lookahead) augmente proportionnellement à la vitesse
+
+        Args:
+            obs (dict): Dictionnaire contenant les observations de l'environnement
+
+        Returns:
+            tuple: (target_vector[0], target_vector[2])
+                - target_vector[0] (float): Écart latéral (x) du point cible
+                - target_vector[2] (float): Distance frontale (z) du point cible
         """
-        # La fonction analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique.
+        # La fonction analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique
         paths = obs['paths_end']
 
         if len(paths) == 0:
@@ -79,18 +86,27 @@ class Agent5Mid(KartAgent):
 
     def compute_turning(self, x, z):
         """
-        Calcule l'angle du volant (steering) en fonction des distances (x, z).
-        Utilise un gain Proportionnel (Kp) pour la direction et un gain Dérivé (Kd) comme amortisseur.
-        """
-        # La fonction calcule l'angle du volant en fonction des distances (x, z).
+        Calcule l'angle du volant (steering) en fonction des distances (x, z)
+        Utilise un gain Proportionnel (Kp) pour la direction et un gain Dérivé (Kd) comme amortisseur
 
-        # On évite de diviser par zéro si le point est trop proche.
+        Args:
+            x (float): Écart latéral par rapport au point cible
+            z (float): Distance frontale par rapport au point cible
+
+        Returns:
+            tuple: (steering_normalise, z)
+                - steering_normalise (float): Valeur de braquage limitée entre -1 et 1
+                - z (float): Distance frontale ajustée (sécurité minimale)
+        """
+        # La fonction calcule l'angle du volant en fonction des distances (x, z)
+
+        # On évite de diviser par zéro si le point est trop proche
         if z < self.conf.pilot.navigation.min_dist_safety:
             z = self.conf.pilot.navigation.min_dist_safety
 
-        # On imagine ici un triangle rectangle où x est le côté opposé et z le côté adjacent.
-        # Pour simplifier, on utilise directement le ratio x / z comme erreur.
-        # plus x est grand (loin du centre), plus l'angle est grand.
+        # On imagine ici un triangle rectangle où x est le côté opposé et z le côté adjacent
+        # Pour simplifier, on utilise directement le ratio x / z comme erreur
+        # plus x est grand (loin du centre), plus l'angle est grand
         error_angle = x / z
 
         # La dérivée mesure la vitesse à laquelle on corrige l'erreur.
@@ -109,62 +125,37 @@ class Agent5Mid(KartAgent):
 
     def manage_speed(self, obs, steering, z):
         """
-        Gère l'accélération, le freinage et la logique de sauvetage (rescue).
-        Réduit la vitesse en virage et gère les épingles serrées (hairpin).
+        Gère l'accélération, le freinage et la logique de sauvetage (rescue)
+        Réduit la vitesse en virage et gère les épingles serrées (hairpin)
+
+        Args:
+            obs (dict): Dictionnaire contenant les observations de l'environnement
+            steering (float): Valeur de braquage actuelle calculée
+            z (float): Distance frontale au point cible
+
+        Returns:
+            tuple: (accel, brake, steering)
+                - accel (float): Valeur d'accélération calculée
+                - brake (bool): Indique si le frein doit être activé
+                - steering (float): Valeur de braquage potentiellement modifiée (ex: rescue)
         """
         dist_now = obs['distance_down_track']
         velocity = obs['velocity']
         speed = np.linalg.norm(velocity)
 
-        # On commence par la vitesse d'accélération par défaut configurée.
+        # On commence par la vitesse d'accélération par défaut configurée
         accel = self.conf.pilot.speed_control.default_accel
         brake = False
 
-        if self.is_rescuing :
-            self.stuck_counter += 1
-            # On recule pendant X frames
-            if self.stuck_counter < self.rescue_duration :
-                accel = 0.0
-                brake = True
-                steering = -steering # On inverse le volant pour s'extraire
-                return accel, brake, steering
-            else:
-                # Reset des paramètres maintenant que notre mission "rescue" a été accomplie
-                self.is_rescuing = False
-                self.stuck_counter = 0
-                self.last_distance = dist_now   # last_distance est la distance par rapport à la ligne de départ de la frame précédente
-
-        
-        # Structure conditionnel nous permettant d'activer is_rescuing :
-        # On commence par vérifier si on a dépassé la ligne de départ
-        elif dist_now > self.conf.pilot.rescue.active_after_meters :
-
-            # On calcule de combien on a avancé depuis la frame précédente
-            # On utilise une petite marge (ex : 0.01) car même bloqué, le kart peut trembler et donc causer de "légers déplacements"
-            if abs(dist_now - self.last_distance) < self.conf.pilot.rescue.stuck_diff_dist_epsilon :
-                self.stuck_counter += 1
-            else:
-                self.stuck_counter = 0
-
-            # Mise à jour de la mémoire pour la prochaine frame 
-            self.last_distance = dist_now 
-
-            if self.stuck_counter > self.conf.pilot.rescue.stuck_frames_limit:
-                self.is_rescuing = True
-                self.stuck_counter = 0
-        else:
-            # Si on roule, on reset le compteur de blocage.
-            self.stuck_counter = 0
-
-        # Virage standard : on ralentit un peu si le volant dépasse un certain seuil.
+        # Virage standard : on ralentit un peu si le volant dépasse un certain seuil
         if abs(steering) > self.conf.pilot.speed_control.steering_threshold:
             accel = self.conf.pilot.speed_control.cornering_accel
 
         # Si le volant est braqué à fond
         if abs(steering) > self.hairpin_threshold:
-            # On réduit fortement l'accélération pour permettre au kart de pivoter sur lui-même.
+            # On réduit fortement l'accélération pour permettre au kart de pivoter sur lui-même
             accel = self.hairpin_accel
-            # Si on arrive trop vite dans l'épingle, on force un coup de frein.
+            # Si on arrive trop vite dans l'épingle, on force un coup de frein
             if speed > self.hairpin_brake_speed:
                 brake = True
 
@@ -172,8 +163,14 @@ class Agent5Mid(KartAgent):
 
     def choose_action(self, obs):
         """
-        Méthode principale orchestrant la lecture de la piste, le braquage et la vitesse.
-        Retourne le dictionnaire d'actions final.
+        Méthode principale orchestrant la lecture de la piste, le braquage et la vitesse
+        Retourne le dictionnaire d'actions final
+
+        Args:
+            obs (dict): Dictionnaire contenant les observations de l'environnement
+
+        Returns:
+            dict: Dictionnaire d'actions (acceleration, steer, brake, drift, nitro, rescue, fire)
         """
         target_x, target_z = self.position_track(obs)
         steering, z = self.compute_turning(target_x, target_z)
