@@ -72,3 +72,8 @@ unblock_steps_default : 6
 
 
 #AgentDrift
+speed_threshold: 7.0
+steer_threshold: 0.4 
+stop_drift_speed: 4.0 
+#max_steer_angle_petit et frein_virage dans AgentSpeed
+
