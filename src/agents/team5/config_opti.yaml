@@ -47,3 +47,7 @@ drift:
   exit_target_threshold: 0.38822082889023735
   cooldown_frames: 8
   drift_accel: 0.6
+avoid_karts:
+  safe_distance: 8
+  avoid_steer: 0.3
+  side_threshold: 2 
