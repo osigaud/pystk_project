@@ -50,23 +50,27 @@ class AccelerationControl:
         ## @var anticipe_kart
         #  @brief Instance utilisée pour mesurer la courbure à chaque step.
         self.anticipe_kart = AnticipeKart()
-
+        # configuration des valeurs attribuées aux attributs d'instance
+        self.amax = 1.0
+        self.virage_tres_serré = cfg.acceleration.virage_tres_serré
+        self.virage_serré = cfg.acceleration.virage_serré
+        self.virage_moyen = cfg.acceleration.virage_moyen
     ## @brief   Retourne l'accélération adaptée à la situation courante.
     #
     #  @param   obs  Dictionnaire d'observation retourné par l'environnement.
     #  @return  float : valeur d'accélération dans [0.0, 1.0].
     #  @see     AnticipeKart.detectVirage()
     def adapteAcceleration(self, obs):
-        acceleration = 1.0
+        acceleration = self.amax
         curvature = abs(self.anticipe_kart.detectVirage(obs))  # valeur absolue de l'angle
 
         if curvature > self.seuildrift:
             # virage très serré : fort freinage anticipé
-            acceleration = 0.80
+            acceleration = self.virage_tres_serré
         elif curvature > self.serreri1 and curvature <= self.serreri2:  # virage serré
-            acceleration = 0.85
+            acceleration = self.virage_serré
         elif curvature > self.moyeni1 and curvature <= self.moyeni2:    # virage moyen
-            acceleration = 0.95
+            acceleration = self.virage_moyen
         else:
             # ligne droite ou courbe très légère : pleine accélération
             acceleration = 1.0

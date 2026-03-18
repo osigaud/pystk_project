@@ -1,5 +1,8 @@
 acceleration:
-  sans_virage: 1.0
+  virage_tres_serré : 0.8
+  virage_serré : 0.85
+  virage_moyen : 0.95
+  virage : 1.0 
 # pour la fonction reaction_items
 
 angle_evite_n: -0.61
