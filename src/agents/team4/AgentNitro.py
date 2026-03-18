@@ -1,21 +1,35 @@
-class Nitro:
+from omegaconf import DictConfig
+
+class AgentNitro:
 
     """
-    Module Nitro : Gère la logique d'activation du nitro
+    Module Agent Expert Nitro : Gère la logique d'activation du nitro
     """
     
-    def manage_nitro(self,steer,energy,obs):
+    def __init__(self,config : DictConfig) -> None:
+        """Initialise les variables d'instances de l'agent."""
+        
+        self.c = config
+        """@private"""
+
+    def reset(self) -> None:
+        """Réinitialise les variables d'instances de l'agent expert"""
+        pass
+    
+    def manage_nitro(self,obs : dict,steer : float,energy : float) -> bool:
 
         """
         Gère l'activation du nitro
 
         Args:
+            
             obs(dict) : Les données fournies par le simulateur.
             steer(float) : Angle de braquage des roues.
             energy(float) : Mesure donnant le taux restant de nitro.
         
         Returns:
-            bool : Variable permettant d'affirmer ou non l'utilisation du nitro
+            
+            bool : Variable permettant d'affirmer ou non l'utilisation du nitro.
         """
         
         points = obs['paths_start'] # Récupération des points 
@@ -27,7 +41,7 @@ class Nitro:
         
         nit = False
         # On active le nitro si on s'est assure qu'aucun virage serre n'arrive
-        if (energy > 0.5 and abs(steer) < 0.45 and abs(target_now)<=5 and abs(target_soon) <= 5 and target_late <= 7):
+        if (energy > self.c.seuil_energy and abs(steer) < self.c.seuil_steer and abs(target_now)<= self.c.seuil_target_now and abs(target_soon) <= self.c.seuil_target_soon and target_late <= self.c.seuil_target_late):
             nit = True
         return nit
 
