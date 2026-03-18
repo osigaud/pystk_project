@@ -3,16 +3,21 @@ from agents.kart_agent import KartAgent
 
 class Agent5Drift(KartAgent):
     """
-    Agent 'Donkey Drift'.
-    Ce wrapper gère spécifiquement les phases de dérapage contrôlé (drift) dans les épingles.
+    Agent 'Donkey Drift'
+    Ce wrapper gère spécifiquement les phases de dérapage contrôlé (drift) dans les épingles
     Il utilise une double anticipation (regard lointain pour l'entrée, regard proche pour la sortie)
-    pour optimiser la trajectoire et conserver une vitesse de sortie élevée.
+    pour optimiser la trajectoire et conserver une vitesse de sortie élevée
     """
-    # AGENT DRIFT : Il gère les dérapages dans les épingles en anticipant la courbure de la piste.
+    # AGENT DRIFT : Il gère les dérapages dans les épingles en anticipant la courbure de la piste
     def __init__(self, env, pilot_agent, conf, path_lookahead=3):
         """
-        Initialise l'agent de drift avec les paramètres de seuils de détection,
-        de sécurité et de physique de glisse définis dans le fichier YAML.
+        Initialise l'agent de drift avec les paramètres de configuration
+
+        Args:
+            env (obj): L'environnement de simulation SuperTuxKart
+            pilot_agent (obj): L'agent pilote enveloppé (MidPilot ou NitroPilot)
+            conf (OmegaConf): Configuration contenant les paramètres de drift (seuils, cooldown)
+            path_lookahead (int): Nombre de points de cheminement à anticiper
         """
         super().__init__(env)
         self.conf = conf
@@ -43,9 +48,17 @@ class Agent5Drift(KartAgent):
 
     def choose_action(self, obs):
         """
-        Arbitre l'activation du drift en analysant la courbure de la piste à longue distance.
-        Si le drift est actif, il remplace les commandes du pilote par des paramètres de glisse.
-        Sinon, il laisse le contrôle au pilote de base (MidPilot).
+        Arbitre l'activation du drift en analysant la courbure de la piste
+        
+        La méthode utilise une logique à deux niveaux :
+        1. Entrée : Détectée par `far_target_x` et confirmée sur `confirm_limit` frames
+        2. Sortie : Déclenchée quand `near_target_x` repasse sous un seuil ou si le kart dévie trop
+
+        Args:
+            obs (dict): Dictionnaire des observations (vitesse, chemins, position)
+
+        Returns:
+            dict: Action finale modifiée (ou non) par la logique de dérapage
         """
         # On récupère l'action calculée par le Mid Pilot
         action = self.pilot.choose_action(obs)
