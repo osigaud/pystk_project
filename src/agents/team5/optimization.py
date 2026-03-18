@@ -80,15 +80,23 @@ def objective(trial):
     # race_jobs permet de spécifier le nombre de coeurs utilisés pour paralléliser les courses lancées quand on éxécute le main_loop()
     # En tout, en parallélise les recherches ET les courses lancées.
     # Note : Soyez raisonables avec les valeurs de race_jobs et de n_jobs (tout en bas, pour la recherche avec optuna) pour éviter les crasher lors des recherches.
-    scores = main_loop(cfg, race_jobs=2)
+    scores = main_loop(cfg, race_jobs=7)
 
     # On récupère la liste des scores sur différentes courses de notre kart.
     # Cette liste des scores se situe dans une liste qui est elle même une valeur du dictionnaire "scores"
     donkey_positions = scores.dict["Donkey Bombs"][0]  
+    # écart-type moyen inter-course. C'est l'écart-type décrivant les variations de places entre les courses
+    donkey_std_between_races = np.std(donkey_positions)
     
     mean_position = np.mean(donkey_positions)   # On calcule la position moyenne de notre kart sur les NB_RACES lancées dans multi_track_race
+    mean_std = np.mean(donkey_std_between_races) 
+
     print(f"Position moyenne : {mean_position:.1f}")
-    return mean_position
+    print(f"Variance moyenne : {mean_std:.1f}")
+
+    alpha = 1
+    beta = 0.5
+    return alpha * mean_position + beta * mean_std
 
 if __name__ == "__main__":
 
@@ -97,7 +105,7 @@ if __name__ == "__main__":
 
     # Puis on lance cette recherche
     # n_trials : nombre de recherches à lancer. Chaque recherche s'accompagne de son lot de paramètres à évaluer sur le multi_track_race.
-    study.optimize(objective, n_trials=5, show_progress_bar=True, n_jobs=2)
+    study.optimize(objective, n_trials=100, show_progress_bar=True, n_jobs=3)
 
     print(f"\nMeilleur score : {study.best_value:.3f}")
     print(f"Meilleurs paramètres : {study.best_params}")

@@ -1,20 +1,20 @@
 pilot:
   brain:
-    kp: 3.7252270125148126
-    kd: 5.62211633935985
+    kp: 9
+    kd: 4
   navigation:
-    lookahead_meters: 9.147169540332644
-    lookahead_max: 10.372563981466936
-    min_dist_safety: 0.9072560322209484
+    lookahead_meters: 8
+    lookahead_max: 10
+    min_dist_safety: 2.4801668430326633
     apex_offset: 0.65
-    lookahead_speed_factor: 0.3497824548094069
+    lookahead_speed_factor: 0.10953090906358806
   speed_control:
     default_accel: 1.0
-    cornering_accel: 0.36410785823113834
-    steering_threshold: 0.8606926773308288
-    hairpin_threshold: 0.7403301190158523
-    hairpin_accel: 0.5501910460099804
-    hairpin_brake_speed: 23.96812081664264
+    cornering_accel: 0.7422392714016787
+    steering_threshold: 0.4466309463298246
+    hairpin_threshold: 0.7108221329867139
+    hairpin_accel: 0.3083483982297248
+    hairpin_brake_speed: 8.487089338012739
   rescue:
     stuck_frames_limit: 60
     active_after_meters: 10
@@ -22,28 +22,28 @@ pilot:
     rescue_duration: 30
 banana:
   detection:
-    max_distance: 11.247462958372994
-    safety_width: 1.3430822997358949
+    max_distance: 10.11787136422409
+    safety_width: 1.862729416714562
   avoidance:
-    steering_force: 0.8275655619401545
-    acceleration: 0.10593644803415472
+    steering_force: 0.7045267951630378
+    acceleration: 0.16758491765681882
   edge_safety:
-    max_center_dist: 6.244842291374678
-    steering_correction: 0.7098304731442835
-    correction_accel: 0.5057093588664858
+    max_center_dist: 8.0439139831209316
+    steering_correction: 0.832489095326997
+    correction_accel: 0.6252053046546346
 nitro:
   detection:
-    steering_threshold_nitro: 0.18655671352747366
-    min_acceleration: 0.5621330912234213
+    steering_threshold_nitro: 0.4404211270076367
+    min_acceleration: 0.6166195263114425
 drift:
-  drift_steer_angle: 0.9699181944659263
-  far_lookahead: 10.250959559563652
-  near_lookahead: 7.916288011907097
-  far_target_threshold: 4.087919088467684
-  steer_trigger: 0.5960009527622006
-  confirmation_frames: 7
-  min_speed: 12.196529836748395
-  max_dist_center: 3.4500883279709424
-  exit_target_threshold: 0.41835747581817684
-  cooldown_frames: 5
-  drift_accel: 0.6994018855996514
+  drift_steer_angle: 0.5
+  far_lookahead: 14
+  near_lookahead: 2.716552385567403
+  far_target_threshold: 1.8882054480896024
+  steer_trigger: 0.86
+  confirmation_frames: 5
+  min_speed: 14
+  max_dist_center: 4
+  exit_target_threshold: 0.38822082889023735
+  cooldown_frames: 8
+  drift_accel: 0.6
