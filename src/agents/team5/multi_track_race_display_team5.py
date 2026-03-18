@@ -10,24 +10,32 @@ import numpy as np
 from datetime import datetime
 from pathlib import Path
 from dataclasses import dataclass
+from omegaconf import OmegaConf
 
+# Permet la parallélisation des courses.
+from concurrent.futures import ProcessPoolExecutor, as_completed
+
+
+SRC_DIR = Path(__file__).resolve().parents[2]
+MAIN_DIR = SRC_DIR / "main"
+
+os.chdir(MAIN_DIR)
+sys.path.append(str(SRC_DIR))
 
 # Append the "src" folder to sys.path.
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "src")))
 
 from agents.team1.agent1 import Agent1
 from agents.team2.agent2 import Agent2
 from agents.team3.agent3 import Agent3
 from agents.team4.agent4 import Agent4
 from agents.team5.agent5 import Agent5
-from agents.team6.agent6 import Agent6
-from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 5
-NB_RACES = 10
-MAX_STEPS = 850
+NB_RACES = 1   # Nombre de courses à chaque fois qu'on lance multi_track_race_team5
+MAX_STEPS = 1300
 
 # Get the current timestamp
 current_timestamp = datetime.now()
@@ -41,18 +49,19 @@ class Scores:
         self.dict = {}
     
     def init(self, name):
-        self.dict[name] = [[], []]
+        self.dict[name] = [[], [], []]
 
-    def append(self, name, pos, std):
+    def append(self, name, pos, pos_std, steps):
         self.dict[name][0].append(pos)
-        self.dict[name][1].append(std)
+        self.dict[name][1].append(pos_std)
+        self.dict[name][2].append(steps)
 
     def display(self):
         print(self.dict)
 
     def display_mean(self):
         for k in self.dict:
-            print(f"{k}: {np.array(self.dict[k][0]).mean()}, {np.array(self.dict[k][1]).mean()}")
+            print(f"{k}: {np.array(self.dict[k][0]).mean()}, {np.array(self.dict[k][1]).mean()}, {np.array(self.dict[k][2]).mean()}, {np.array(self.dict[k][2]).std()}")
 
     def display_html(self, fp):
         for k in self.dict:
@@ -60,6 +69,8 @@ class Scores:
             fp.write(
                     f"""<td>{np.array(self.dict[k][0]).mean():.2f}</td>"""
                     f"""<td>{np.array(self.dict[k][1]).mean():.2f}</td>"""
+                    f"""<td>{np.array(self.dict[k][2]).mean():.2f}</td>"""
+                    f"""<td>{np.array(self.dict[k][2]).std():.2f}</td>"""
                     "</tr>"
                 )
             
@@ -85,12 +96,12 @@ agents_specs = [
     AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.ON) for i in range(MAX_TEAMS)
 ]
 
-def create_race():
+def create_race(cfg=None):
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)
+        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode=None, num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
     else:
-        env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
+        env = STKRaceMultiEnv(agents=agents_specs, render_mode=None, num_kart=MAX_TEAMS)
 
     # Instantiate the agents.
 
@@ -101,65 +112,110 @@ def create_race():
     agents.append(Agent2(env, path_lookahead=3))
     agents.append(Agent3(env, path_lookahead=3))
     agents.append(Agent4(env, path_lookahead=3))
-    agents.append(Agent5(env, path_lookahead=3))
-    #agents.append(Agent6(env, path_lookahead=3))
-    #agents.append(Agent7(env, path_lookahead=3))
+    agents.append(Agent5(env, path_lookahead=3, cfg=None))   # On donne le fichier de configuration chargé en mémoire à notre Agent5
     np.random.shuffle(agents)
 
     for i in range(MAX_TEAMS):
-        names.append(agents[i].name)        
+        names.append(agents[i].name)
         agents_specs[i].name = agents[i].name
+        agents_specs[i].kart = agents[i].name
     return env, agents, names
 
 
-def single_race(env, agents, names, scores):
+def single_race(cfg=None):
+    env, agents, names = create_race(cfg)
     obs, _ = env.reset()
     done = False
     steps = 0
+    nb_finished = 0
     positions = []
+
+    for i in range(MAX_TEAMS):
+        agents[i].steps = MAX_STEPS
+
     while not done and steps < MAX_STEPS:
         actions = {}
+        env.world_update()
+
         for i in range(MAX_TEAMS):
-            str = f"{i}"
+            key = f"{i}"
             try:
-                actions[str] = agents[i].choose_action(obs[str])
+                actions[key] = agents[i].choose_action(obs[key])
             except Exception as e:
                 print(f"Team {i+1} error: {e}")
-                actions[str] = default_action
-        obs, _, terminated, truncated, info = env.step(actions)
-        #print(f"{info['infos']}")
+                actions[key] = default_action
+
+            kart = env.world.karts[i]
+            if kart.has_finished_race and not agents[i].isEnd:
+                print(f"{names[i]} has finished the race at step {steps}")
+                nb_finished += 1
+                agents[i].isEnd = True
+                agents[i].steps = steps
+
+        obs, _, _, _, info = env.step(actions)
+
         pos = np.zeros(MAX_TEAMS)
-        dist = np.zeros(MAX_TEAMS)
         for i in range(MAX_TEAMS):
-            str = f"{i}"
-            pos[i] = info['infos'][str]['position']
-            dist[i] = info['infos'][str]['distance']
-        # print(f"{names}{dist}")
-        steps = steps + 1
-        done = terminated or truncated
+            key = f"{i}"
+            pos[i] = info["infos"][key]["position"]
+
+        steps += 1
+        done = (nb_finished == MAX_TEAMS)
         positions.append(pos)
-    avg_pos = np.array(positions).mean(axis=0)
-    std_pos = np.array(positions).std(axis=0)
-    for i in range(MAX_TEAMS):
-        scores.append(names[i], avg_pos[i], std_pos[i])
 
-def main_loop():
+    pos_avg = np.array(positions).mean(axis=0)
+    pos_std = np.array(positions).std(axis=0)
+
+    race_data = []
+    for i in range(MAX_TEAMS):
+        if not agents[i].isEnd:
+            race_data.append((names[i], 5, 5, MAX_STEPS))
+        else:
+            race_data.append((names[i], pos_avg[i], pos_std[i], agents[i].steps))
+
+    env.close()
+    print("race duration:", steps)
+    return race_data
+
+def single_race_worker(cfg_dict):
+    cfg = OmegaConf.create(cfg_dict) if cfg_dict is not None else None
+    return single_race(cfg)
+
+def main_loop(cfg=None, race_jobs=1):
     scores = Scores()
-    #unsatisfactory: first call just to init the names
-    env, agents, names = create_race()
-    for i in range(MAX_TEAMS):
-        scores.init(names[i])
 
-    for j in range(NB_RACES):
-        print(f"race : {j}")
-        env, agents, names = create_race()
-        single_race(env, agents, names, scores)
+    env, agents, names = create_race(cfg)
+    env.close()
 
-        env.close()
+    for name in names:
+        scores.init(name)
+
+    if race_jobs == 1:
+        for j in range(NB_RACES):
+            print(f"race : {j}")
+            race_data = single_race(cfg)
+            for name, pos, pos_std, steps in race_data:
+                scores.append(name, pos, pos_std, steps)
+    else:
+        cfg_dict = OmegaConf.to_container(cfg, resolve=True) if cfg is not None else None
+
+        # On crée un pool de processus en parallèle
+        with ProcessPoolExecutor(max_workers=race_jobs) as executor:
+
+            # Chaque tâche correspond à UNE course parmis toutes les NB_RACES courses d'une recherche
+            futures = [
+                executor.submit(single_race_worker, cfg_dict)
+                for _ in range(NB_RACES)
+            ]
+
+            # "as_completed" permet de traiter les courses dès qu'elles se terminent
+            for j, future in enumerate(as_completed(futures)):
+                print(f"race terminée : {j}")
+                race_data = future.result()
+                for name, pos, pos_std, steps in race_data:
+                    scores.append(name, pos, pos_std, steps)
 
     print("final scores:")
-    scores.display()
-    scores.display_mean()
     return scores
 
 
@@ -178,6 +234,8 @@ def output_html(output: Path, scores: Scores):
     <tr>
       <th class="no-sort">Name</th>
       <th id="position">Avg. position</th>
+      <th class="no-sort">±</th>
+      <th id="position">Avg. steps</th>
       <th class="no-sort">±</th>
     </tr>
   </thead>
@@ -199,8 +257,7 @@ def output_html(output: Path, scores: Scores):
         )
         fp.write("""</body>""")
 
-
-
+        
 if __name__ == "__main__":
     scores = main_loop()
     output_html(Path("../../docs/index.html"), scores)
