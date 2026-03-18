@@ -20,24 +20,24 @@ ajust : 0.6386812473361506
 
 #AgentSpeed
 # seuil à partir duquel on considère l'écart entre le front du kart et la direction du segment
-ecartpetit : 2.9
-ecartgrand : 3
+ecartpetit : 3.1052264371860465
+ecartgrand : 3.3379507231468204
 
 # seuil à partir duquel on considère que la capacité à tourner le volant selon la vitesse(max_steer_angle)
-max_steer_angle_petit : 0.2
-max_steer_angle_grand : 0.9
+max_steer_angle_petit : 0.25695886258961403
+max_steer_angle_grand : 0.9824233440624094
 
 #vitesse max ligne droite
-accel_ligne_droite : 2
+accel_ligne_droite : 3.2936037808932275
 
 #ralentissement dans un virage serré
-frein_virage : 0.25
+frein_virage : 0.13929755500933277
 
 #acceleration sortie de virage
-accel_virage : 0.5
+accel_virage : 0.7532895208471412
 
 #distance a partir de laquelle on reagit a un segment
-dist_segment : 6
+dist_segment : 7.6537214237813975
 
 
 
