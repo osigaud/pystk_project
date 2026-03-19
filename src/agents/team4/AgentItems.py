@@ -38,7 +38,7 @@ class AgentItems:
         
         """
         
-        item = int(obs.get("powerup", 0))
+        item = int(obs.get("powerup_type", 0))
 
         # Bubblegum Cake Switch
         if item in (1, 2, 6):

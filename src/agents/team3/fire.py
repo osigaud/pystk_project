@@ -17,7 +17,7 @@ class Fire(KartAgent):
         # Notre kart utilise les items si et seulement si un kart est devant nous
         # Cette fois-ci on utilise l'angle pour mieux cibler les karts adverses et faire mouche
          
-        if obs["powerup"] != 0: 
+        if obs["powerup_count"] != 0: 
             karts = obs["karts_position"]
             for kart in karts:
                 kart_x, kart_z = kart[0], kart[2]

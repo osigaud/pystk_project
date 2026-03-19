@@ -52,7 +52,7 @@ class Agent4(KartAgent):
         """@private"""
         self.expert_drift = AgentDrift(self.conf.drift)
         """@private"""
-        self.expert_items = AgentItems(self.conf.powerup, self.conf.steering)
+        self.expert_items = AgentItems(self.conf.powerup_type, self.conf.steering)
         """@private"""
         #print(OmegaConf.to_yaml(conf))
         
