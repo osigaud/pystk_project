@@ -19,6 +19,8 @@ speed:
   acceleration_low : 0.3
   acceleration_czero : 0.05
   acceleration_drift : 0.6
+  curvature_gain : 2.5
+  vitesse_max : 1.0
 
 steering:
   empattement : 2.5
