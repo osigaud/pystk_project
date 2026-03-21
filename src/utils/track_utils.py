@@ -133,7 +133,7 @@ def compute_curvature(nodes):
     direction_changes = []
     for i in range(len(nodes) - 1):
         dx = nodes[i + 1][0] - nodes[i][0]  # Extract X
-        dy = nodes[i + 1][1] - nodes[i][1]  # Extract Y
+        dy = nodes[i + 1][1] - nodes[i][2]  # Extract Z
         angle = np.arctan2(dy, dx)
         direction_changes.append(angle)
 
@@ -158,22 +158,18 @@ def compute_slope(nodes):
     
     node1, node2 = np.asarray(nodes[0]), np.asarray(nodes[1])
     
-    dz = node2[2] - node1[2]  # Height difference (z-axis in kart referential)
+    dy = node2[1] - node1[1]  # Height difference (Y-axis in kart referential)
     dx = node2[0] - node1[0]  # X-axis distance
-    dy = node2[1] - node1[1]  # Y-axis distance
-    distance = np.sqrt(dx**2 + dy**2)  # Compute horizontal distance
+    dz = node2[2] - node1[2]  # Z-axis distance
+    distance = np.sqrt(dx**2 + dz**2)  # Compute horizontal distance
 
     if distance == 0:
         return 0  # Avoid division by zero
 
-    slope = dz / distance  # Gradient of the slope
-
-    # Ensure that the slope is positive when going uphill and negative when going downhill
-    uphill = dz > 0  # True if climbing
-    adjusted_slope = slope if uphill else -abs(slope)
+    slope = dy / distance  # Gradient of the slope
 
     # print(f"Computed Slope: {adjusted_slope}")
-    return adjusted_slope
+    return slope
 
 
 
