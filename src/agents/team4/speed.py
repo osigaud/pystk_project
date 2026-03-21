@@ -33,11 +33,11 @@ class SpeedController:
         """
         points = obs.get("paths_start",[]) # On récupère la liste des points
 
-        p1 = np.array(points[1][:2]) # on recupère plusieurs points espacés pour regarder plus loin sur la piste
-        p2 = np.array(points[2][:2])
-        p3 = np.array(points[3][:2])
-        p4 = np.array(points[4][:2])
-        p5 = np.array(points[5][:2])
+        p1 = np.array(points[1][:3]) # on recupère plusieurs points espacés pour regarder plus loin sur la piste
+        p2 = np.array(points[2][:3])
+        p3 = np.array(points[3][:3])
+        p4 = np.array(points[4][:3])
+        p5 = np.array(points[5][:3])
 
         v1 = p2 - p1 #on calcule chaque vecteurs ce qui nous permet d'avoir la direction de la piste
         v2 = p3 - p2
