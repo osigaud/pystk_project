@@ -78,7 +78,7 @@ opponent:
   radar_x : 0.8
   radar_zmin : 0.1
   radar_zmax : 1.3
-  decalage_lateral : 2.0
+  decalage_lateral : 4.0
   default_gain : 7.0
 
 nitro:
