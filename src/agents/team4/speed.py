@@ -17,14 +17,12 @@ class SpeedController:
         """Réinitialise les variables d'instances de l'agent expert"""
         pass
     
-    def manage_speed(self,speed:float,drift:bool,obs:dict) -> tuple[float,bool]:
+    def manage_speed(self,obs:dict) -> tuple[float,bool]:
         """
         Gère l'accélération.
 
         Args:
             
-            speed(float) : Vitesse de l'agent.
-            drift(bool) : Booléen disant si l'agent drift ou non.
             obs(dict) : Les données fournies par le simulateur.
         
         Returns:

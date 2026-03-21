@@ -56,6 +56,7 @@ class Agent4(KartAgent):
         self.expert_items = AgentItems(self.conf.powerup_type, self.conf.steering)
         """@private"""
         self.expert_edge = AgentEdge(self.conf.edge,self.conf.steering)
+        """@private"""
         #print(OmegaConf.to_yaml(conf))
         
         
@@ -117,7 +118,7 @@ class Agent4(KartAgent):
         gain_volant = self.c.default_gain  #Gain par défaut
         steering = self.steering.manage_pure_pursuit(gx,gz,gain_volant)
         #drift, modified_steer = self.expert_drift.choose_action(obs,steering,vel)
-        acceleration, brake = self.speedcontroller.manage_speed(speed,drift,obs) # Appel à la fonction gerer_vitesse
+        acceleration, brake = self.speedcontroller.manage_speed(obs) # Appel à la fonction gerer_vitesse
         nitro = self.expert_nitro.manage_nitro(obs,steering,energy) # Appel à la fonction manage_nitro
         
         # Au depart on avance tout droit pour eviter de se cogner contre les adversaires
