@@ -23,7 +23,7 @@ speed:
 steering:
   empattement : 2.5
 
-powerup:
+powerup_type:
   radar_xball : 0.8
   radar_xswatter : 0.4
   radar_zmin_ball : 2.0

@@ -40,14 +40,14 @@ class AgentItems(KartAgent) :
 
         Args:
             obs (dict): Observations de l'environnement. Clés utilisées :
-                - powerup : objet actuellement détenu
+                - powerup_type : objet actuellement détenu
                 - karts_position : positions relatives des autres karts
             action (dict): Action courante à modifier.
 
         Returns:
             dict: Action corrigée avec la clé `fire` mise à jour.
         """
-        current_item = obs["powerup"]        
+        current_item = obs["powerup_type"]        
         action["fire"] = False        
 
         if current_item == BUBBLEGUM :
