@@ -55,7 +55,7 @@ class Agent4(KartAgent):
         """@private"""
         self.expert_items = AgentItems(self.conf.powerup_type, self.conf.steering)
         """@private"""
-        self.expert_edge = AgentEdge(self.conf.steering)
+        self.expert_edge = AgentEdge(self.conf.edge,self.conf.steering)
         #print(OmegaConf.to_yaml(conf))
         
         
@@ -122,8 +122,6 @@ class Agent4(KartAgent):
         speed = float(vel[2])
         energy = float(obs.get("energy", [0.0])[0])
 
-        gx = gx + 5
-
         drift = False
         gain_volant = self.c.default_gain  #Gain par défaut
         steering = self.steering.manage_pure_pursuit(gx,gz,gain_volant)
@@ -154,7 +152,7 @@ class Agent4(KartAgent):
         # Appel de la fonction edge
         edge, action_edge = self.expert_edge.choose_action(obs)
         if edge:
-            print("Danger Limite Piste")
+            #print("Danger Limite Piste")
             return action_edge
         
         # Appel de la fonction esquive banane

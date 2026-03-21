@@ -4,12 +4,12 @@ from omegaconf import DictConfig
 
 class AgentEdge:
     """
-    Module Agent Expert Edge : Empêche la sortie de piste en surveillant 
-    la distance par rapport au centre.
+    Module Agent Expert Edge : Empêche la sortie de piste en surveillant la distance par rapport au centre.
     """
-    def __init__(self,config_pilote : DictConfig):
+    def __init__(self,config : DictConfig ,config_pilote : DictConfig):
      
-        self.correction_steer = 0.6
+        self.conf = config
+        self.correction_steer = self.conf.correction_steer
         self.pilotage = Steering(config_pilote)
 
     def reset(self):
@@ -29,7 +29,7 @@ class AgentEdge:
         #print((limit_path - abs(center_path_distance))[0])
         
         # 3. Vérification de la sortie de piste imminente
-        if ((limit_path - abs(center_path_distance))[0]) <= 1.5 :
+        if ((limit_path - abs(center_path_distance))[0]) <= self.conf.epsilon_limite :
 
             gx = center_path[0]
             gz = center_path[2]
@@ -37,7 +37,7 @@ class AgentEdge:
             #print(gx)
             #print(center_path_distance)
             
-            if gz < 0.01:    
+            if gz < self.conf.epsilon_gz:    
                 # ATTENTION LOGIQUE INVERSEE POUR CENTER PATH, si > 0 l'agent se situe à droite de la piste
                 if center_path_distance > 0:
                     #print("Esquive Vers la gauche")
@@ -49,10 +49,10 @@ class AgentEdge:
                 #print("Esquive Par Pure_Pursuit")
                 
                 # Logique inversée pour le décalage latéral d'où -gx
-                steer = self.pilotage.manage_pure_pursuit(-gx,gz,7.0)
+                steer = self.pilotage.manage_pure_pursuit(-gx,gz,self.conf.gain)
 
             # On réduit l'accélération pour reprendre de l'adhérence
-            new_accel = 0.4
+            new_accel = self.conf.new_accel
 
             action = {
             "acceleration": new_accel,

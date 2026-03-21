@@ -82,7 +82,7 @@ nitro:
 
 edge:
   correction_steer : 0.6
-  epsilon_limite_path : 1.5
-  epsilon_limite_gz : 0.01
+  epsilon_limite : 1.5
+  epsilon_gz : 0.01
   gain : 7.0
   new_accel : 0.4
