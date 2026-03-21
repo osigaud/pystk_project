@@ -133,8 +133,8 @@ def compute_curvature(nodes):
     direction_changes = []
     for i in range(len(nodes) - 1):
         dx = nodes[i + 1][0] - nodes[i][0]  # Extract X
-        dy = nodes[i + 1][1] - nodes[i][2]  # Extract Z
-        angle = np.arctan2(dy, dx)
+        dz = nodes[i + 1][1] - nodes[i][2]  # Extract Z
+        angle = np.arctan2(dz, dx)
         direction_changes.append(angle)
 
     if len(direction_changes) > 1:
