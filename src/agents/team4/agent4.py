@@ -8,6 +8,7 @@ from .AgentBanana import AgentBanana
 from .AgentEsquiveAdv import AgentEsquiveAdv
 from .AgentDrift import AgentDrift
 from .AgentItems import AgentItems
+from .AgentEdge import AgentEdge
 from omegaconf import OmegaConf
 from pathlib import Path
 
@@ -54,6 +55,7 @@ class Agent4(KartAgent):
         """@private"""
         self.expert_items = AgentItems(self.conf.powerup_type, self.conf.steering)
         """@private"""
+        self.expert_edge = AgentEdge(self.conf.steering)
         #print(OmegaConf.to_yaml(conf))
         
         
@@ -69,6 +71,7 @@ class Agent4(KartAgent):
         self.expert_esquive_adv.reset()
         self.expert_drift.reset()
         self.expert_items.reset()
+        self.expert_edge.reset()
         
     def endOfTrack(self) -> bool:
         """Indique si la course est fini."""
@@ -88,6 +91,7 @@ class Agent4(KartAgent):
         """
         
         points = obs.get("paths_start",[]) # On récupère la liste des points
+        #points_end = obs.get("paths_end",[])
         
         if len(points) <= self.c.seuil_lenpoints: # Si la longueur de la liste est inferieur à 2, on accèlère à fond (ligne d'arrivée proche)
             return {
@@ -100,6 +104,15 @@ class Agent4(KartAgent):
                 "fire": False,
             }
         
+        """center_path_distance = obs.get("center_path_distance", 0.0)[0]
+        paths_width = obs.get("paths_width", [10.0]) # 10.0 par défaut
+        center_path = obs.get("center_path", [0.0, 0.0, 0.0])
+        limit_path = paths_width[0] / 2
+
+        print(f"Largeur de la piste : {paths_width}")
+        print(f"End - Start {points_end[2] - points[2]}")
+        print(f"Path Distance : {obs['paths_distance']}")"""
+        
         target = points[self.path_lookahead] # On récupère le x-ème point de la liste defini par la variable de classe
         gx = target[0] # On récupère x, le décalage latéral
         gz = target[2] # On récupère z, la profondeur
@@ -108,6 +121,8 @@ class Agent4(KartAgent):
         vel = obs.get("velocity", [0.0, 0.0, 0.0])
         speed = float(vel[2])
         energy = float(obs.get("energy", [0.0])[0])
+
+        gx = gx + 5
 
         drift = False
         gain_volant = self.c.default_gain  #Gain par défaut
@@ -135,6 +150,12 @@ class Agent4(KartAgent):
         is_stuck, action_stuck = self.expert_rescue.choose_action(steering,speed,distance)
         if is_stuck and obs['distance_down_track'] >= self.c.seuil_distance_stuck:
             return action_stuck
+        
+        # Appel de la fonction edge
+        edge, action_edge = self.expert_edge.choose_action(obs)
+        if edge:
+            print("Danger Limite Piste")
+            return action_edge
         
         # Appel de la fonction esquive banane
         danger_banane, action_banane = self.expert_banana_dodge.choose_action(obs,gx,gz,acceleration)
