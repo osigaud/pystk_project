@@ -14,7 +14,7 @@ class SpeedController:
         """@private"""
         self.g = self.c.curvature_gain
         """@private"""
-        self.vmax = self.c.vitesse_max
+        self.amax = self.c.acceleration_max
         """@private"""
     
     def reset(self) -> None:
@@ -55,10 +55,10 @@ class SpeedController:
 
         k = (angle(v1,v2) + angle(v2,v3) + angle(v3,v4)) / 3
 
-        v_target2 = self.vmax/np.sqrt(1+self.g*k)
+        v_target2 = self.amax/np.sqrt(1+self.g*k)
 
         if v_target2 >= 0.96:  
-            v_target2 = self.vmax #suite a ce calcul v_target est limité a 0.96 donc ce if lui permet d'atteindre la vitesse maximale
+            v_target2 = self.amax #suite a ce calcul v_target est limité a 0.96 donc ce if lui permet d'atteindre la vitesse maximale
         
-        return np.clip(v_target2,0,self.vmax), False #on ajoute un gain 
+        return np.clip(v_target2,0,self.amax), False #on ajoute un gain 
         
