@@ -104,15 +104,6 @@ class Agent4(KartAgent):
                 "fire": False,
             }
         
-        """center_path_distance = obs.get("center_path_distance", 0.0)[0]
-        paths_width = obs.get("paths_width", [10.0]) # 10.0 par défaut
-        center_path = obs.get("center_path", [0.0, 0.0, 0.0])
-        limit_path = paths_width[0] / 2
-
-        print(f"Largeur de la piste : {paths_width}")
-        print(f"End - Start {points_end[2] - points[2]}")
-        print(f"Path Distance : {obs['paths_distance']}")"""
-        
         target = points[self.path_lookahead] # On récupère le x-ème point de la liste defini par la variable de classe
         gx = target[0] # On récupère x, le décalage latéral
         gz = target[2] # On récupère z, la profondeur

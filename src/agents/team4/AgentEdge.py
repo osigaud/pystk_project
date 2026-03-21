@@ -1,26 +1,42 @@
 from .steering import Steering
 from omegaconf import DictConfig
 
-
 class AgentEdge:
     """
     Module Agent Expert Edge : Empêche la sortie de piste en surveillant la distance par rapport au centre.
     """
     def __init__(self,config : DictConfig ,config_pilote : DictConfig):
+
+        """Initialise les variables d'instances de l'agent expert"""
      
         self.conf = config
+        """@private"""
         self.correction_steer = self.conf.correction_steer
+        """@private"""
         self.pilotage = Steering(config_pilote)
+        """@private"""
 
-    def reset(self):
+    def reset(self) -> None:
+
+        """Réinitialise les variables d'instances de l'agent expert"""
         
         self.pilotage.reset()
 
-    def choose_action(self, obs):
+    def choose_action(self, obs : dict) -> tuple[bool,dict]:
         """
-        Analyse la position latérale et corrige si nécessaire.
+        Analyse la position latérale et corrige si nécessaire
+
+        Args:
+
+            obs(dict) : Les données de télémétrie fournies par le simulateur.
+
+        Returns:
+
+            bool : Variable affirmant ou non la nécessite de se réaxer.
+            dict : Dictionnaire d'actions à réaliser pour se réaxer.
+
         """
-        # 1. Récupération des données de piste
+        # Récupération des données de piste
         center_path_distance = obs.get("center_path_distance", 0.0)[0]
         paths_width = obs.get("paths_width", [10.0]) # 10.0 par défaut
         center_path = obs.get("center_path", [0.0, 0.0, 0.0])
@@ -28,11 +44,11 @@ class AgentEdge:
 
         #print((limit_path - abs(center_path_distance))[0])
         
-        # 3. Vérification de la sortie de piste imminente
+        # Vérification de la sortie de piste imminente
         if ((limit_path - abs(center_path_distance))[0]) <= self.conf.epsilon_limite :
 
-            gx = center_path[0]
-            gz = center_path[2]
+            gx = center_path[0] # Récupération du décalage latéral du centre de la piste
+            gz = center_path[2] # Récupération de la profondeur du centre de la piste
 
             #print(gx)
             #print(center_path_distance)
