@@ -74,6 +74,8 @@ class Agent2(KartAgent):
         self.agent_positions = []
 
         self.active_shield = ActiveShield()
+        
+        #self.anticipateur = AnticipeKart()
 
         ## @var obs
         #  @brief Dernière observation reçue de l'environnement.
@@ -101,6 +103,26 @@ class Agent2(KartAgent):
     def endOfTrack(self):
         return self.isEnd
 
+    """
+    def calculer_lookahead_dynamique(self, obs, speed):
+        """ Détermine le lookahead de facon dynamique en fonction de la courbure de la piste """
+        nodes = obs.get("paths_start", [])
+        
+        #si pas assez de points -> lookahead court par défaut
+        if len(nodes) < 6:
+            return 3
+        
+        #calcul de l'angle du virage prochain
+        angle = abs(self.anticipateur.detectVirage(obs))
+        
+        if angle > 0.5:    #virage serré -> on regarde près pour être précis
+            return 2
+        elif angle > 0.2:  #virage moyen
+            return 4
+        else:              # Ligne droite -> on regarde loin pour la vitesse
+            return 7 if speed > 15 else 5
+    """
+            
     ## @brief   Calcule l'action complète à effectuer pour le step courant.
     #
     #  Fusionne les décisions de tous les sous-modules dans l'ordre de priorité :
@@ -138,6 +160,8 @@ class Agent2(KartAgent):
         if action_secours is not None:
             return action_secours
 
+        #self.path_lookahead = self._calculer_lookahead_dynamique(obs, speed)
+        
         phase = obs.get("phase", 0)
 
         if "paths_start" in obs:
