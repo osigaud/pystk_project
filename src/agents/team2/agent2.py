@@ -14,6 +14,7 @@ from .rival_attack import AttackRivals
 from .kart_rescue import StuckControl
 from .acceleration_kart import AccelerationControl
 from .shield_kart import ActiveShield
+#from .anticipe_kart import AnticipeKart
 
 ## @var cfg
 #  @brief Configuration globale chargée depuis configDemoPilote.yaml.
