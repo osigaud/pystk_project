@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent
 BASE_CONFIG_PATH = BASE_DIR / "config.yaml"
 OUTPUT_CONFIG_PATH = BASE_DIR / "config_opti.yaml"
 
-def objective(trial):
+def objective(trial, nb_courses, coeurs_course):
     params = {
         # Brain
         "pilot.brain.kp":trial.suggest_float("kp", 2.0, 12.0),
@@ -80,7 +80,7 @@ def objective(trial):
     # race_jobs permet de spécifier le nombre de coeurs utilisés pour paralléliser les courses lancées quand on éxécute le main_loop()
     # En tout, en parallélise les recherches ET les courses lancées.
     # Note : Soyez raisonables avec les valeurs de race_jobs et de n_jobs (tout en bas, pour la recherche avec optuna) pour éviter les crasher lors des recherches.
-    scores = main_loop(cfg, race_jobs=7)
+    scores = main_loop(cfg, nb_courses = nb_courses, race_jobs=coeurs_course)
 
     # On récupère la liste des scores sur différentes courses de notre kart.
     # Cette liste des scores se situe dans une liste qui est elle même une valeur du dictionnaire "scores"
@@ -100,12 +100,19 @@ def objective(trial):
 
 if __name__ == "__main__":
 
+    nb_trials = int(input("Entrez le nb de recherches à effectuer : "))
+    nb_coeurs_recherche = int(input("Entrez le nb de coeurs pour la recherche (n_jobs) : "))
+    nb_course_par_recherche = int(input("Entrez le nb de courses pour chaque recherche : "))
+    nb_coeurs_par_course = int(input("Entres le nb de coeurs pour les courses : "))
+
+    function = lambda trial: objective(trial, nb_courses=nb_course_par_recherche, coeurs_course=nb_coeurs_par_course)
+
     # On crée une étude/recherche
     study = optuna.create_study(direction="minimize")
 
     # Puis on lance cette recherche
     # n_trials : nombre de recherches à lancer. Chaque recherche s'accompagne de son lot de paramètres à évaluer sur le multi_track_race.
-    study.optimize(objective, n_trials=1, show_progress_bar=True, n_jobs=3)
+    study.optimize(function, n_trials=nb_trials, show_progress_bar=True, n_jobs=nb_coeurs_recherche)
 
     print(f"\nMeilleur score : {study.best_value:.3f}")
     print(f"Meilleurs paramètres : {study.best_params}")
