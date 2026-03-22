@@ -34,7 +34,7 @@ from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 5
-NB_RACES = 1   # Nombre de courses à chaque fois qu'on lance multi_track_race_team5
+NB_RACES = 5   # Nombre de courses à chaque fois qu'on lance multi_track_race_team5
 MAX_STEPS = 1300
 
 # Get the current timestamp
@@ -181,7 +181,7 @@ def single_race_worker(cfg_dict):
     cfg = OmegaConf.create(cfg_dict) if cfg_dict is not None else None
     return single_race(cfg)
 
-def main_loop(cfg=None, nb_courses = NB_RACES, race_jobs=1):
+def main_loop(cfg=None, nb_courses=NB_RACES, race_jobs=1):
     scores = Scores()
 
     env, agents, names = create_race(cfg)
@@ -262,6 +262,7 @@ def output_html(output: Path, scores: Scores):
         
 if __name__ == "__main__":
     input_config = input("Voulez vous utiliser le fichier config_opti.yaml ? [o/n] : ")
+    input_nb_races = int(input("Entrez le nombre de courses : "))
 
     if input_config == 'o':
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -273,5 +274,5 @@ if __name__ == "__main__":
     else : 
         # Si cfg=None alors on utilise le fichier config.yaml classique. Voir le __init__() de agent5.py
         print("Le kart utilise le fichier config.yaml\n")
-        scores = main_loop(cfg=None)
-    output_html(Path("../../docs/index.html"), scores)
+        scores = main_loop(cfg=None, nb_courses=input_nb_races)
+    #output_html(Path("../../docs/index.html"), scores)
