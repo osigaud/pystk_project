@@ -13,6 +13,7 @@ from .react_items import ReactionItems
 from .rival_attack import AttackRivals
 from .kart_rescue import StuckControl
 from .acceleration_kart import AccelerationControl
+from .shield_kart import ActiveShield
 
 ## @var cfg
 #  @brief Configuration globale chargée depuis configDemoPilote.yaml.
@@ -71,6 +72,8 @@ class Agent2(KartAgent):
         ## @var agent_positions
         #  @brief Historique des positions du kart (utilisé pour la visualisation).
         self.agent_positions = []
+
+        self.active_shield = ActiveShield()
 
         ## @var obs
         #  @brief Dernière observation reçue de l'environnement.
@@ -152,11 +155,6 @@ class Agent2(KartAgent):
         else:
             steering = 0
 
-        #eviter les murs/ revenir sur la piste si kart bloqué
-        if abs(obs["center_path_distance"]) > obs["paths_width"][0] / 2:
-            rescue = True
-        else:
-            rescue = False
 
         #utiliser les boost: (nitro->pour activer bouteille bleu, fire->pour activer les cadeaux)
         if obs["energy"][0] > 0 and abs(steering) < 0.2:
@@ -175,7 +173,7 @@ class Agent2(KartAgent):
         final_steering = np.clip(item_steering + correction_piste + steering, -1, 1)
 
         has_item = obs.get("attachment", 0) != 0 #0 si il ne possede pas l'item
-        fire = has_item and self.attack_rival.attack_rivals(obs)
+        fire = has_item and self.active_shield.fire_shield(obs)
 
         action = {
             "acceleration": acceleration,
@@ -183,8 +181,7 @@ class Agent2(KartAgent):
             "brake": False,
             "drift": False,
             "nitro": nitro,
-            "rescue": rescue,
+            "rescue": False,
             "fire": fire,
         }
-
         return action
