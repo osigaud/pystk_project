@@ -40,7 +40,7 @@ class Agent5(KartAgent):
 
         
         # On créer le chemin /src/agent/team5/config.yaml
-        config_path = os.path.join(current_dir, "config_opti.yaml")
+        config_path = os.path.join(current_dir, "config.yaml")
 
         # On charge le fichier conf avec ce chemin
         self.conf = OmegaConf.load(config_path)

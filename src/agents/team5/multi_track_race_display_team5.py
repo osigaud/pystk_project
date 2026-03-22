@@ -99,9 +99,9 @@ agents_specs = [
 def create_race(cfg=None):
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode=None, num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
+        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
     else:
-        env = STKRaceMultiEnv(agents=agents_specs, render_mode=None, num_kart=MAX_TEAMS)
+        env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
 
     # Instantiate the agents.
 
@@ -259,5 +259,17 @@ def output_html(output: Path, scores: Scores):
 
         
 if __name__ == "__main__":
-    scores = main_loop()
+    input_config = input("Voulez vous utiliser le fichier config_opti.yaml ? [o/n] : ")
+
+    if input_config == 'o':
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(current_dir, "config_opti.yaml")
+        cfg = OmegaConf.load(config_path)
+        print("Le kart utilise le fichier config_opti.yaml\n")
+        scores = main_loop(cfg=cfg)
+        
+    else : 
+        # Si cfg=None alors on utilise le fichier config.yaml classique. Voir le __init__() de agent5.py
+        print("Le kart utilise le fichier config.yaml\n")
+        scores = main_loop(cfg=None)
     output_html(Path("../../docs/index.html"), scores)

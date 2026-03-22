@@ -105,7 +105,7 @@ if __name__ == "__main__":
 
     # Puis on lance cette recherche
     # n_trials : nombre de recherches à lancer. Chaque recherche s'accompagne de son lot de paramètres à évaluer sur le multi_track_race.
-    study.optimize(objective, n_trials=5, show_progress_bar=True, n_jobs=3)
+    study.optimize(objective, n_trials=1, show_progress_bar=True, n_jobs=3)
 
     print(f"\nMeilleur score : {study.best_value:.3f}")
     print(f"Meilleurs paramètres : {study.best_params}")
@@ -167,8 +167,14 @@ if __name__ == "__main__":
         OmegaConf.update(cfg, key, best_params[val])
 
     # On enregistre dans le fichier config_opti.yaml les meilleurs paramètres.
-    # C'est incroyable comment la technologie a évolué au fil du temps...
     OmegaConf.save(cfg, OUTPUT_CONFIG_PATH)
+
+    # On demande à l'utilisateur s'il veut enregistrer les paramètres obtenus dans le fichier config.yaml
+    reponse = input("Voulez vous enregistrer ces paramètres dans le fichier config.yaml ? [o/n]: ")
+    if reponse == 'o':
+        OmegaConf.save(cfg, BASE_CONFIG_PATH)
+        print(f"{BASE_CONFIG_PATH.name} mis à jour avec les meilleurs paramètres.")
+
     print(f"{OUTPUT_CONFIG_PATH.name} mis à jour avec les meilleurs paramètres.")        
 
         
