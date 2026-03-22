@@ -73,6 +73,6 @@ class AccelerationControl:
             acceleration = self.virage_moyen
         else:
             # ligne droite ou courbe très légère : pleine accélération
-            acceleration = self.max
+            acceleration = self.amax
 
         return acceleration
