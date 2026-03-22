@@ -25,3 +25,9 @@ vitesse : 0.2
 steps : 5
 recovery : 15
 braquage : 0.85
+
+#pour la fonction attack rivals
+
+champs_vision:
+  dist: 40 
+  angle: 15.0
