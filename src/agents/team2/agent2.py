@@ -106,7 +106,7 @@ class Agent2(KartAgent):
 
     """
     def calculer_lookahead_dynamique(self, obs, speed):
-        """ Détermine le lookahead de facon dynamique en fonction de la courbure de la piste """
+        Détermine le lookahead de facon dynamique en fonction de la courbure de la piste 
         nodes = obs.get("paths_start", [])
         
         #si pas assez de points -> lookahead court par défaut
