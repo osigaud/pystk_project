@@ -18,7 +18,7 @@ from .anticipe_kart import AnticipeKart
 #  - Ligne droite      (courbure faible)             : 1.00
 #
 #  @see AnticipeKart
-class AccelerationControl:
+class AccelerationControl(AnticipeKart):
 
     ## @brief   Initialise les seuils de classification des virages.
     #
@@ -26,6 +26,7 @@ class AccelerationControl:
     #                Utilise les clés virages.drift, virages.serrer.i1/i2
     #                et virages.moyen.i1/i2.
     def __init__(self, cfg):
+        super().__init__()
 
         ## @var seuildrift
         #  @brief Seuil de courbure au-delà duquel le virage est considéré très serré.
@@ -46,10 +47,7 @@ class AccelerationControl:
         ## @var moyeni2
         #  @brief Borne supérieure de l'intervalle des virages moyens.
         self.moyeni2 = cfg.virages.moyen.i2
-
-        ## @var anticipe_kart
-        #  @brief Instance utilisée pour mesurer la courbure à chaque step.
-        self.anticipe_kart = AnticipeKart()
+        
         # configuration des valeurs attribuées aux attributs d'instance
         self.amax = 1.0
         self.virage_tres_serré = cfg.acceleration.virage_tres_serré
@@ -62,10 +60,14 @@ class AccelerationControl:
     #  @see     AnticipeKart.detectVirage()
     def adapteAcceleration(self, obs):
         acceleration = self.amax
-        curvature = abs(self.anticipe_kart.detectVirage(obs))  # valeur absolue de l'angle
+        #self.path_lookahead = self.get_dynamicLookahead(obs)
+        curvature = abs(self.detectVirage(obs))  # valeur absolue de l'angle
 
         if curvature > self.seuildrift:
             # virage très serré : fort freinage anticipé
+            #if self.virage_long :  #en fonction d un virage plus long on reduit l acceleration bcp plus 
+            #    acceleration = 0.65
+            #else : 
             acceleration = self.virage_tres_serré
         elif curvature > self.serreri1 and curvature <= self.serreri2:  # virage serré
             acceleration = self.virage_serré
@@ -74,5 +76,5 @@ class AccelerationControl:
         else:
             # ligne droite ou courbe très légère : pleine accélération
             acceleration = self.amax
-
+            
         return acceleration
