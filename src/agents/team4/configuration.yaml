@@ -50,13 +50,19 @@ banana:
   dodge_timer_basic : 0
   dodge_timer_start : 10
   decalage_lateral : 3.0
-  radar_x : 2.0
+  radar_x : 5.0
   radar_zmin : 0.0
   radar_zmax : 17.0
   seuil_ligne : 2.0
   default_gain : 7.0
-  adjusted_gain : 6.0
+  adjusted_gain : 9.0
   seuil_limite_path : 1.5
+  nb_noeuds : 5
+  limite_banane_single : 1.8
+  limite_centre : 1.8
+  limite_courbe : 3.0
+  limite_banane_courbe : 1.8
+  decalage_lateral_courbe : 5.0
 
 rescue:
   recovery_timer : 10
