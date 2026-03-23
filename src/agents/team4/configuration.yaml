@@ -63,6 +63,7 @@ banana:
   limite_courbe : 3.0
   limite_banane_courbe : 1.8
   decalage_lateral_courbe : 5.0
+  true_virage : 0.5
 
 rescue:
   recovery_timer : 10

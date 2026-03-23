@@ -198,13 +198,18 @@ class AgentBanana:
             elif abs(center_path_distance) <= self.c.limite_centre and abs(b_x) <= self.c.limite_banane_courbe and abs(courbe) <= self.c.limite_courbe:
                 self.use_corde = True
                 #print(courbe)
-                if -courbe >= 0:
+                if -courbe >= self.c.true_virage: # Seuleument si la courbe tourne assez pour eviter l'instabilité
                     #print("VIRAGE A DROITE")
                     new_side = 1
-                else:
+                elif courbe <= -self.c.true_virage:
                     #print("VIRAGE A GAUCHE")
                     new_side = -1
-            
+                else:
+                    if b_x>=0:
+                        new_side = -1
+                    else:
+                        new_side = 1
+
             else:   
                 #print("choix normal")
                 self.use_corde = False
