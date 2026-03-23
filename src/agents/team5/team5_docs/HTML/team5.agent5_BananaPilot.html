@@ -45,7 +45,8 @@
 &nbsp;<br>
 Agent&nbsp;'Donkey&nbsp;Bombs&nbsp;Banana'.<br>
 Ce&nbsp;wrapper&nbsp;est&nbsp;responsable&nbsp;de&nbsp;la&nbsp;détection&nbsp;et&nbsp;de&nbsp;l'évitement&nbsp;des&nbsp;obstacles&nbsp;<br>
-(bananes&nbsp;et&nbsp;autres&nbsp;objets&nbsp;fixes)&nbsp;sur&nbsp;la&nbsp;trajectoire&nbsp;du&nbsp;kart.<br>&nbsp;</tt></td></tr>
+(bananes&nbsp;et&nbsp;autres&nbsp;objets&nbsp;fixes)&nbsp;sur&nbsp;la&nbsp;trajectoire&nbsp;du&nbsp;kart,&nbsp;ainsi&nbsp;que&nbsp;du&nbsp;<br>
+maintien&nbsp;du&nbsp;kart&nbsp;à&nbsp;l'intérieur&nbsp;des&nbsp;limites&nbsp;de&nbsp;la&nbsp;piste<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="team5.agent5_BananaPilot.html#Agent5Banana">Agent5Banana</a></dd>
@@ -54,21 +55,53 @@ Ce&nbsp;wrapper&nbsp;est&nbsp;responsable&nbsp;de&nbsp;la&nbsp;détection&nbsp;e
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="Agent5Banana-__init__"><strong>__init__</strong></a>(self, env, pilot_agent, conf, path_lookahead=3)</dt><dd><tt>Initialise&nbsp;le&nbsp;module&nbsp;d'évitement&nbsp;avec&nbsp;les&nbsp;paramètres&nbsp;de&nbsp;détection&nbsp;et&nbsp;de&nbsp;force&nbsp;<br>
-de&nbsp;braquage&nbsp;définis&nbsp;dans&nbsp;le&nbsp;fichier&nbsp;de&nbsp;configuration.</tt></dd></dl>
+<dl><dt><a name="Agent5Banana-__init__"><strong>__init__</strong></a>(self, env, pilot_agent, conf, path_lookahead=3)</dt><dd><tt>Initialise&nbsp;le&nbsp;module&nbsp;d'évitement&nbsp;avec&nbsp;les&nbsp;paramètres&nbsp;de&nbsp;détection.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;env&nbsp;(obj):&nbsp;L'environnement&nbsp;de&nbsp;simulation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pilot_agent&nbsp;(obj):&nbsp;L'agent&nbsp;pilote&nbsp;enveloppé&nbsp;(celui&nbsp;qui&nbsp;gère&nbsp;la&nbsp;conduite&nbsp;de&nbsp;base)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;conf&nbsp;(OmegaConf):&nbsp;Objet&nbsp;de&nbsp;configuration&nbsp;contenant&nbsp;les&nbsp;seuils&nbsp;d'évitement<br>
+&nbsp;&nbsp;&nbsp;&nbsp;path_lookahead&nbsp;(int):&nbsp;Nombre&nbsp;de&nbsp;points&nbsp;de&nbsp;cheminement&nbsp;à&nbsp;anticiper</tt></dd></dl>
 
-<dl><dt><a name="Agent5Banana-choose_action"><strong>choose_action</strong></a>(self, obs)</dt><dd><tt>Arbitre&nbsp;entre&nbsp;la&nbsp;conduite&nbsp;normale&nbsp;et&nbsp;la&nbsp;manœuvre&nbsp;d'évitement.<br>
-Si&nbsp;un&nbsp;danger&nbsp;est&nbsp;détecté,&nbsp;la&nbsp;priorité&nbsp;est&nbsp;donnée&nbsp;à&nbsp;l'esquive.</tt></dd></dl>
+<dl><dt><a name="Agent5Banana-choose_action"><strong>choose_action</strong></a>(self, obs)</dt><dd><tt>Sélectionne&nbsp;l'action&nbsp;en&nbsp;fonction&nbsp;des&nbsp;priorités&nbsp;:&nbsp;1.&nbsp;Bananes,&nbsp;2.&nbsp;Bordures,&nbsp;3.&nbsp;Conduite<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;obs&nbsp;(dict):&nbsp;Les&nbsp;observations&nbsp;courantes&nbsp;du&nbsp;simulateur<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dict:&nbsp;Le&nbsp;dictionnaire&nbsp;d'actions&nbsp;final</tt></dd></dl>
 
-<dl><dt><a name="Agent5Banana-detect_banana"><strong>detect_banana</strong></a>(self, obs)</dt><dd><tt>Scanne&nbsp;les&nbsp;objets&nbsp;environnants&nbsp;et&nbsp;identifie&nbsp;les&nbsp;menaces&nbsp;(types&nbsp;1,&nbsp;4,&nbsp;5).<br>
-Calcule&nbsp;la&nbsp;distance&nbsp;perpendiculaire&nbsp;de&nbsp;chaque&nbsp;obstacle&nbsp;par&nbsp;rapport&nbsp;à&nbsp;la&nbsp;droite&nbsp;<br>
-Kart-Cible.&nbsp;Si&nbsp;un&nbsp;objet&nbsp;est&nbsp;trop&nbsp;proche,&nbsp;génère&nbsp;une&nbsp;commande&nbsp;d'évitement.</tt></dd></dl>
+<dl><dt><a name="Agent5Banana-detect_banana"><strong>detect_banana</strong></a>(self, obs)</dt><dd><tt>Identifie&nbsp;les&nbsp;menaces&nbsp;et&nbsp;calcule&nbsp;une&nbsp;manoeuvre&nbsp;d'esquive&nbsp;perpendiculaire<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;obs&nbsp;(dict):&nbsp;Les&nbsp;observations&nbsp;courantes&nbsp;du&nbsp;simulateur<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;tuple:&nbsp;(danger_detected,&nbsp;steering,&nbsp;acceleration)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;danger_detected&nbsp;(bool):&nbsp;True&nbsp;si&nbsp;une&nbsp;banane&nbsp;est&nbsp;sur&nbsp;la&nbsp;trajectoire<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;steering&nbsp;(float):&nbsp;Force&nbsp;de&nbsp;braquage&nbsp;pour&nbsp;éviter&nbsp;l'objet<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;acceleration&nbsp;(float):&nbsp;Accélération&nbsp;pendant&nbsp;l'esquive</tt></dd></dl>
 
-<dl><dt><a name="Agent5Banana-position_track"><strong>position_track</strong></a>(self, obs)</dt><dd><tt>Calcule&nbsp;le&nbsp;point&nbsp;de&nbsp;visée&nbsp;dynamique.&nbsp;<br>
-Utilisé&nbsp;ici&nbsp;pour&nbsp;définir&nbsp;la&nbsp;droite&nbsp;de&nbsp;trajectoire&nbsp;théorique&nbsp;afin&nbsp;de&nbsp;calculer&nbsp;<br>
-la&nbsp;distance&nbsp;perpendiculaire&nbsp;des&nbsp;obstacles.</tt></dd></dl>
+<dl><dt><a name="Agent5Banana-edge_safety"><strong>edge_safety</strong></a>(self, obs)</dt><dd><tt>Vérifie&nbsp;si&nbsp;le&nbsp;kart&nbsp;s'éloigne&nbsp;trop&nbsp;du&nbsp;centre&nbsp;de&nbsp;la&nbsp;piste&nbsp;et&nbsp;génère&nbsp;une&nbsp;correction<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;obs&nbsp;(dict):&nbsp;Les&nbsp;observations&nbsp;courantes&nbsp;du&nbsp;simulateur<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;tuple:&nbsp;(edge_detected,&nbsp;steering,&nbsp;acceleration)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;edge_detected&nbsp;(bool):&nbsp;True&nbsp;si&nbsp;une&nbsp;correction&nbsp;est&nbsp;nécessaire<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;steering&nbsp;(float):&nbsp;Valeur&nbsp;de&nbsp;braquage&nbsp;corrective<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;acceleration&nbsp;(float):&nbsp;Valeur&nbsp;d'accélération&nbsp;ajustée</tt></dd></dl>
 
-<dl><dt><a name="Agent5Banana-reset"><strong>reset</strong></a>(self)</dt><dd><tt>Réinitialise&nbsp;le&nbsp;pilote&nbsp;interne.</tt></dd></dl>
+<dl><dt><a name="Agent5Banana-position_track"><strong>position_track</strong></a>(self, obs)</dt><dd><tt>Calcule&nbsp;le&nbsp;point&nbsp;de&nbsp;visée&nbsp;dynamique&nbsp;pour&nbsp;définir&nbsp;la&nbsp;trajectoire&nbsp;théorique<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;obs&nbsp;(dict):&nbsp;Les&nbsp;observations&nbsp;courantes&nbsp;du&nbsp;simulateur<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;tuple:&nbsp;(target_x,&nbsp;target_z)&nbsp;représentant&nbsp;les&nbsp;coordonnées&nbsp;du&nbsp;point&nbsp;cible</tt></dd></dl>
+
+<dl><dt><a name="Agent5Banana-reset"><strong>reset</strong></a>(self)</dt><dd><tt>Réinitialise&nbsp;le&nbsp;pilote&nbsp;interne</tt></dd></dl>
 
 <hr>
 Methods inherited from <a href="agents.kart_agent.html#KartAgent">agents.kart_agent.KartAgent</a>:<br>

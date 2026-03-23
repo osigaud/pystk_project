@@ -22,8 +22,10 @@ class AgentSpeed(KartAgent):
         self.conf = conf
         self.agent = agent
         self.path_lookahead = path_lookahead
-        
-    def detecter_virage(self, obs):
+    
+    @staticmethod
+    def detecter_virage(conf, obs):
+
 
         """Analyse la piste devant le kart et classe la situation selon si c'est un virage ou non.
 
@@ -43,14 +45,14 @@ class AgentSpeed(KartAgent):
         """
 
         virage_serre = False
-        nbsegments = min(self.path_lookahead, len(obs["paths_start"]))
+        nbsegments = min(conf.path_lookahead, len(obs["paths_start"]))
         for i in range(nbsegments):
             direction_segment = obs["paths_end"][i] - obs["paths_start"][i]
             diff_direction = direction_segment - obs["front"]
             ecart_direction = float(np.linalg.norm(diff_direction))
-            distance_segment = abs(obs["paths_distance"][i][self.conf.x] - obs["paths_distance"][0][self.conf.x])
+            distance_segment = abs(obs["paths_distance"][i][conf.x] - obs["paths_distance"][0][conf.x])
                 
-            if ecart_direction >= self.conf.ecartgrand and distance_segment < self.conf.dist_segment:
+            if ecart_direction >= conf.ecartgrand and distance_segment < conf.dist_segment:
                 virage_serre = True
       
         return virage_serre
@@ -102,7 +104,7 @@ class AgentSpeed(KartAgent):
   
     def choose_action(self, obs):
         act = self.agent.choose_action(obs)
-        virage_serre = self.detecter_virage(obs)
+        virage_serre = self.detecter_virage(self.conf, obs)
         action_ajustee = self.ajuster_acceleration(virage_serre, act, obs)
         return action_ajustee
 

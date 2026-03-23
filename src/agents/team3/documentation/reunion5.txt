@@ -1,0 +1,2 @@
+-git pull/commit souvent
+-mieux sorganiser

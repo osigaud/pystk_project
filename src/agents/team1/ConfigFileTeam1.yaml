@@ -9,36 +9,36 @@ x : 0
 y : 1
 z : 2
 
+path_lookahead : 3
 
 #AgentCenter
 # distance à partir de laquelle on considère notre distance par rapport au centre trop élevée
-dist:  1.1959096763600898
-
+dist : 0.673833673012193
 
 # à quel point on ajuste la direction
-ajust: 0.48582297658049045
+ajust : 0.6386812473361506
 
 
 #AgentSpeed
 # seuil à partir duquel on considère l'écart entre le front du kart et la direction du segment
-ecartpetit : 2.9
-ecartgrand : 3
+ecartpetit : 3.1052264371860465
+ecartgrand : 3.3379507231468204
 
 # seuil à partir duquel on considère que la capacité à tourner le volant selon la vitesse(max_steer_angle)
-max_steer_angle_petit : 0.2
-max_steer_angle_grand : 0.9
+max_steer_angle_petit : 0.25695886258961403
+max_steer_angle_grand : 0.9824233440624094
 
 #vitesse max ligne droite
-accel_ligne_droite : 2
+accel_ligne_droite : 3.2936037808932275
 
 #ralentissement dans un virage serré
-frein_virage : 0.25
+frein_virage : 0.13929755500933277
 
 #acceleration sortie de virage
-accel_virage : 0.5
+accel_virage : 0.7532895208471412
 
 #distance a partir de laquelle on reagit a un segment
-dist_segment : 6
+dist_segment : 7.6537214237813975
 
 
 
@@ -72,13 +72,8 @@ unblock_steps_default : 6
 
 
 #AgentDrift
+speed_threshold: 7.0
+steer_threshold: 0.4 
+stop_drift_speed: 4.0 
+#max_steer_angle_petit et frein_virage dans AgentSpeed
 
-#AgentVirage
-
-seuil_intensite: 0.1
-seuil_delta: 0.035
-seuil_corde : 0.8
-steer1: 0.07
-steer2: 0.15
-acceleration: 0.08561080277373714
-brake: 0.19667823752517477

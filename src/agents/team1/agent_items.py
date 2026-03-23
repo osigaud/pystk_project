@@ -1,5 +1,8 @@
 from agents.kart_agent import KartAgent
 import numpy as np
+
+from agents.team1.agent_speed import AgentSpeed
+
 BUBBLEGUM = 1
 CAKE = 2
 BOWLING = 3
@@ -20,7 +23,7 @@ class AgentItems(KartAgent) :
         self.conf = conf
         self.agent = agent 
 
-    def is_bonus_close(selv, obs) :
+    def is_bonus_close(self, obs) :
         """Renvoie True si on est très proche d'une boîte cadeau, False sinon"""
         next_item = obs["items_position"][0]
         if obs["items_type"][0] == 0 : #BONUS BOX
@@ -37,14 +40,14 @@ class AgentItems(KartAgent) :
 
         Args:
             obs (dict): Observations de l'environnement. Clés utilisées :
-                - powerup : objet actuellement détenu
+                - powerup_type : objet actuellement détenu
                 - karts_position : positions relatives des autres karts
             action (dict): Action courante à modifier.
 
         Returns:
             dict: Action corrigée avec la clé `fire` mise à jour.
         """
-        current_item = obs["powerup"]        
+        current_item = obs["powerup_type"]        
         action["fire"] = False        
 
         if current_item == BUBBLEGUM :
@@ -57,7 +60,7 @@ class AgentItems(KartAgent) :
                 action["fire"] = False
                 return action 
             for kart in obs["karts_position"]:
-                if kart[self.conf.z]>=0 and kart[self.conf.z]<60:
+                if kart[self.conf.z] >= 0 and kart[self.conf.z] < 80:
                    action["fire"] = True
                    return action
             return action
@@ -84,7 +87,7 @@ class AgentItems(KartAgent) :
             if premier_kart[self.conf.z]<0:
                 action["fire"] = False
             for kart in obs["karts_position"]:
-                if kart[self.conf.z]>=0 and kart[self.conf.z]<25:
+                if kart[self.conf.z]>=0 and kart[self.conf.z] < 50:
                     if abs(kart[self.conf.x]) <= 3:
                         action["fire"] = True 
             return action
@@ -98,7 +101,7 @@ class AgentItems(KartAgent) :
 
         if current_item == SWATTER :
             for kart in obs["karts_position"]:
-                if abs(kart[self.conf.z])<=10 and abs(kart[self.conf.x])<=10 and abs(kart[self.conf.y])<=5:
+                if abs(kart[self.conf.z]) <= 9 and abs(kart[self.conf.x]) <= 9 and abs(kart[self.conf.y])<=5:
                     action["fire"] = True
             return action
 
@@ -132,9 +135,8 @@ class AgentItems(KartAgent) :
         Returns:
             dict: Action corrigée avec la clé `nitro` éventuellement activée.
         """
-
         nit = obs["energy"]
-        virage_serre = False
+        virage_serre = AgentSpeed.detecter_virage(self.conf, obs)
         if nit > 0.05 :
             act["nitro"] = True
         return act 
