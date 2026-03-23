@@ -25,6 +25,8 @@ class AgentBanana:
         """@private"""
         self.pilotage = Steering(config_pilote)
         """@private"""
+        self.use_corde = False
+        """@private"""
         
     def reset(self) -> None:
         
@@ -35,6 +37,7 @@ class AgentBanana:
         self.lock_mode = None
         self.locked_gx = 0.0
         self.pilotage.reset()
+        self.use_corde = False
         
     def rotate(self, x : float, z : float, angle : float) -> tuple[float,float]:
         
