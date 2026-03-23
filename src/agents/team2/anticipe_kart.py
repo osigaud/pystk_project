@@ -80,5 +80,4 @@ class AnticipeKart:
                 lookahead = 7 # on regarde loin pour un long virage 
         self.path_lookahead = lookahead
         self.virage_long = virage_long # sera utilisé dans l'acceleration pour ajuster la vitesse du kart dans les virages longs
-        #print(self.path_lookahead)
         return self.path_lookahead
