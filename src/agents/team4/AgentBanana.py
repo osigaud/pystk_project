@@ -155,7 +155,11 @@ class AgentBanana:
         courbe = compute_curvature(points[:self.c.nb_noeuds]) # Calcul de la courbe
         
         paths_width = obs.get("paths_width",0.0)
-        center_path_distance = obs.get("center_path_distance",[0.0])
+        
+        # Sécurité pour obtenir toujours un float
+        cpd_base = obs.get("center_path_distance",0.0)
+        center_path_distance = float(cpd_base[0] if hasattr(cpd_base,"__getitem__") else cpd_base)
+        
         limit_path = paths_width[0]/2 # Limite de la piste calculée
 
         #print(center_path_distance)
@@ -191,7 +195,7 @@ class AgentBanana:
                     new_side = 1
             
             # Prendre l'interieur des virages sur des virages pas trop serrés
-            elif abs(center_path_distance[0]) <= self.c.limite_centre and abs(b_x) <= self.c.limite_banane_courbe and abs(courbe) <= self.c.limite_courbe:
+            elif abs(center_path_distance) <= self.c.limite_centre and abs(b_x) <= self.c.limite_banane_courbe and abs(courbe) <= self.c.limite_courbe:
                 self.use_corde = True
                 #print(courbe)
                 if -courbe >= 0:
