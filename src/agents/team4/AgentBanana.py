@@ -1,5 +1,7 @@
 from .steering import Steering
 from omegaconf import DictConfig
+import math
+from utils.track_utils import compute_curvature
 
 class AgentBanana:
 
@@ -34,6 +36,31 @@ class AgentBanana:
         self.locked_gx = 0.0
         self.pilotage.reset()
         
+    def rotate(self, x : float, z : float, angle : float) -> tuple[float,float]:
+        
+        """
+        Fonction permettant de faire la rotation de x et z selon un angle, formule basée sur la matrice de rotation
+        
+        Args:
+
+            x(float) : Décalage latéral de la cible.
+            z(float) : Profondeur de la cible.
+            angle(float) : Angle de rotation.
+
+        Returns:
+
+            float : Décalage latéral obtenu après rotation.
+            float : Profondeur obtenue après rotation.
+        """
+
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+
+        x_prime = x*cos_a - z*sin_a
+        z_prime = x*sin_a + z*cos_a
+
+        return x_prime,z_prime
+    
     def banana_detection(self,obs : dict,limit_path : float,center_path : float) -> tuple[str,float,list]:
         """
         
