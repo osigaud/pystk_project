@@ -68,7 +68,7 @@ class AnticipeKart:
         
         if angle < 0.1 :         # ligne droite 
             lookahead = 7
-        elif 0.1<= angle <=0.5:        # virage leger
+        elif angle <=0.5:        # virage leger
             lookahead = 5     
         else :                    
             lookahead =  3        # virage serré
