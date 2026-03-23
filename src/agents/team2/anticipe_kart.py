@@ -6,7 +6,6 @@
 
 import numpy as np
 
-
 ## @class   AnticipeKart
 #  @brief   Calcule l'angle du virage à venir en comparant deux nœuds de piste.
 #
@@ -17,7 +16,9 @@ import numpy as np
 #
 #  @see AccelerationControl
 class AnticipeKart:
-
+    def __init__(self) : 
+        self.virage_long = False
+        self.path_lookahead = 3
     ## @brief   Calcule l'angle du virage devant le kart.
     #
     #  Mesure la déviation angulaire entre le nœud courant et le nœud
@@ -31,7 +32,7 @@ class AnticipeKart:
     #                   La valeur absolue représente l'intensité du virage.
     def detectVirage(self, obs):
         noeuds_piste   = obs["paths_start"]  # noeuds de piste dans le repere du kart (Z=avant, X=droite)
-        path_lookahead = 5                   # on regarde 5 noeuds en avant
+        path_lookahead = 5 #self.path_lookahead                   # on regarde 5 noeuds en avant
 
         noeud_cour = noeuds_piste[0]               # noeud juste devant le kart
         noeud_loin = noeuds_piste[path_lookahead]  # noeud eloigne pour anticiper le virage
@@ -45,3 +46,39 @@ class AnticipeKart:
         angle = np.arctan2(dx, dz)  # angle de ce vecteur par rapport a l'axe avant Z
 
         return angle
+    
+    
+    def get_dynamicLookahead(self, obs) :
+        """Cette fonction permet de déterminer dynamiquement le nombre de noeuds à regarder au plus loin 
+        en fonction des différents seuils de virages
+        
+        Args : 
+        - obs(dict) : Dictionnaire d'observation retourné par l'environnement
+        
+        Return : 
+                int : nombre de noeuds à regarder
+        """
+        
+        node_path = obs.get("paths_start",[])
+        if len(node_path) < 7 : 
+            return self.path_lookahead
+        
+        angle = abs(self.detectVirage(obs))
+        virage_long = False
+        
+        if angle < 0.1 :         # ligne droite 
+            lookahead = 7
+        elif 0.1<= angle <=0.5:        # virage leger
+            lookahead = 5     
+        else :                    
+            lookahead =  3        # virage serré
+            # on verifie si le virage est long ou pas 
+            i = min(7, len(node_path)-1)
+            distance = np.linalg.norm(node_path[i] - node_path[0])
+            virage_long = distance > 20
+            if virage_long :
+                lookahead = 7 # on regarde loin pour un long virage 
+        self.path_lookahead = lookahead
+        self.virage_long = virage_long # sera utilisé dans l'acceleration pour ajuster la vitesse du kart dans les virages longs
+        #print(self.path_lookahead)
+        return self.path_lookahead
