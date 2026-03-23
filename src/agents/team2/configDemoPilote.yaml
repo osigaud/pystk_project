@@ -1,10 +1,10 @@
 acceleration:
   virage: 0.9972472427271639
   virage_moyen: 0.9544710574047249
-  virage_serre: 0.8261081593205882
-  "virage_serre": 0.85
-  virage_tres_serre: 0.8067896957489046
-  "virage_tres_serre": 0.8
+  virage_serré: 0.8261081593205882
+  
+  virage_tres_serré: 0.8067896957489046
+ 
 angle_evite_n: -0.7560262910779454
 angle_evite_p: 0.7560262910779454
 braquage: 0.8374079786428565

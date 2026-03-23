@@ -181,7 +181,7 @@ def objective(trial):
 
     )
 
-    print("ERREUR CACHÉE DU JEU :", resultat.stderr)
+    
 
 
     score_final = 10000.0  
