@@ -85,18 +85,25 @@ class AgentBanana:
 
         banana = [] # Liste qui va accueillir nos bananes
 
+        p0 = obs['paths_start'][0] # Premier point de la liste
+        p1 = obs['paths_end'][0]
+
+        angle_piste = math.atan2(p1[0]-p0[0],p1[2]-p0[2]) # Calcul de l'angle de la cible par rapport à l'agents
+
         for i in range(len(items_pos)):
             if items_type[i] == 1 or items_type[i] == 4: # Si c'est une banane ou une chewing-gum
                 pos_x = items_pos[i][0] # On récupère le décalage latéral 
                 pos_z = items_pos[i][2] # On récupère la profondeur
 
-                dist_obj_centre= abs(center_path+pos_x) #Calcul de la distance absolu de l'objet
+                nx, nz = self.rotate(pos_x,pos_z,-angle_piste) # Rotation inverse pour ramener sur l'axe z
+
+                dist_obj_centre= abs(center_path+nx) #Calcul de la distance absolu de l'objet
 
                 if dist_obj_centre > limit_path: # Si l'objet est hors des limites de la piste, on ne le prend pas en compte
                     continue
 
-                if -self.c.radar_x <= pos_x <= self.c.radar_x and self.c.radar_zmin <= pos_z <= self.c.radar_zmax: # Si la banana est dans notre radar, on l'ajoute dans notre liste
-                    banana.append((pos_x,pos_z))
+                if -self.c.radar_x <= nx <= self.c.radar_x and self.c.radar_zmin <= nz <= self.c.radar_zmax: # Si la banana est dans notre radar, on l'ajoute dans notre liste
+                    banana.append((nx,nz))
 
         banana.sort(key=lambda x: x[1]) # On trie la liste par ordre croissant selon la profondeur
 
@@ -119,7 +126,7 @@ class AgentBanana:
         else:
             return "SINGLE",first_x,banana # Cas d'une seule banane
         
-    
+        
     def choose_action(self,obs : dict,gx : float ,gz : float,acceleration : float) -> tuple[bool,dict]:
 
         """
