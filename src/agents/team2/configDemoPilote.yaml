@@ -1,33 +1,26 @@
 acceleration:
-  virage_tres_serré : 0.8
-  virage_serré : 0.85
-  virage_moyen : 0.95
-  virage : 1.0 
-# pour la fonction reaction_items
-
-angle_evite_n: -0.61
-angle_evite_p: 0.61
-correction: 0.504447548795972
-curvature: 0.4265392236049711
-virages:
-  drift: 0.1   #seuil necessitant un drift (tres serrer)
-  serrer:       #intervale viarges serres
-    i1: 0.05
-    i2: 0.1 
-  moyen:        #intervale viarges moyen
-    i1: 0 
-    i2: 0.05  
-  
-
-#pour la fonction gerer recul
-
-vitesse : 0.2
-steps : 5
-recovery : 15
-braquage : 0.85
-
-#pour la fonction attack rivals
-
+  virage: 0.9972472427271639
+  virage_moyen: 0.9544710574047249
+  virage_serre: 0.8261081593205882
+  "virage_serre": 0.85
+  virage_tres_serre: 0.8067896957489046
+  "virage_tres_serre": 0.8
+angle_evite_n: -0.7560262910779454
+angle_evite_p: 0.7560262910779454
+braquage: 0.8374079786428565
 champs_vision:
-  dist: 40 
-  angle: 15.0
+  angle: 20.162036738469265
+  dist: 24.514755260973594
+correction: 0.6366486936797998
+curvature: 0.5274503214873205
+recovery: 18
+steps: 8
+virages:
+  drift: 0.16259576810108756
+  moyen:
+    i1: 0.0
+    i2: 0.07593688267397228
+  serrer:
+    i1: 0.07593688267397228
+    i2: 0.16259576810108756
+vitesse: 0.1730058694074001
