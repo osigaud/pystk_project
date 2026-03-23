@@ -77,3 +77,14 @@ steer_threshold: 0.4
 stop_drift_speed: 4.0 
 #max_steer_angle_petit et frein_virage dans AgentSpeed
 
+
+#AgentVirage
+
+seuil_intensite: 0.1
+seuil_delta: 0.035
+seuil_corde : 0.8
+steer1: 0.07
+steer2: 0.15
+acceleration: 0.08561080277373714
+brake: 0.19667823752517477
+
