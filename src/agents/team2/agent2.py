@@ -161,7 +161,7 @@ class Agent2(KartAgent):
         if action_secours is not None:
             return action_secours
 
-        #self.path_lookahead = self._calculer_lookahead_dynamique(obs, speed)
+        #self.path_lookahead = self.calculer_lookahead_dynamique(obs, speed)
         
         phase = obs.get("phase", 0)
 
