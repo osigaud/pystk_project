@@ -60,9 +60,10 @@ banana:
   nb_noeuds : 5
   limite_banane_single : 1.8
   limite_centre : 1.8
-  limite_courbe : 3.0
+  limite_courbe : 1.2
   limite_banane_courbe : 1.8
-  decalage_lateral_courbe : 5.0
+  decalage_lateral_courbe : 4.0
+  true_virage : 0.5
 
 rescue:
   recovery_timer : 10
@@ -88,8 +89,10 @@ nitro:
   seuil_target_late : 7
 
 edge:
-  correction_steer : 0.6
-  epsilon_limite : 1.5
+  correction_steer : 0.2
+  epsilon_limite_max : 0.5
+  epsilon_limite_min : 0.05
   epsilon_gz : 0.01
   gain : 7.0
   new_accel : 0.4
+  decalage_lateral : 0.5
