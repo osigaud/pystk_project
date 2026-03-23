@@ -60,7 +60,7 @@ class AgentItems(KartAgent) :
                 action["fire"] = False
                 return action 
             for kart in obs["karts_position"]:
-                if kart[self.conf.z]>=0 and kart[self.conf.z]<60:
+                if kart[self.conf.z] >= 0 and kart[self.conf.z] < 80:
                    action["fire"] = True
                    return action
             return action
@@ -87,7 +87,7 @@ class AgentItems(KartAgent) :
             if premier_kart[self.conf.z]<0:
                 action["fire"] = False
             for kart in obs["karts_position"]:
-                if kart[self.conf.z]>=0 and kart[self.conf.z]<25:
+                if kart[self.conf.z]>=0 and kart[self.conf.z] < 50:
                     if abs(kart[self.conf.x]) <= 3:
                         action["fire"] = True 
             return action
@@ -101,7 +101,7 @@ class AgentItems(KartAgent) :
 
         if current_item == SWATTER :
             for kart in obs["karts_position"]:
-                if abs(kart[self.conf.z])<=10 and abs(kart[self.conf.x])<=10 and abs(kart[self.conf.y])<=5:
+                if abs(kart[self.conf.z]) <= 9 and abs(kart[self.conf.x]) <= 9 and abs(kart[self.conf.y])<=5:
                     action["fire"] = True
             return action
 
