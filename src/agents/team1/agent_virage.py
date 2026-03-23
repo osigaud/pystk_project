@@ -9,6 +9,7 @@ class AgentVirage(KartAgent):
         self.intensite_precedente = None
         self.conf = conf
         self.seuil_intensite = self.conf.seuil_intensite
+        self.seuil_corde = self.conf.seuil_corde
         self.seuil_delta = self.conf.seuil_delta
         self.steer1 = self.conf.steer1
         self.steer2 = self.conf.steer2
@@ -68,8 +69,10 @@ class AgentVirage(KartAgent):
                 phase = 1
             elif delta < -self.seuil_delta:
                 phase = 3
-            else:
+            elif (self.intensite_precedente > self.seuil_corde):
                 phase = 2
+            else:
+                phase = 0
 
         
         self.intensite_precedente = intensite_actuelle
@@ -82,6 +85,9 @@ class AgentVirage(KartAgent):
             accel = act["acceleration"]
             accel += self.acceleration * self.intensite_precedente
             act["acceleration"] = np.clip(accel, 0, 1)
+
+        if (phase == 2):
+            act["drift"] = True
 
         return act
 

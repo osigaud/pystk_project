@@ -12,10 +12,11 @@ z : 2
 
 #AgentCenter
 # distance à partir de laquelle on considère notre distance par rapport au centre trop élevée
-dist : 0.673833673012193
+dist:  1.1959096763600898
+
 
 # à quel point on ajuste la direction
-ajust : 0.6386812473361506
+ajust: 0.48582297658049045
 
 
 #AgentSpeed
@@ -71,3 +72,13 @@ unblock_steps_default : 6
 
 
 #AgentDrift
+
+#AgentVirage
+
+seuil_intensite: 0.1
+seuil_delta: 0.035
+seuil_corde : 0.8
+steer1: 0.07
+steer2: 0.15
+acceleration: 0.08561080277373714
+brake: 0.19667823752517477
