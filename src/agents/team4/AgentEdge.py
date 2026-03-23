@@ -11,8 +11,6 @@ class AgentEdge:
      
         self.conf = config
         """@private"""
-        self.correction_steer = self.conf.correction_steer
-        """@private"""
         self.pilotage = Steering(config_pilote)
         """@private"""
 
@@ -22,13 +20,15 @@ class AgentEdge:
         
         self.pilotage.reset()
 
-    def choose_action(self, obs : dict) -> tuple[bool,dict]:
+    def choose_action(self, obs : dict, gx : float, gz : float) -> tuple[bool,dict]:
         """
         Analyse la position latérale et corrige si nécessaire
 
         Args:
 
             obs(dict) : Les données de télémétrie fournies par le simulateur.
+            gx(float) : Décalage latéral de la cible.
+            gz(float) : Profondeur de la cible.
 
         Returns:
 
@@ -37,38 +37,37 @@ class AgentEdge:
 
         """
         # Récupération des données de piste
-        center_path_distance = obs.get("center_path_distance", 0.0)[0]
-        paths_width = obs.get("paths_width", [10.0]) # 10.0 par défaut
-        center_path = obs.get("center_path", [0.0, 0.0, 0.0])
-        limit_path = paths_width[0] / 2
-
+        cpd_raw = obs.get("center_path_distance", 0.0)
+        center_path_distance = cpd_raw[0]
+        
+        pw_raw = obs.get("paths_width", [10.0, 0.0, 0.0])
+        limit_path = pw_raw[0] / 2
+        limit_path = limit_path[0]
+        
+        # Calcul de la marge de sécurité (Distance bord <-> Kart)
+        marge_securite = limit_path - abs(center_path_distance)
         #print((limit_path - abs(center_path_distance))[0])
         
         # Vérification de la sortie de piste imminente
-        if ((limit_path - abs(center_path_distance))[0]) <= self.conf.epsilon_limite :
+        if self.conf.epsilon_limite_min <= marge_securite <= self.conf.epsilon_limite_max :
 
-            gx = center_path[0] # Récupération du décalage latéral du centre de la piste
-            gz = center_path[2] # Récupération de la profondeur du centre de la piste
-
+            #print(f"Limite de sortie = {marge_securite}")
+            
             #print(gx)
             #print(center_path_distance)
             
-            if gz < self.conf.epsilon_gz:    
-                # ATTENTION LOGIQUE INVERSEE POUR CENTER PATH, si > 0 l'agent se situe à droite de la piste
-                if center_path_distance > 0:
-                    #print("Esquive Vers la gauche")
-                    steer = -self.correction_steer
-                else:
-                    #print("Esquive Vers la droite")
-                    steer = self.correction_steer
+            # ATTENTION LOGIQUE INVERSEE POUR CENTER PATH, si > 0 l'agent se situe à droite de la piste
+            """if center_path_distance > 0:
+                print("Esquive Vers la gauche")
+                gx -= self.conf.decalage_lateral
             else:
-                #print("Esquive Par Pure_Pursuit")
-                
-                # Logique inversée pour le décalage latéral d'où -gx
-                steer = self.pilotage.manage_pure_pursuit(-gx,gz,self.conf.gain)
-
+                print("Esquive Vers la droite")
+                gx += self.conf.decalage_lateral"""
+            
             # On réduit l'accélération pour reprendre de l'adhérence
             new_accel = self.conf.new_accel
+
+            steer = self.pilotage.manage_pure_pursuit(gx,gz,self.conf.gain)
 
             action = {
             "acceleration": new_accel,

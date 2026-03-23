@@ -173,7 +173,7 @@ class AgentBanana:
             self.lock_mode = None # On réinitialise l'état
             return False, {}
         
-        # Si la banane esseulé est trop loin de l'agent, on ne la regarde pass
+        # Si la banane esseulée est trop loin de l'agent, on ne la regarde pass
         if mode == "SINGLE" and abs(b_x) >= self.c.limite_banane_single and self.lock_mode != "LIGNE":
             if self.dodge_timer <= 0:
                 return False, {}
@@ -182,20 +182,8 @@ class AgentBanana:
 
             #print(banana_list)
             
-            #Sécurité pour éviter de sortir de la piste
-            if (limit_path - abs(center_path_distance)) <= self.c.seuil_limite_path :
-                #print("choix par limite de bord")
-                #print(limit_path, center_path_distance)
-                
-                # ATTENTION LOGIQUE INVERSEE POUR CENTER PATH, si > 0 l'agent se situe à droite de la piste
-                self.use_corde = True
-                if center_path_distance >= 0:
-                    new_side = -1
-                else:
-                    new_side = 1
-            
             # Prendre l'interieur des virages sur des virages pas trop serrés
-            elif abs(center_path_distance) <= self.c.limite_centre and abs(b_x) <= self.c.limite_banane_courbe and abs(courbe) <= self.c.limite_courbe:
+            if abs(center_path_distance) <= self.c.limite_centre and abs(b_x) <= self.c.limite_banane_courbe and abs(courbe) <= self.c.limite_courbe:
                 self.use_corde = True
                 #print(courbe)
                 if -courbe >= self.c.true_virage: # Seuleument si la courbe tourne assez pour eviter l'instabilité
@@ -205,6 +193,7 @@ class AgentBanana:
                     #print("VIRAGE A GAUCHE")
                     new_side = -1
                 else:
+                    self.use_corde = False
                     if b_x>=0:
                         new_side = -1
                     else:

@@ -142,14 +142,17 @@ class Agent4(KartAgent):
             return action_stuck
         
         # Appel de la fonction edge
-        edge, action_edge = self.expert_edge.choose_action(obs)
+        edge, action_edge = self.expert_edge.choose_action(obs, gx, gz)
         if edge:
-            #print("Danger Limite Piste")
+            self.expert_esquive_adv.reset()
+            self.expert_banana_dodge.reset()
+            print("Danger Limite Piste")
             return action_edge
         
         # Appel de la fonction esquive banane
         danger_banane, action_banane = self.expert_banana_dodge.choose_action(obs,gx,gz,acceleration)
         if danger_banane:
+            self.expert_esquive_adv.reset()
             return action_banane
         
         # Appel de la fonction esquive adversaire
