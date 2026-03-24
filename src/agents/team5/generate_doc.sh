@@ -24,18 +24,24 @@ fi
 # Creation du dossier de doc
 mkdir -p "$TARGET_DIR"
 
+# On ajoute src/ au PYTHONPATH pour que Python trouve 'agents'
+# On remonte deux fois : team5 -> agents -> src
+export PYTHONPATH="$SCRIPT_DIR/../..:"
+
 # Preparation des modules pour pydoc
 echo "--- Recherche des modules dans team5 ---"
+
+# On reste dans src/agents/ comme dans le script original
 cd "$SCRIPT_DIR/.."  # On va dans src/agents
 
 # On liste les fichiers agent5*.py dans le dossier team5
 MODULES=$(ls team5/agent5*.py | sed 's/\.py//' | sed 's/\//./g')
-ALL_MODULES="team5 $MODULES"
+ALL_MODULES="$MODULES"
 
 echo "Modules detectes : $ALL_MODULES"
 
 echo "--- Generation de la documentation ---"
-python3 -m pydoc -w $ALL_MODULES
+python3 -m pydoc -w team5 $ALL_MODULES
 mv team5*.html "$TARGET_DIR/"
 
 echo "--- Succes ---"
