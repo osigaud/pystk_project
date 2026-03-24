@@ -1,27 +1,24 @@
-#valeurs a ajuster dans la fonction correction_centrePiste
-correction: 0.5
-
-#seuil a ajuster dans la fonction DetecteVirage():
-
-curvature: 0.35
-
-#valeurs a ajuster dans la fonction adapteAcceleration():
-
-acceleration: 
-#j'ai modifié c'était 0.90      
-  sans_virage: 1.0   #acceleration avant de rencontrer un virage
-
-virages:
-  drift: 2.80   #seuil necessitant un drift (tres serrer)
-  serrer:       #intervale viarges serres
-    i1: 1.80 
-    i2: 2.80 
-  moyen:        #intervale viarges moyen
-    i1: 0.85 
-    i2: 1.80  
-  
-
+acceleration:
+  sans_virage: 1.0
 # pour la fonction reaction_items
 
-angle_evite_p :  0.61
-angle_evite_n :  -0.61
+angle_evite_n: -0.61
+angle_evite_p: 0.61
+correction: 0.504447548795972
+curvature: 0.4265392236049711
+virages:
+  drift: 0.1   #seuil necessitant un drift (tres serrer)
+  serrer:       #intervale viarges serres
+    i1: 0.05
+    i2: 0.1 
+  moyen:        #intervale viarges moyen
+    i1: 0 
+    i2: 0.05  
+  
+
+#pour la fonction gerer recul
+
+vitesse : 0.2
+steps : 5
+recovery : 15
+braquage : 0.85
