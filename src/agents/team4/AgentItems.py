@@ -74,8 +74,8 @@ class AgentItems:
                     return True, steer
                 return False, steer
     
-        # Bowling Ball, Plunger, RubberBall, Parachute, Anvil
-        if item_type in (ItemType.BOWLING, ItemType.PLUNGER, ItemType.RUBBERBALL, ItemType.PARACHUTE, ItemType.ANVIL):
+        # Bowling Ball, Plunger, RubberBall
+        if item_type in (ItemType.BOWLING, ItemType.PLUNGER, ItemType.RUBBERBALL):
             for kart in karts:
                 x, z = float(kart[0]), float(kart[2])
                 if -self.c.radar_xball <= x <= self.c.radar_xball and self.c.radar_zmin_ball <= z <= self.c.radar_zmax_ball:
