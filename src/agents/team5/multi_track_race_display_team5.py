@@ -101,7 +101,8 @@ def create_race(cfg=None):
     if NB_RACES==1:
         env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
     else:
-        env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
+        env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS) # render_node = None = Aucune fenêtre graphique
+    # Pour avoir la fenêtre graphique, mettre "human" au lieu des None
 
     # Instantiate the agents.
 
