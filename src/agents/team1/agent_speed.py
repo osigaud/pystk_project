@@ -17,11 +17,12 @@ class AgentSpeed(KartAgent):
         msagrand (float): Seuil haut sur obs["max_steer_angle"] pour moduler l'accélération.
     """
 
-    def __init__(self, env, conf, agent, path_lookahead=3):
+    def __init__(self, env, conf, agent, path_lookahead=1):
         super().__init__(env)
         self.conf = conf
         self.agent = agent
         self.path_lookahead = path_lookahead
+        self.step_count = 0
     
     @staticmethod
     def detecter_virage(conf, obs):
@@ -104,6 +105,14 @@ class AgentSpeed(KartAgent):
   
     def choose_action(self, obs):
         act = self.agent.choose_action(obs)
+        
+        if self.step_count < 30:
+        	act["acceleration"] = 1
+        	act["brake"] = False
+        	self.step_count += 1
+        	return act
+        
+        self.step_count += 1
         virage_serre = self.detecter_virage(self.conf, obs)
         action_ajustee = self.ajuster_acceleration(virage_serre, act, obs)
         return action_ajustee
