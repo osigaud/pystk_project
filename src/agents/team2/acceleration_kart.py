@@ -60,8 +60,10 @@ class AccelerationControl(AnticipeKart):
     #  @see     AnticipeKart.detectVirage()
     def adapteAcceleration(self, obs):
         acceleration = self.amax
+        #print("ancien : ", self.path_lookahead)
         #self.path_lookahead = self.get_dynamicLookahead(obs)
         curvature = abs(self.detectVirage(obs))  # valeur absolue de l'angle
+        #print("nouveau :", self.path_lookahead)
 
         if curvature > self.seuildrift:
             # virage très serré : fort freinage anticipé
@@ -76,5 +78,4 @@ class AccelerationControl(AnticipeKart):
         else:
             # ligne droite ou courbe très légère : pleine accélération
             acceleration = self.amax
-            
         return acceleration

@@ -18,7 +18,7 @@ import numpy as np
 class AnticipeKart:
     def __init__(self) : 
         self.virage_long = False
-        self.path_lookahead = 3
+        self.path_lookahead = 5
     ## @brief   Calcule l'angle du virage devant le kart.
     #
     #  Mesure la déviation angulaire entre le nœud courant et le nœud
@@ -49,7 +49,7 @@ class AnticipeKart:
     
     
     def get_dynamicLookahead(self, obs) :
-        """Cette fonction permet de déterminer dynamiquement le nombre de noeuds à regarder au plus loin 
+        """ Cette fonction permet de déterminer dynamiquement le nombre de noeuds à regarder au plus loin 
         en fonction des différents seuils de virages
         
         Args : 
@@ -58,9 +58,8 @@ class AnticipeKart:
         Return : 
                 int : nombre de noeuds à regarder
         """
-        
-        node_path = obs.get("paths_start",[])
-        if len(node_path) < 7 : 
+        node_path = obs.get("paths_start")
+        if len(node_path) < 6 : 
             return self.path_lookahead
         
         angle = abs(self.detectVirage(obs))
