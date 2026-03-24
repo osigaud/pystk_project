@@ -43,7 +43,7 @@ def objective(trial):
 
     # optuna propose des valeurs dans les intervalles définis
 
-    correction = trial.suggest_float("correction", 0.1, 1.0)
+    #correction = trial.suggest_float("correction", 0.1, 1.0)
 
     curvature  = trial.suggest_float("curvature",  0.1, 0.8)
 
@@ -114,7 +114,7 @@ def objective(trial):
 
     # remplacement des valeurs par celles proposées par Optuna
 
-    config['correction'] = correction
+    #config['correction'] = correction
 
     config['curvature']  = curvature
 
