@@ -175,7 +175,8 @@ def kart_observation_space(use_ai: bool):
         {
             "aux_ticks": spaces.Box(0.0, float("inf"), dtype=np.float32, shape=(1,)),
             "phase": spaces.Discrete(max_enum_value(Phase)),
-            "powerup": spaces.Discrete(max_enum_value(pystk2.Powerup)),
+            "powerup_type": spaces.Discrete(max_enum_value(pystk2.Powerup)),
+            "powerup_count": spaces.Discrete(6),
             # Last attachment... is no attachment
             "attachment": spaces.Discrete(max_enum_value(pystk2.Attachment)),
             "skeed_factor": spaces.Box(0.0, float("inf"), dtype=np.float32, shape=(1,)),

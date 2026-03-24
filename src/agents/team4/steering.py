@@ -1,24 +1,36 @@
 import math
 import numpy as np
+from omegaconf import DictConfig
 
 class Steering:
     """
     Module Steering : Gère la logique de direction
     """
     
-    def __init__(self):
-        self.L = 2.5  # On simule un empattement
+    def __init__(self,config : DictConfig) -> None:
+        """Initialise les variables d'instances de l'agent."""
         
-    def manage_pure_pursuit(self,gx,gz,gain):
+        self.c = config
+        """@private"""
+        self.L = self.c.empattement  # On simule un empattement
+        """@private"""
+
+    def reset(self) -> None:
+        """Réinitialise les variables d'instances de l'agent expert"""
+        pass
+        
+    def manage_pure_pursuit(self,gx:float,gz:float,gain:float) -> float:
         """
         Gère la logique de direction grâce au pure pursuit
 
         Args:
+            
             gx(float) : Décalage latéral de la cible.
             gz(float) : Profondeur de la cible.
             gain(float) : Gain à appliquer à l'angle final.
         
         Returns:
+            
             float : Variable donnant la direction des roues.
         """
         
