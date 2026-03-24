@@ -1,5 +1,6 @@
 from .steering import Steering
 from omegaconf import DictConfig
+from .ItemType import ItemType
 
 class AgentItems:
     
@@ -38,35 +39,50 @@ class AgentItems:
         
         """
         
-        item_type = int(obs.get("powerup_type", 0))
-        item_count = obs["powerup_count"]
+        item_type = ItemType(obs.get("powerup_type", 0))
+        item_count = obs.get("powerup_count", 0)
+    
+        #1 bubblegum
+        #2 cake
+        #3 bowling ball
+        #4 zipper (boost speed)
+        #5 plunger
+        #6 switch bonus <-> banana
+        #7 swapper
+        if item_count < 1 :
+            return False, steer #cas où nous n'avons pas d'item
         
-        
-        if item_count>=1:
-            # Bubblegum Cake Switch
-            if item_type in (1, 2, 6):
+        karts = obs.get("karts_positions", [])
+
+        # Bubblegum Cake Switch
+        if item_type in (ItemType.BUBBLEGUM, ItemType.CAKE, ItemType.SWITCH):
+            #return False, steer
+            return True, steer
+    
+        # Zipper
+        if item_type == ItemType.ZIPPER:
+            if (abs(steer) < self.c.steer_allow_zipper):
+                #return False, steer
                 return True, steer
     
-            # Zipper
-            if item_type == 4:
-                if (abs(steer) < self.c.steer_allow_zipper):
+        # Swatter
+        if item_type == ItemType.SWATTER:
+            for kart in karts:
+                x, z = float(kart[0]), float(kart[2])
+                if -self.c.radar_xswatter <= x <= self.c.radar_xswatter and self.c.radar_zmin_swatter <= z <= self.c.radar_zmax_swatter:
+                    #return False, steer
                     return True, steer
+                return False, steer
     
-            # Swatter
-            if item_type == 7:
-                for kart in obs.get("karts_position", []):
-                    x, z = float(kart[0]), float(kart[2])
-                    if -self.c.radar_xswatter <= x <= self.c.radar_xswatter and self.c.radar_zmin_swatter <= z <= self.c.radar_zmax_swatter:
-                        return True, steer
-    
-            # Bowling Ball, Plunger, RubberBall, Parachute, Anvil
-            if item_type in (3, 5, 8, 9, 10):
-                for kart in obs.get("karts_position", []):
-                    x, z = float(kart[0]), float(kart[2])
-                    if -self.c.radar_xball <= x <= self.c.radar_xball and self.c.radar_zmin_ball <= z <= self.c.radar_zmax_ball:
-                        target = self.steerer.manage_pure_pursuit(x, z, self.c.gain_steer)
-                        new_steer = float(self.c.rate_steer * steer + self.c.rate_target * target)
-                        return True, new_steer
-
-        # Nothing
+        # Bowling Ball, Plunger, RubberBall, Parachute, Anvil
+        if item_type in (ItemType.BOWLING, ItemType.PLUNGER, ItemType.RUBBERBALL, ItemType.PARACHUTE, ItemType.ANVIL):
+            for kart in karts:
+                x, z = float(kart[0]), float(kart[2])
+                if -self.c.radar_xball <= x <= self.c.radar_xball and self.c.radar_zmin_ball <= z <= self.c.radar_zmax_ball:
+                    target = self.steerer.manage_pure_pursuit(x, z, self.c.gain_steer)
+                    new_steer = float(self.c.rate_steer * steer + self.c.rate_target * target)
+                    #return False, steer
+                    return True, new_steer
+            return False, steer
         return False, steer
+            

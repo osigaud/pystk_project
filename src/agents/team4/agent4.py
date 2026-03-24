@@ -176,4 +176,10 @@ class Agent4(KartAgent):
             "rescue":False,
             "fire": fire,
         }
+        item_type = int(obs.get("powerup_type", 0))
+        item_count = obs["powerup_count"]
+        #print("item",item_type," ",item_count," fois")
+        #if item_type in (1, 2, 6):
+            #print("objet instantanement utilisé !!!!!")
+        print(obs.get("attachment",0))
         return action
