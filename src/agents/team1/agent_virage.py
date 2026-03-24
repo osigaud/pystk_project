@@ -17,16 +17,16 @@ class AgentVirage(KartAgent):
         self.brake = self.conf.brake
 
     def calcul_vecteur(self, v1, v2):
-        nv_x = v2[0] - v1[0]
-        nv_z = v2[2] - v1[2]
+        nv_x = v2[self.conf.x] - v1[self.conf.x]
+        nv_z = v2[self.conf.z] - v1[self.conf.z]
 
         return np.array([nv_x, nv_z], dtype=float)
 
 
     def direction_virage(self, vecteur):
-        if (vecteur[0] > 0):
+        if (vecteur[self.conf.x] > 0):
             return 1
-        elif (vecteur[0] < 0):
+        elif (vecteur[self.conf.x] < 0):
             return -1
         else:
             return 0
@@ -36,7 +36,7 @@ class AgentVirage(KartAgent):
         v1 = np.array(v1, dtype=float)
         v2 = np.array(v2, dtype=float)
 
-        epsilon = 0.0001
+        epsilon = 0.0001  #eviter de diviser a 0
         prod_scal = np.dot(v1, v2)
 
         norm_v1 = np.linalg.norm(v1)
