@@ -141,8 +141,8 @@ class Kart_drift(Agent2):
         #else:
             #fire=False
 
-    #eviter les murs/ revenir sur la piste si kart bloqué
-        if abs(obs["center_path_distance"])> obs["paths_width"][0]/2:
-            rescue=True
-        else:
-            rescue=False
+    # #eviter les murs/ revenir sur la piste si kart bloqué
+    #     if abs(obs["center_path_distance"])> obs["paths_width"][0]/2:
+    #         rescue=True
+    #     else:
+    #         rescue=False
