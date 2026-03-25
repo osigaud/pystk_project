@@ -146,7 +146,7 @@ class Agent4(KartAgent):
         if edge:
             self.expert_esquive_adv.reset()
             self.expert_banana_dodge.reset()
-            print("Danger Limite Piste")
+            #print("Danger Limite Piste")
             return action_edge
         
         # Appel de la fonction esquive banane
