@@ -82,7 +82,7 @@ def objective(trial):
 
     vitesse  = trial.suggest_float("vitesse", 0.1, 0.5)
 
-    steps    = trial.suggest_int("steps", 3, 10)
+    #steps    = trial.suggest_int("steps", 3, 10)
 
     recovery = trial.suggest_int("recovery", 10, 30)
 
@@ -126,7 +126,7 @@ def objective(trial):
 
     config['vitesse'] = vitesse
 
-    config['steps'] = steps
+   # config['steps'] = steps
 
     config['recovery'] = recovery
 
