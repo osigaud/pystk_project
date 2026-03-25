@@ -1,5 +1,7 @@
 from .steering import Steering
 from omegaconf import DictConfig
+import math
+from utils.track_utils import compute_curvature
 
 class AgentBanana:
 
@@ -23,6 +25,8 @@ class AgentBanana:
         """@private"""
         self.pilotage = Steering(config_pilote)
         """@private"""
+        self.use_corde = False
+        """@private"""
         
     def reset(self) -> None:
         
@@ -33,7 +37,33 @@ class AgentBanana:
         self.lock_mode = None
         self.locked_gx = 0.0
         self.pilotage.reset()
+        self.use_corde = False
         
+    def rotate(self, x : float, z : float, angle : float) -> tuple[float,float]:
+        
+        """
+        Fonction permettant de faire la rotation de x et z selon un angle, formule basée sur la matrice de rotation
+        
+        Args:
+
+            x(float) : Décalage latéral de la cible.
+            z(float) : Profondeur de la cible.
+            angle(float) : Angle de rotation.
+
+        Returns:
+
+            float : Décalage latéral obtenu après rotation.
+            float : Profondeur obtenue après rotation.
+        """
+
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+
+        x_prime = x*cos_a - z*sin_a
+        z_prime = x*sin_a + z*cos_a
+
+        return x_prime,z_prime
+    
     def banana_detection(self,obs : dict,limit_path : float,center_path : float) -> tuple[str,float,list]:
         """
         
@@ -58,18 +88,25 @@ class AgentBanana:
 
         banana = [] # Liste qui va accueillir nos bananes
 
+        p0 = obs['paths_start'][0] # Premier point de la liste
+        p1 = obs['paths_end'][0]
+
+        angle_piste = math.atan2(p1[0]-p0[0],p1[2]-p0[2]) # Calcul de l'angle de la cible par rapport à l'agents
+
         for i in range(len(items_pos)):
             if items_type[i] == 1 or items_type[i] == 4: # Si c'est une banane ou une chewing-gum
                 pos_x = items_pos[i][0] # On récupère le décalage latéral 
                 pos_z = items_pos[i][2] # On récupère la profondeur
 
-                dist_obj_centre= abs(center_path+pos_x) #Calcul de la distance absolu de l'objet
+                nx, nz = self.rotate(pos_x,pos_z,-angle_piste) # Rotation inverse pour ramener sur l'axe z
+
+                dist_obj_centre= abs(center_path+nx) #Calcul de la distance absolu de l'objet
 
                 if dist_obj_centre > limit_path: # Si l'objet est hors des limites de la piste, on ne le prend pas en compte
                     continue
 
-                if -self.c.radar_x <= pos_x <= self.c.radar_x and self.c.radar_zmin <= pos_z <= self.c.radar_zmax: # Si la banana est dans notre radar, on l'ajoute dans notre liste
-                    banana.append((pos_x,pos_z))
+                if -self.c.radar_x <= nx <= self.c.radar_x and self.c.radar_zmin <= nz <= self.c.radar_zmax: # Si la banana est dans notre radar, on l'ajoute dans notre liste
+                    banana.append((nx,nz))
 
         banana.sort(key=lambda x: x[1]) # On trie la liste par ordre croissant selon la profondeur
 
@@ -92,7 +129,7 @@ class AgentBanana:
         else:
             return "SINGLE",first_x,banana # Cas d'une seule banane
         
-    
+        
     def choose_action(self,obs : dict,gx : float ,gz : float,acceleration : float) -> tuple[bool,dict]:
 
         """
@@ -113,9 +150,19 @@ class AgentBanana:
         
         """
 
+        points = obs['paths_start'] # Récupération des points
+
+        courbe = compute_curvature(points[:self.c.nb_noeuds]) # Calcul de la courbe
+        
         paths_width = obs.get("paths_width",0.0)
-        center_path_distance = obs.get("center_path_distance",0.0)
+        
+        # Sécurité pour obtenir toujours un float
+        cpd_base = obs.get("center_path_distance",0.0)
+        center_path_distance = float(cpd_base[0] if hasattr(cpd_base,"__getitem__") else cpd_base)
+        
         limit_path = paths_width[0]/2 # Limite de la piste calculée
+
+        #print(center_path_distance)
 
         # Appel de la fonction de détection
         mode, b_x, banana_list = self.banana_detection(obs,limit_path,center_path_distance)
@@ -126,28 +173,41 @@ class AgentBanana:
             self.lock_mode = None # On réinitialise l'état
             return False, {}
         
+        # Si la banane esseulée est trop loin de l'agent, on ne la regarde pass
+        if mode == "SINGLE" and abs(b_x) >= self.c.limite_banane_single and self.lock_mode != "LIGNE":
+            if self.dodge_timer <= 0:
+                return False, {}
+        
         if mode == "SINGLE" and self.lock_mode != "LIGNE": # Si on a capte un cas d'une banane seule et qu'on était pas déjà dans une situation d'esquive de barrage
 
             #print(banana_list)
             
-            #Sécurité pour éviter de sortir de la piste
-            if (limit_path - abs(center_path_distance)) <= self.c.seuil_limite_path :
-                #print("choix par limite de bord")
-                #print(limit_path, center_path_distance)
-                
-                # ATTENTION LOGIQUE INVERSEE POUR CENTER PATH, si > 0 l'agent se situe à droite de la piste
-                if center_path_distance >= 0:
+            # Prendre l'interieur des virages sur des virages pas trop serrés
+            if abs(center_path_distance) <= self.c.limite_centre and abs(b_x) <= self.c.limite_banane_courbe and abs(courbe) <= self.c.limite_courbe:
+                self.use_corde = True
+                #print(courbe)
+                if -courbe >= self.c.true_virage: # Seuleument si la courbe tourne assez pour eviter l'instabilité
+                    #print("VIRAGE A DROITE")
+                    new_side = 1
+                elif courbe <= -self.c.true_virage:
+                    #print("VIRAGE A GAUCHE")
                     new_side = -1
                 else:
-                    new_side = 1
+                    self.use_corde = False
+                    if b_x>=0:
+                        new_side = -1
+                    else:
+                        new_side = 1
+
             else:   
                 #print("choix normal")
+                self.use_corde = False
                 if b_x>=0:
                     new_side = -1
                     
                 else:
                     new_side = 1
-            
+
             # Utilisation d'un compteur pour maintenir le cap d'esquive sur x frames
             if self.dodge_timer == 0 or (self.lock_mode == "SINGLE" and self.dodge_side != new_side):
                 self.lock_mode = "SINGLE"
@@ -155,6 +215,7 @@ class AgentBanana:
                 self.dodge_side = new_side
 
         elif mode == "LIGNE": #Si on a capte un mode ligne
+            
             self.lock_mode = "LIGNE"
             self.dodge_timer = self.c.dodge_timer_basic
             self.locked_gx = b_x
@@ -163,12 +224,22 @@ class AgentBanana:
 
         if self.dodge_timer >0: # On est dans le mode Single
             #print("Esquive SINGLE")
+            #print(banana_list)
             self.dodge_timer -= 1 # On decremente le compteur
-            gx += self.c.decalage_lateral * self.dodge_side # On cree le decalage pour le cas single
+            if self.use_corde:
+                gx += self.c.decalage_lateral_courbe * self.dodge_side # Prendre l'intérieur d'un virage demande plus de force pour contrer la force centrifuge
+            else:
+                gx += self.c.decalage_lateral * self.dodge_side # On cree le decalage pour le cas single
             
         elif (mode == "SINGLE" or mode == "LIGNE") and self.lock_mode == "LIGNE":
             #print("Esquive LIGNE")
-            gx = self.locked_gx # On vise le gap calculé pour le mode ligne
+            #print(banana_list)
+
+            # Tant qu'on capte le mode ligne, on recalcule notre gap
+            if mode == "LIGNE":
+                gx = b_x
+            else:
+                gx = self.locked_gx # On vise le gap calculé pour le mode ligne
             gain_volant = self.c.adjusted_gain # Ajustement du gain pour le mode ligne
 
         # Appel de la fonction de steering avec les paramètres modifiés.
@@ -185,4 +256,3 @@ class AgentBanana:
         }
 
         return True,action
-        

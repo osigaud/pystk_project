@@ -8,6 +8,7 @@ from .AgentBanana import AgentBanana
 from .AgentEsquiveAdv import AgentEsquiveAdv
 from .AgentDrift import AgentDrift
 from .AgentItems import AgentItems
+from .AgentEdge import AgentEdge
 from omegaconf import OmegaConf
 from pathlib import Path
 
@@ -54,6 +55,8 @@ class Agent4(KartAgent):
         """@private"""
         self.expert_items = AgentItems(self.conf.powerup_type, self.conf.steering)
         """@private"""
+        self.expert_edge = AgentEdge(self.conf.edge,self.conf.steering)
+        """@private"""
         #print(OmegaConf.to_yaml(conf))
         
         
@@ -69,6 +72,7 @@ class Agent4(KartAgent):
         self.expert_esquive_adv.reset()
         self.expert_drift.reset()
         self.expert_items.reset()
+        self.expert_edge.reset()
         
     def endOfTrack(self) -> bool:
         """Indique si la course est fini."""
@@ -88,6 +92,7 @@ class Agent4(KartAgent):
         """
         
         points = obs.get("paths_start",[]) # On récupère la liste des points
+        #points_end = obs.get("paths_end",[])
         
         if len(points) <= self.c.seuil_lenpoints: # Si la longueur de la liste est inferieur à 2, on accèlère à fond (ligne d'arrivée proche)
             return {
@@ -113,7 +118,7 @@ class Agent4(KartAgent):
         gain_volant = self.c.default_gain  #Gain par défaut
         steering = self.steering.manage_pure_pursuit(gx,gz,gain_volant)
         #drift, modified_steer = self.expert_drift.choose_action(obs,steering,vel)
-        acceleration, brake = self.speedcontroller.manage_speed(speed,drift,obs) # Appel à la fonction gerer_vitesse
+        acceleration, brake = self.speedcontroller.manage_speed(obs) # Appel à la fonction gerer_vitesse
         nitro = self.expert_nitro.manage_nitro(obs,steering,energy) # Appel à la fonction manage_nitro
         
         # Au depart on avance tout droit pour eviter de se cogner contre les adversaires
@@ -136,9 +141,18 @@ class Agent4(KartAgent):
         if is_stuck and obs['distance_down_track'] >= self.c.seuil_distance_stuck:
             return action_stuck
         
+        # Appel de la fonction edge
+        edge, action_edge = self.expert_edge.choose_action(obs, gx, gz)
+        if edge:
+            self.expert_esquive_adv.reset()
+            self.expert_banana_dodge.reset()
+            #print("Danger Limite Piste")
+            return action_edge
+        
         # Appel de la fonction esquive banane
         danger_banane, action_banane = self.expert_banana_dodge.choose_action(obs,gx,gz,acceleration)
         if danger_banane:
+            self.expert_esquive_adv.reset()
             return action_banane
         
         # Appel de la fonction esquive adversaire
