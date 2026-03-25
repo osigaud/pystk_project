@@ -1,14 +1,16 @@
 DemoPilote
 
-Installation de doxygen:
-     
-    ....
+Installation de doxygen: 
+Il faut s'assurer d'etre bien sur la branche demoPilote/src/agents/team2
+et on utilise la commande:
+    doxygen -g Doxyfile
 
 
-    Ouvrir un fichier doxifile:
+    pour generer la documentation du doxyfile:
+         doxygen Doxyfile
 
 
-        ....
+        
 
 Utilisation du fichier de configuration dans un wrapper ou dans agent2:
     Prerequis:
