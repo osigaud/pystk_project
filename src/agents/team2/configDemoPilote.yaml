@@ -14,7 +14,7 @@ champs_vision:
 correction: 0.5
 curvature: 0.5274503214873205
 recovery: 18
-steps: 8
+steps: 2
 virages:
   drift: 0.16259576810108756
   moyen:
