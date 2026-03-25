@@ -31,21 +31,50 @@ class AnticipeKart:
     #                   Positif = virage à droite, négatif = virage à gauche.
     #                   La valeur absolue représente l'intensité du virage.
     def detectVirage(self, obs):
-        noeuds_piste   = obs["paths_start"]  # noeuds de piste dans le repere du kart (Z=avant, X=droite)
-        path_lookahead = 5 #self.path_lookahead                   # on regarde 5 noeuds en avant
+        noeuds_piste = obs["paths_start"]
 
-        noeud_cour = noeuds_piste[0]               # noeud juste devant le kart
-        noeud_loin = noeuds_piste[path_lookahead]  # noeud eloigne pour anticiper le virage
+        path_lookahead = min(10, len(noeuds_piste) - 2)
+        if path_lookahead < 1:
+            return 0.0
 
-        x1, z1 = noeud_cour[0], noeud_cour[2]  # coordonnees horizontales du noeud courant
-        x2, z2 = noeud_loin[0], noeud_loin[2]  # coordonnees horizontales du noeud eloigne
+        deviations = []
 
-        dx = x2 - x1  # composante X du vecteur entre les deux noeuds
-        dz = z2 - z1  # composante Z du vecteur entre les deux noeuds
+        for i in range(path_lookahead):
+            dx0 = noeuds_piste[i+1][0] - noeuds_piste[i][0]
+            dz0 = noeuds_piste[i+1][2] - noeuds_piste[i][2]
+            dx1 = noeuds_piste[i+2][0] - noeuds_piste[i+1][0]
+            dz1 = noeuds_piste[i+2][2] - noeuds_piste[i+1][2]
 
-        angle = np.arctan2(dx, dz)  # angle de ce vecteur par rapport a l'axe avant Z
+            angle0 = np.arctan2(dx0, dz0)
+            angle1 = np.arctan2(dx1, dz1)
 
-        return angle
+            deviation = angle1 - angle0
+            deviation = (deviation + np.pi) % (2 * np.pi) - np.pi
+
+            deviations.append(deviation)
+
+        deviations.sort(key=abs, reverse=True)
+        top3 = deviations[:min(3, len(deviations))]
+        angle_final = sum(top3) / len(top3)
+
+        return angle_final
+    
+    # def detectVirage(self, obs):
+    #     noeuds_piste   = obs["paths_start"]  # noeuds de piste dans le repere du kart (Z=avant, X=droite)
+    #     path_lookahead = 5 #self.path_lookahead                   # on regarde 5 noeuds en avant
+
+    #     noeud_cour = noeuds_piste[0]               # noeud juste devant le kart
+    #     noeud_loin = noeuds_piste[path_lookahead]  # noeud eloigne pour anticiper le virage
+
+    #     x1, z1 = noeud_cour[0], noeud_cour[2]  # coordonnees horizontales du noeud courant
+    #     x2, z2 = noeud_loin[0], noeud_loin[2]  # coordonnees horizontales du noeud eloigne
+
+    #     dx = x2 - x1  # composante X du vecteur entre les deux noeuds
+    #     dz = z2 - z1  # composante Z du vecteur entre les deux noeuds
+
+    #     angle = np.arctan2(dx, dz)  # angle de ce vecteur par rapport a l'axe avant Z
+
+    #     return angle
     
     
     def get_dynamicLookahead(self, obs) :
