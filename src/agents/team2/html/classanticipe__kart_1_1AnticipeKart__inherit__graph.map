@@ -1,5 +1,0 @@
-<map id="anticipe_kart.AnticipeKart" name="anticipe_kart.AnticipeKart">
-<area shape="rect" id="Node000001" title="Calcule l&#39;angle du virage à venir en comparant deux nœuds de piste." alt="" coords="19,5,210,31"/>
-<area shape="rect" id="Node000002" href="$classacceleration__kart_1_1AccelerationControl.html" title="Choisit le niveau d&#39;accélération en fonction du virage détecté." alt="" coords="5,79,224,119"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,44,117,79,112,79,112,44"/>
-</map>

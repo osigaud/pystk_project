@@ -1,7 +1,0 @@
-<map id="agent2.Agent2" name="agent2.Agent2">
-<area shape="rect" id="Node000001" title="Agent de pilotage heuristique pour SuperTuxKart." alt="" coords="20,79,137,104"/>
-<area shape="rect" id="Node000003" href="$classKart__drift_1_1Kart__drift.html" title=" " alt="" coords="5,152,152,177"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="81,118,81,152,76,152,76,118"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="35,5,122,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,44,81,79,76,79,76,44"/>
-</map>
