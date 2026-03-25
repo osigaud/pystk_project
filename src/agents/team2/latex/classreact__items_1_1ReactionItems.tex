@@ -1,0 +1,76 @@
+\doxysection{react\+\_\+items.\+Reaction\+Items Class Reference}
+\hypertarget{classreact__items_1_1ReactionItems}{}\label{classreact__items_1_1ReactionItems}\index{react\_items.ReactionItems@{react\_items.ReactionItems}}
+
+
+Oriente le kart vers les bons items et l\textquotesingle{}éloigne des mauvais.  
+
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classreact__items_1_1ReactionItems_adae9607f11620fe71ffe15ae2d4f937d}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, cfg)
+\begin{DoxyCompactList}\small\item\em Initialise les angles d\textquotesingle{}esquive depuis la configuration. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classreact__items_1_1ReactionItems_a17173bba5039b1afbe11fa073b8eba34}{reaction\+\_\+items}} (self, obs)
+\begin{DoxyCompactList}\small\item\em Retourne un ajustement de steering selon les items devant le kart. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classreact__items_1_1ReactionItems_a796d25e83dec1a8fc7f6a7fc2f01eaf8}\label{classreact__items_1_1ReactionItems_a796d25e83dec1a8fc7f6a7fc2f01eaf8} 
+{\bfseries angle\+\_\+n}
+\begin{DoxyCompactList}\small\item\em Angle d\textquotesingle{}esquive quand le mauvais item est à droite (valeur négative = virage à gauche). \end{DoxyCompactList}\item 
+\Hypertarget{classreact__items_1_1ReactionItems_acc85d42e2d8b34c12638ac3bd0e9e77f}\label{classreact__items_1_1ReactionItems_acc85d42e2d8b34c12638ac3bd0e9e77f} 
+{\bfseries angle\+\_\+p}
+\begin{DoxyCompactList}\small\item\em Angle d\textquotesingle{}esquive quand le mauvais item est à gauche (valeur positive = virage à droite). \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Oriente le kart vers les bons items et l\textquotesingle{}éloigne des mauvais. 
+
+Priorité \+: esquiver un mauvais item proche l\textquotesingle{}emporte toujours sur aller chercher un bon item.
+
+Bons items \+: BONUS\+\_\+\+BOX(0), NITRO\+\_\+\+BIG(2), NITRO\+\_\+\+SMALL(3), EASTER\+\_\+\+EGG(6). Mauvais items \+: tout le reste (banane, bubblegum...). 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classreact__items_1_1ReactionItems_adae9607f11620fe71ffe15ae2d4f937d}\label{classreact__items_1_1ReactionItems_adae9607f11620fe71ffe15ae2d4f937d} 
+\index{react\_items.ReactionItems@{react\_items.ReactionItems}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!react\_items.ReactionItems@{react\_items.ReactionItems}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily react\+\_\+items.\+Reaction\+Items.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{cfg }\end{DoxyParamCaption})}
+
+
+
+Initialise les angles d\textquotesingle{}esquive depuis la configuration. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cfg} & Configuration Omega\+Conf issue de config\+Demo\+Pilote.\+yaml. Utilise les clés angle\+\_\+evite\+\_\+n et angle\+\_\+evite\+\_\+p. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classreact__items_1_1ReactionItems_a17173bba5039b1afbe11fa073b8eba34}\label{classreact__items_1_1ReactionItems_a17173bba5039b1afbe11fa073b8eba34} 
+\index{react\_items.ReactionItems@{react\_items.ReactionItems}!reaction\_items@{reaction\_items}}
+\index{reaction\_items@{reaction\_items}!react\_items.ReactionItems@{react\_items.ReactionItems}}
+\doxysubsubsection{\texorpdfstring{reaction\_items()}{reaction\_items()}}
+{\footnotesize\ttfamily react\+\_\+items.\+Reaction\+Items.\+reaction\+\_\+items (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{obs }\end{DoxyParamCaption})}
+
+
+
+Retourne un ajustement de steering selon les items devant le kart. 
+
+Parcourt tous les items visibles (Z \texorpdfstring{$>$}{>} 0, distance \texorpdfstring{$<$}{<} 25). Pour les bons items \+: calcule l\textquotesingle{}angle vers le plus proche et ajuste le steering. Pour les mauvais items à moins de 15 unités \+: applique un angle d\textquotesingle{}esquive fixe.
+
+
+\begin{DoxyParams}{Parameters}
+{\em obs} & Dictionnaire d\textquotesingle{}observation retourné par l\textquotesingle{}environnement. Utilise les clés "{}items\+\_\+position"{} et "{}items\+\_\+type"{}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+float \+: ajustement de steering entre -\/1.\+0 et 1.\+0. 0.\+0 si aucun item pertinent n\textquotesingle{}est détecté. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{react__items_8py}{react\+\_\+items.\+py}}\end{DoxyCompactItemize}

@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,92,31"/>
+<area shape="rect" id="Node000001" href="$classagent2_1_1Agent2.html" title="Agent de pilotage heuristique pour SuperTuxKart." alt="" coords="140,5,257,31"/>
+<area shape="poly" id="edge2_Node000000_Node000001" title=" " alt="" coords="106,15,140,15,140,21,106,21"/>
+<area shape="rect" id="Node000002" href="$classKart__drift_1_1Kart__drift.html" title=" " alt="" coords="305,5,452,31"/>
+<area shape="poly" id="edge3_Node000001_Node000002" title=" " alt="" coords="271,15,305,15,305,21,271,21"/>
+</map>

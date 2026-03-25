@@ -1,0 +1,96 @@
+\doxysection{kart\+\_\+rescue.\+Stuck\+Control Class Reference}
+\hypertarget{classkart__rescue_1_1StuckControl}{}\label{classkart__rescue_1_1StuckControl}\index{kart\_rescue.StuckControl@{kart\_rescue.StuckControl}}
+
+
+Surveille la vitesse du kart et déclenche un recul si nécessaire.  
+
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classkart__rescue_1_1StuckControl_a00e4d349ac4490b95e6abdca8bbf6e55}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, cfg)
+\begin{DoxyCompactList}\small\item\em Initialise les paramètres de détection et de récupération. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classkart__rescue_1_1StuckControl_a05663e264e2e1bb0814b09b04507b101}{gerer\+\_\+recul}} (self, obs, \mbox{\hyperlink{classkart__rescue_1_1StuckControl_acd7251b4d1aa8ab8ef79dff402e5fd73}{vitesse}}, steering)
+\begin{DoxyCompactList}\small\item\em Vérifie si le kart est bloqué et gère la manœuvre de recul. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classkart__rescue_1_1StuckControl_a6c97307eb8f82d2f422ecdc5954140ee}\label{classkart__rescue_1_1StuckControl_a6c97307eb8f82d2f422ecdc5954140ee} 
+{\bfseries stuck\+\_\+steps}
+\begin{DoxyCompactList}\small\item\em Compteur de steps consécutifs où le kart est quasi-\/immobile. \end{DoxyCompactList}\item 
+\Hypertarget{classkart__rescue_1_1StuckControl_a071af9a1d0cd8cc8fb876067ad2c7f58}\label{classkart__rescue_1_1StuckControl_a071af9a1d0cd8cc8fb876067ad2c7f58} 
+{\bfseries recovery\+\_\+steps}
+\begin{DoxyCompactList}\small\item\em Nombre de steps restants dans la séquence de marche arrière. \end{DoxyCompactList}\item 
+\Hypertarget{classkart__rescue_1_1StuckControl_ab616b6df7f8b528a3525a366ebfe6ef6}\label{classkart__rescue_1_1StuckControl_ab616b6df7f8b528a3525a366ebfe6ef6} 
+{\bfseries en\+\_\+marche\+\_\+arriere}
+\begin{DoxyCompactList}\small\item\em Vrai quand une séquence de recul est en cours. \end{DoxyCompactList}\item 
+\Hypertarget{classkart__rescue_1_1StuckControl_a15d5b196bcaf307b34633fdd6ee94bd0}\label{classkart__rescue_1_1StuckControl_a15d5b196bcaf307b34633fdd6ee94bd0} 
+{\bfseries recovery}
+\begin{DoxyCompactList}\small\item\em Durée totale de la marche arrière en nombre de steps. \end{DoxyCompactList}\item 
+\Hypertarget{classkart__rescue_1_1StuckControl_a785a6f31c7b9bbddf1cf140ee3ea92d7}\label{classkart__rescue_1_1StuckControl_a785a6f31c7b9bbddf1cf140ee3ea92d7} 
+{\bfseries steps}
+\begin{DoxyCompactList}\small\item\em Nombre de steps immobiles avant de déclencher le recul. \end{DoxyCompactList}\item 
+\Hypertarget{classkart__rescue_1_1StuckControl_acd7251b4d1aa8ab8ef79dff402e5fd73}\label{classkart__rescue_1_1StuckControl_acd7251b4d1aa8ab8ef79dff402e5fd73} 
+{\bfseries vitesse}
+\begin{DoxyCompactList}\small\item\em Seuil de vitesse (m/s) en dessous duquel le kart est considéré bloqué. \end{DoxyCompactList}\item 
+\Hypertarget{classkart__rescue_1_1StuckControl_ab8a867816d992deb1e2d61726fa6861e}\label{classkart__rescue_1_1StuckControl_ab8a867816d992deb1e2d61726fa6861e} 
+{\bfseries braquage}
+\begin{DoxyCompactList}\small\item\em Amplitude du braquage appliqué pendant la marche arrière. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Surveille la vitesse du kart et déclenche un recul si nécessaire. 
+
+Si le kart reste sous le seuil de vitesse pendant trop de steps consécutifs, une séquence de marche arrière est activée pour le dégager. Doit être appelé en priorité absolue dans choose\+\_\+action(). 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classkart__rescue_1_1StuckControl_a00e4d349ac4490b95e6abdca8bbf6e55}\label{classkart__rescue_1_1StuckControl_a00e4d349ac4490b95e6abdca8bbf6e55} 
+\index{kart\_rescue.StuckControl@{kart\_rescue.StuckControl}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!kart\_rescue.StuckControl@{kart\_rescue.StuckControl}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily kart\+\_\+rescue.\+Stuck\+Control.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{cfg }\end{DoxyParamCaption})}
+
+
+
+Initialise les paramètres de détection et de récupération. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cfg} & Configuration Omega\+Conf issue de config\+Demo\+Pilote.\+yaml. Utilise les clés \+: vitesse, steps, recovery, braquage. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classkart__rescue_1_1StuckControl_a05663e264e2e1bb0814b09b04507b101}\label{classkart__rescue_1_1StuckControl_a05663e264e2e1bb0814b09b04507b101} 
+\index{kart\_rescue.StuckControl@{kart\_rescue.StuckControl}!gerer\_recul@{gerer\_recul}}
+\index{gerer\_recul@{gerer\_recul}!kart\_rescue.StuckControl@{kart\_rescue.StuckControl}}
+\doxysubsubsection{\texorpdfstring{gerer\_recul()}{gerer\_recul()}}
+{\footnotesize\ttfamily kart\+\_\+rescue.\+Stuck\+Control.\+gerer\+\_\+recul (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{obs,  }\item[{}]{vitesse,  }\item[{}]{steering }\end{DoxyParamCaption})}
+
+
+
+Vérifie si le kart est bloqué et gère la manœuvre de recul. 
+
+Doit être appelé en premier dans choose\+\_\+action(). Si le kart n\textquotesingle{}est pas bloqué, retourne None.
+
+
+\begin{DoxyParams}{Parameters}
+{\em obs} & Dictionnaire d\textquotesingle{}observation retourné par l\textquotesingle{}environnement. \\
+\hline
+{\em vitesse} & Vitesse scalaire courante du kart (norme du vecteur vitesse). \\
+\hline
+{\em steering} & Instance de Steering\+Piste pour calculer le braquage de recul. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+dict \+: action de marche arrière si le kart est bloqué, None sinon. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+Steering\+Piste.\+correction\+\_\+centre\+Piste() 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{kart__rescue_8py}{kart\+\_\+rescue.\+py}}\end{DoxyCompactItemize}

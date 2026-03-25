@@ -1,0 +1,145 @@
+\doxysection{acceleration\+\_\+kart.\+Acceleration\+Control Class Reference}
+\hypertarget{classacceleration__kart_1_1AccelerationControl}{}\label{classacceleration__kart_1_1AccelerationControl}\index{acceleration\_kart.AccelerationControl@{acceleration\_kart.AccelerationControl}}
+
+
+Choisit le niveau d\textquotesingle{}accélération en fonction du virage détecté.  
+
+
+
+
+Inheritance diagram for acceleration\+\_\+kart.\+Acceleration\+Control\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{classacceleration__kart_1_1AccelerationControl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for acceleration\+\_\+kart.\+Acceleration\+Control\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{classacceleration__kart_1_1AccelerationControl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classacceleration__kart_1_1AccelerationControl_a8bce815e9b658ce1bc376610e8867f6a}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, cfg)
+\begin{DoxyCompactList}\small\item\em Initialise les seuils de classification des virages. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classacceleration__kart_1_1AccelerationControl_a4c6cfb351fd64d3a87c82f5c960e2daa}{adapte\+Acceleration}} (self, obs)
+\begin{DoxyCompactList}\small\item\em Retourne l\textquotesingle{}accélération adaptée à la situation courante. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classanticipe__kart_1_1AnticipeKart}{anticipe\+\_\+kart.\+Anticipe\+Kart}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classanticipe__kart_1_1AnticipeKart_ae88b34ed217632c40ca996e7e71ca447}{detect\+Virage}} (self, obs)
+\begin{DoxyCompactList}\small\item\em Calcule l\textquotesingle{}angle du virage devant le kart. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classanticipe__kart_1_1AnticipeKart_a3ec983ccafe83220f43dc52750bedf7b}{get\+\_\+dynamic\+Lookahead}} (self, obs)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classacceleration__kart_1_1AccelerationControl_a9940766dcbd09e168c582f57646366f9}\label{classacceleration__kart_1_1AccelerationControl_a9940766dcbd09e168c582f57646366f9} 
+{\bfseries seuildrift}
+\begin{DoxyCompactList}\small\item\em Seuil de courbure au-\/delà duquel le virage est considéré très serré. \end{DoxyCompactList}\item 
+\Hypertarget{classacceleration__kart_1_1AccelerationControl_a0f2c6a71eb164143c1997378ebedf4b7}\label{classacceleration__kart_1_1AccelerationControl_a0f2c6a71eb164143c1997378ebedf4b7} 
+{\bfseries serreri1}
+\begin{DoxyCompactList}\small\item\em Borne inférieure de l\textquotesingle{}intervalle des virages serrés. \end{DoxyCompactList}\item 
+\Hypertarget{classacceleration__kart_1_1AccelerationControl_a4b5273286e2415b69f6d968d338dd04f}\label{classacceleration__kart_1_1AccelerationControl_a4b5273286e2415b69f6d968d338dd04f} 
+{\bfseries serreri2}
+\begin{DoxyCompactList}\small\item\em Borne supérieure de l\textquotesingle{}intervalle des virages serrés. \end{DoxyCompactList}\item 
+\Hypertarget{classacceleration__kart_1_1AccelerationControl_a2fe163e098f3b7013769f6e95782d0d6}\label{classacceleration__kart_1_1AccelerationControl_a2fe163e098f3b7013769f6e95782d0d6} 
+{\bfseries moyeni1}
+\begin{DoxyCompactList}\small\item\em Borne inférieure de l\textquotesingle{}intervalle des virages moyens. \end{DoxyCompactList}\item 
+\Hypertarget{classacceleration__kart_1_1AccelerationControl_ad2ed325eaed1ea7a5f54bcee702547f6}\label{classacceleration__kart_1_1AccelerationControl_ad2ed325eaed1ea7a5f54bcee702547f6} 
+{\bfseries moyeni2}
+\begin{DoxyCompactList}\small\item\em Borne supérieure de l\textquotesingle{}intervalle des virages moyens. \end{DoxyCompactList}\item 
+\Hypertarget{classacceleration__kart_1_1AccelerationControl_a82fe171cce93ee06ae42a589b2619520}\label{classacceleration__kart_1_1AccelerationControl_a82fe171cce93ee06ae42a589b2619520} 
+{\bfseries amax}
+\item 
+\Hypertarget{classacceleration__kart_1_1AccelerationControl_ae9276c0139134ee30ee22a79615204bb}\label{classacceleration__kart_1_1AccelerationControl_ae9276c0139134ee30ee22a79615204bb} 
+{\bfseries virage\+\_\+tres\+\_\+serré}
+\item 
+\Hypertarget{classacceleration__kart_1_1AccelerationControl_ac519c979ff7412421aeef1395fd2c877}\label{classacceleration__kart_1_1AccelerationControl_ac519c979ff7412421aeef1395fd2c877} 
+{\bfseries virage\+\_\+serré}
+\item 
+\Hypertarget{classacceleration__kart_1_1AccelerationControl_abf2ef328a1b84777f005d3d6d13c5bc5}\label{classacceleration__kart_1_1AccelerationControl_abf2ef328a1b84777f005d3d6d13c5bc5} 
+{\bfseries virage\+\_\+moyen}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{classanticipe__kart_1_1AnticipeKart}{anticipe\+\_\+kart.\+Anticipe\+Kart}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries virage\+\_\+long}
+\item 
+{\bfseries path\+\_\+lookahead}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Choisit le niveau d\textquotesingle{}accélération en fonction du virage détecté. 
+
+Appelle Anticipe\+Kart.\+detect\+Virage() pour mesurer la courbure courante, puis retourne une accélération réduite selon le type de virage \+:
+\begin{DoxyItemize}
+\item Virage très serré (\texorpdfstring{$>$}{>} cfg.\+virages.\+drift) \+: 0.\+80
+\item Virage serré (cfg.\+virages.\+serrer.\+i1 à i2) \+: 0.\+85
+\item Virage moyen (cfg.\+virages.\+moyen.\+i1 à i2) \+: 0.\+95
+\item Ligne droite (courbure faible) \+: 1.\+00
+\end{DoxyItemize}
+
+\begin{DoxySeeAlso}{See also}
+Anticipe\+Kart 
+\end{DoxySeeAlso}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classacceleration__kart_1_1AccelerationControl_a8bce815e9b658ce1bc376610e8867f6a}\label{classacceleration__kart_1_1AccelerationControl_a8bce815e9b658ce1bc376610e8867f6a} 
+\index{acceleration\_kart.AccelerationControl@{acceleration\_kart.AccelerationControl}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!acceleration\_kart.AccelerationControl@{acceleration\_kart.AccelerationControl}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily acceleration\+\_\+kart.\+Acceleration\+Control.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{cfg }\end{DoxyParamCaption})}
+
+
+
+Initialise les seuils de classification des virages. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cfg} & Configuration Omega\+Conf issue de config\+Demo\+Pilote.\+yaml. Utilise les clés virages.\+drift, virages.\+serrer.\+i1/i2 et virages.\+moyen.\+i1/i2. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{classanticipe__kart_1_1AnticipeKart}{anticipe\+\_\+kart.\+Anticipe\+Kart}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classacceleration__kart_1_1AccelerationControl_a4c6cfb351fd64d3a87c82f5c960e2daa}\label{classacceleration__kart_1_1AccelerationControl_a4c6cfb351fd64d3a87c82f5c960e2daa} 
+\index{acceleration\_kart.AccelerationControl@{acceleration\_kart.AccelerationControl}!adapteAcceleration@{adapteAcceleration}}
+\index{adapteAcceleration@{adapteAcceleration}!acceleration\_kart.AccelerationControl@{acceleration\_kart.AccelerationControl}}
+\doxysubsubsection{\texorpdfstring{adapteAcceleration()}{adapteAcceleration()}}
+{\footnotesize\ttfamily acceleration\+\_\+kart.\+Acceleration\+Control.\+adapte\+Acceleration (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{obs }\end{DoxyParamCaption})}
+
+
+
+Retourne l\textquotesingle{}accélération adaptée à la situation courante. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em obs} & Dictionnaire d\textquotesingle{}observation retourné par l\textquotesingle{}environnement. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+float \+: valeur d\textquotesingle{}accélération dans \mbox{[}0.\+0, 1.\+0\mbox{]}. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+Anticipe\+Kart.\+detect\+Virage() 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{acceleration__kart_8py}{acceleration\+\_\+kart.\+py}}\end{DoxyCompactItemize}

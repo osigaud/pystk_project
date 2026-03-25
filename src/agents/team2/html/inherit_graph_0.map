@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classanticipe__kart_1_1AnticipeKart.html" title="Calcule l&#39;angle du virage à venir en comparant deux nœuds de piste." alt="" coords="5,13,196,38"/>
+<area shape="rect" id="Node000001" href="$classacceleration__kart_1_1AccelerationControl.html" title="Choisit le niveau d&#39;accélération en fonction du virage détecté." alt="" coords="244,5,463,45"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="210,23,244,23,244,28,210,28"/>
+</map>

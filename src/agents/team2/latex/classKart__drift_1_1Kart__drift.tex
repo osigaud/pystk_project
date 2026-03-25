@@ -1,0 +1,99 @@
+\doxysection{Kart\+\_\+drift.\+Kart\+\_\+drift Class Reference}
+\hypertarget{classKart__drift_1_1Kart__drift}{}\label{classKart__drift_1_1Kart__drift}\index{Kart\_drift.Kart\_drift@{Kart\_drift.Kart\_drift}}
+
+
+Inheritance diagram for Kart\+\_\+drift.\+Kart\+\_\+drift\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{classKart__drift_1_1Kart__drift__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Kart\+\_\+drift.\+Kart\+\_\+drift\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{classKart__drift_1_1Kart__drift__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classKart__drift_1_1Kart__drift_ae90ab8adaf0e1cebec7f48ef8dac7b7d}{calcul\+\_\+rayon}} (self, n1, n2, n3)
+\item 
+\Hypertarget{classKart__drift_1_1Kart__drift_abb2d99ee7ed64cc3af17974f07d6e54e}\label{classKart__drift_1_1Kart__drift_abb2d99ee7ed64cc3af17974f07d6e54e} 
+{\bfseries detect\+Virage} (self, \mbox{\hyperlink{classagent2_1_1Agent2_a42ae4cc52dc14229684f7226bb20344f}{obs}})
+\item 
+\mbox{\hyperlink{classKart__drift_1_1Kart__drift_a6760a0751539bd5226d3f46dbd2678b2}{adapte\+Acceleration}} (self, \mbox{\hyperlink{classagent2_1_1Agent2_a42ae4cc52dc14229684f7226bb20344f}{obs}})
+\item 
+\Hypertarget{classKart__drift_1_1Kart__drift_a6760a0751539bd5226d3f46dbd2678b2}\label{classKart__drift_1_1Kart__drift_a6760a0751539bd5226d3f46dbd2678b2} 
+{\bfseries adapte\+Acceleration} (self, \mbox{\hyperlink{classagent2_1_1Agent2_a42ae4cc52dc14229684f7226bb20344f}{obs}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classagent2_1_1Agent2}{agent2.\+Agent2}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classagent2_1_1Agent2_a9c51d88ec0e92f1281240235dbbf0660}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, env, \mbox{\hyperlink{classagent2_1_1Agent2_a84ade440336c35f2916f84f403e91689}{path\+\_\+lookahead}}=3)
+\begin{DoxyCompactList}\small\item\em Initialise l\textquotesingle{}agent et ses sous-\/modules de pilotage. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classagent2_1_1Agent2_ac39f6c745872171cfbaf7fba1d79f507}{reset}} (self)
+\begin{DoxyCompactList}\small\item\em Réinitialise l\textquotesingle{}état de l\textquotesingle{}agent pour une nouvelle course. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classagent2_1_1Agent2_a51f3056755c628eb9f958da6e21b28b7}{end\+Of\+Track}} (self)
+\begin{DoxyCompactList}\small\item\em Indique si la course est terminée pour ce kart. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classagent2_1_1Agent2_a50d8ad3ba86914f7506937888895127a}{choose\+\_\+action}} (self, \mbox{\hyperlink{classagent2_1_1Agent2_a42ae4cc52dc14229684f7226bb20344f}{obs}})
+\begin{DoxyCompactList}\small\item\em Calcule l\textquotesingle{}action complète à effectuer pour le step courant. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{classagent2_1_1Agent2}{agent2.\+Agent2}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries path\+\_\+lookahead}
+\begin{DoxyCompactList}\small\item\em Nombre de nœuds de piste anticipés pour le calcul du steering. \end{DoxyCompactList}\item 
+{\bfseries steering}
+\begin{DoxyCompactList}\small\item\em Module de correction latérale pour rester au centre de la piste. \end{DoxyCompactList}\item 
+{\bfseries items\+\_\+steering}
+\begin{DoxyCompactList}\small\item\em Module de réaction aux items présents sur la piste. \end{DoxyCompactList}\item 
+{\bfseries attack\+\_\+rival}
+\begin{DoxyCompactList}\small\item\em Module de décision de tir sur les karts adversaires. \end{DoxyCompactList}\item 
+{\bfseries rescue\+\_\+kart}
+\begin{DoxyCompactList}\small\item\em Module de gestion des situations de blocage (marche arrière). \end{DoxyCompactList}\item 
+{\bfseries acceleration}
+\begin{DoxyCompactList}\small\item\em Module d\textquotesingle{}adaptation de l\textquotesingle{}accélération selon la courbure. \end{DoxyCompactList}\item 
+{\bfseries agent\+\_\+positions}
+\begin{DoxyCompactList}\small\item\em Historique des positions du kart (utilisé pour la visualisation). \end{DoxyCompactList}\item 
+{\bfseries active\+\_\+shield}
+\item 
+{\bfseries obs}
+\begin{DoxyCompactList}\small\item\em Dernière observation reçue de l\textquotesingle{}environnement. \end{DoxyCompactList}\item 
+{\bfseries is\+End}
+\begin{DoxyCompactList}\small\item\em Indique si le kart a terminé la course. \end{DoxyCompactList}\item 
+{\bfseries name}
+\begin{DoxyCompactList}\small\item\em Nom affiché du pilote dans l\textquotesingle{}interface de la course. \end{DoxyCompactList}\item 
+{\bfseries stuck\+\_\+steps}
+\item 
+{\bfseries recovery\+\_\+steps}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classKart__drift_1_1Kart__drift_a6760a0751539bd5226d3f46dbd2678b2}\label{classKart__drift_1_1Kart__drift_a6760a0751539bd5226d3f46dbd2678b2} 
+\index{Kart\_drift.Kart\_drift@{Kart\_drift.Kart\_drift}!adapteAcceleration@{adapteAcceleration}}
+\index{adapteAcceleration@{adapteAcceleration}!Kart\_drift.Kart\_drift@{Kart\_drift.Kart\_drift}}
+\doxysubsubsection{\texorpdfstring{adapteAcceleration()}{adapteAcceleration()}}
+{\footnotesize\ttfamily Kart\+\_\+drift.\+Kart\+\_\+drift.\+adapte\+Acceleration (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{obs }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}le but va etre d'adpater l'acclération dans diverses situations dont notamment 
+les virages serrés, les lignes droites ou une legere curvature \end{DoxyVerb}
+ \Hypertarget{classKart__drift_1_1Kart__drift_ae90ab8adaf0e1cebec7f48ef8dac7b7d}\label{classKart__drift_1_1Kart__drift_ae90ab8adaf0e1cebec7f48ef8dac7b7d} 
+\index{Kart\_drift.Kart\_drift@{Kart\_drift.Kart\_drift}!calcul\_rayon@{calcul\_rayon}}
+\index{calcul\_rayon@{calcul\_rayon}!Kart\_drift.Kart\_drift@{Kart\_drift.Kart\_drift}}
+\doxysubsubsection{\texorpdfstring{calcul\_rayon()}{calcul\_rayon()}}
+{\footnotesize\ttfamily Kart\+\_\+drift.\+Kart\+\_\+drift.\+calcul\+\_\+rayon (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{n1,  }\item[{}]{n2,  }\item[{}]{n3 }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}permet de calculer le rayon d'un virage à partir de 3 noeuds qui se trouvent en face du kart \end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Kart\+\_\+drift.\+py\end{DoxyCompactItemize}

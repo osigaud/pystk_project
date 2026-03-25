@@ -1,0 +1,101 @@
+\doxysection{anticipe\+\_\+kart.\+Anticipe\+Kart Class Reference}
+\hypertarget{classanticipe__kart_1_1AnticipeKart}{}\label{classanticipe__kart_1_1AnticipeKart}\index{anticipe\_kart.AnticipeKart@{anticipe\_kart.AnticipeKart}}
+
+
+Calcule l\textquotesingle{}angle du virage à venir en comparant deux nœuds de piste.  
+
+
+
+
+Inheritance diagram for anticipe\+\_\+kart.\+Anticipe\+Kart\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{classanticipe__kart_1_1AnticipeKart__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classanticipe__kart_1_1AnticipeKart_a2a772c4d11db2538d1251040b7170bea}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self)
+\item 
+\mbox{\hyperlink{classanticipe__kart_1_1AnticipeKart_ae88b34ed217632c40ca996e7e71ca447}{detect\+Virage}} (self, obs)
+\begin{DoxyCompactList}\small\item\em Calcule l\textquotesingle{}angle du virage devant le kart. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classanticipe__kart_1_1AnticipeKart_a3ec983ccafe83220f43dc52750bedf7b}{get\+\_\+dynamic\+Lookahead}} (self, obs)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classanticipe__kart_1_1AnticipeKart_a7c6178508a83ef5faad8b1c26a0de930}\label{classanticipe__kart_1_1AnticipeKart_a7c6178508a83ef5faad8b1c26a0de930} 
+{\bfseries virage\+\_\+long}
+\item 
+\Hypertarget{classanticipe__kart_1_1AnticipeKart_a280e045c1dedbf68a2343f56c62a0c91}\label{classanticipe__kart_1_1AnticipeKart_a280e045c1dedbf68a2343f56c62a0c91} 
+{\bfseries path\+\_\+lookahead}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Calcule l\textquotesingle{}angle du virage à venir en comparant deux nœuds de piste. 
+
+Compare le nœud courant (index 0) et un nœud éloigné (index 5) dans le plan horizontal XZ du référentiel du kart. Le résultat est utilisé par Acceleration\+Control pour choisir le niveau d\textquotesingle{}accélération adapté.
+
+\begin{DoxySeeAlso}{See also}
+Acceleration\+Control 
+\end{DoxySeeAlso}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classanticipe__kart_1_1AnticipeKart_a2a772c4d11db2538d1251040b7170bea}\label{classanticipe__kart_1_1AnticipeKart_a2a772c4d11db2538d1251040b7170bea} 
+\index{anticipe\_kart.AnticipeKart@{anticipe\_kart.AnticipeKart}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!anticipe\_kart.AnticipeKart@{anticipe\_kart.AnticipeKart}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily anticipe\+\_\+kart.\+Anticipe\+Kart.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Reimplemented in \mbox{\hyperlink{classacceleration__kart_1_1AccelerationControl_a8bce815e9b658ce1bc376610e8867f6a}{acceleration\+\_\+kart.\+Acceleration\+Control}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classanticipe__kart_1_1AnticipeKart_ae88b34ed217632c40ca996e7e71ca447}\label{classanticipe__kart_1_1AnticipeKart_ae88b34ed217632c40ca996e7e71ca447} 
+\index{anticipe\_kart.AnticipeKart@{anticipe\_kart.AnticipeKart}!detectVirage@{detectVirage}}
+\index{detectVirage@{detectVirage}!anticipe\_kart.AnticipeKart@{anticipe\_kart.AnticipeKart}}
+\doxysubsubsection{\texorpdfstring{detectVirage()}{detectVirage()}}
+{\footnotesize\ttfamily anticipe\+\_\+kart.\+Anticipe\+Kart.\+detect\+Virage (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{obs }\end{DoxyParamCaption})}
+
+
+
+Calcule l\textquotesingle{}angle du virage devant le kart. 
+
+Mesure la déviation angulaire entre le nœud courant et le nœud situé path\+\_\+lookahead positions devant, dans le plan horizontal XZ. Un angle proche de zéro indique une ligne droite.
+
+
+\begin{DoxyParams}{Parameters}
+{\em obs} & Dictionnaire d\textquotesingle{}observation retourné par l\textquotesingle{}environnement. Doit contenir la clé "{}paths\+\_\+start"{} avec au moins 6 éléments. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+float \+: angle en radian. Positif = virage à droite, négatif = virage à gauche. La valeur absolue représente l\textquotesingle{}intensité du virage. 
+\end{DoxyReturn}
+\Hypertarget{classanticipe__kart_1_1AnticipeKart_a3ec983ccafe83220f43dc52750bedf7b}\label{classanticipe__kart_1_1AnticipeKart_a3ec983ccafe83220f43dc52750bedf7b} 
+\index{anticipe\_kart.AnticipeKart@{anticipe\_kart.AnticipeKart}!get\_dynamicLookahead@{get\_dynamicLookahead}}
+\index{get\_dynamicLookahead@{get\_dynamicLookahead}!anticipe\_kart.AnticipeKart@{anticipe\_kart.AnticipeKart}}
+\doxysubsubsection{\texorpdfstring{get\_dynamicLookahead()}{get\_dynamicLookahead()}}
+{\footnotesize\ttfamily anticipe\+\_\+kart.\+Anticipe\+Kart.\+get\+\_\+dynamic\+Lookahead (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{obs }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Cette fonction permet de déterminer dynamiquement le nombre de noeuds à regarder au plus loin 
+en fonction des différents seuils de virages
+
+Args : 
+- obs(dict) : Dictionnaire d'observation retourné par l'environnement
+
+Return : 
+        int : nombre de noeuds à regarder
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{anticipe__kart_8py}{anticipe\+\_\+kart.\+py}}\end{DoxyCompactItemize}
