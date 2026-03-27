@@ -7,7 +7,6 @@ The simulation runs on the "black_forest" track with MAX_TEAMS karts.
 
 import sys, os
 import numpy as np
-from datetime import datetime
 from pathlib import Path
 
 # Append the "src" folder to sys.path.
@@ -26,12 +25,6 @@ from pystk2_gymnasium.definitions import CameraMode
 MAX_TEAMS = 7
 MAX_STEPS = 1000
 NB_RACES = 1
-
-# Get the current timestamp
-current_timestamp = datetime.now()
-
-# Format it into a human-readable string
-formatted_timestamp = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
 # Make AgentSpec hashable.
 def agent_spec_hash(self):

@@ -1,5 +1,12 @@
 from pathlib import Path
+from datetime import datetime
 from dataclasses import dataclass
+
+# Get the current timestamp
+current_timestamp = datetime.now()
+
+# Format it into a human-readable string
+formatted_timestamp = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
 @dataclass
 class Scores:
