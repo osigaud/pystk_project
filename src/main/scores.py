@@ -40,8 +40,8 @@ class Scores:
                     f"""<td>{np.array(self.dict[k][1]).mean():.2f}</td>"""
                     f"""<td>{np.array(self.dict[k][2]).mean():.2f}</td>"""
                     f"""<td>{np.array(self.dict[k][2]).std():.2f}</td>"""
-                    f"""<td>{np.array(self.dict[k][3]).sum():.2f}</td>"""
-                    f"""<td>{np.array(self.dict[k][4]).sum():.2f}</td>"""
+                    f"""<td>{np.array(self.dict[k][3]).sum()}</td>"""
+                    f"""<td>{np.array(self.dict[k][4]).sum()}</td>"""
                     "</tr>"
                 )
             
