@@ -38,6 +38,8 @@ class SpeedController:
         """
         points = obs.get("paths_start",[]) # On récupère la liste des points
 
+        pts = obs.get("paths_start",[])
+
         p1 = np.array(points[1][:3]) # on recupère plusieurs points espacés pour regarder plus loin sur la piste
         p2 = np.array(points[2][:3])
         p3 = np.array(points[3][:3])
@@ -60,12 +62,18 @@ class SpeedController:
         k2 = abs(compute_curvature(points[1:5][:3]))
         #print("compute_curvature renvoie ", k2)
 
+        k3 = abs(compute_curvature(points[1:5][:2]))
+
 
         v_target2 = self.amax/np.sqrt(1+self.g*k)
-        print('vitesse avec angle ',v_target2)
+        #print('vitesse avec angle ',v_target2)
 
         v_test = np.clip(self.amax/np.sqrt(1+k2),0, self.amax)
-        print('vitesse avec compute_curvature ', v_test)
+        print('vitesse avec compute_curvature [:3] ', v_test)
+
+        v_test2 = np.clip(self.amax/np.sqrt(1+k2),0, self.amax)
+        print('vitesse avec compute_curvature [:2] ', v_test2)
+        print(' ')
 
         if v_target2 >= 0.96:  
             v_target2 = self.amax #suite a ce calcul v_target est limité a 0.96 donc ce if lui permet d'atteindre la vitesse maximale
