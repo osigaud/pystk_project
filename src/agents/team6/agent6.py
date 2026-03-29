@@ -4,8 +4,6 @@ import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 
-
-
 class Agent6(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)
@@ -22,27 +20,16 @@ class Agent6(KartAgent):
     def endOfTrack(self):
         return self.isEnd
 
-    def suivre_piste(self, obs, action):
-        steer = action["steer"]
-        centre = obs["paths_end"][2]
-        if (abs(centre[0])>2):
-            steer += 0.1 * centre[0]
-        action["steer"]=steer
-        return action
-
-
-
     def choose_action(self, obs):
         acceleration = random.random()
         steering = random.random()
         action = {
-            "acceleration" : 0.7,
-            "steer": 0,
+            "acceleration": acceleration,
+            "steer": steering,
             "brake": False, # bool(random.getrandbits(1)),
-            "drift": False,
+            "drift": bool(random.getrandbits(1)),
             "nitro": bool(random.getrandbits(1)),
             "rescue":bool(random.getrandbits(1)),
             "fire": bool(random.getrandbits(1)),
         }
-        action = self.suivre_piste(obs,action)
         return action
