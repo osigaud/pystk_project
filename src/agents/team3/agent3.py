@@ -8,6 +8,8 @@ from .speed import Speed
 from .fire import Fire
 from .rescue import Rescue
 
+# kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
+
 class Agent3(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)
@@ -30,7 +32,8 @@ class Agent3(KartAgent):
         self.speed_pilot = Speed(env, self.base_pilot)
         self.fire_pilot = Fire(env, self.speed_pilot)
         self.rescue = Rescue(env, self.fire_pilot)
-
+        self.skin = 'adiumy'
+        
     def reset(self):
         self.obs, _ = self.env.reset()
         self.rescue.reset()

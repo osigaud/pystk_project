@@ -624,8 +624,6 @@ class STKRaceEnv(BaseSTKRaceEnv):
         self.config.players[self.kart_ix].name = self.agent.name
         if self.agent.kart:
             self.config.players[self.kart_ix].kart = kart_skin[self.kart_ix]
-        #
-        #    self.config.players[self.kart_ix].kart = self.agent.kart
         if self.agent.color > 0:
             self.config.players[self.kart_ix].color = self.agent.color
 
@@ -723,8 +721,6 @@ class STKRaceMultiEnv(BaseSTKRaceEnv):
             self.config.players[kart_ix].name = agent.name
             if agent.kart:
                 self.config.players[kart_ix].kart = kart_skin[kart_ix]
-            #
-            #    self.config.players[kart_ix].kart = agent.kart
             if agent.color > 0:
                 self.config.players[kart_ix].color = agent.color
 

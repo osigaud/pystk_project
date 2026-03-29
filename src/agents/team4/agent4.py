@@ -15,6 +15,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent # On obtient le chemin absolu vers notre fichier agent4
 CONFIG_PATH = BASE_DIR / "configuration.yaml" # On dit que notre fichier de config se trouve aussi ici
 
+# kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
+
 __all__ = ["Agent4"]
 
 class Agent4(KartAgent):
@@ -58,7 +60,7 @@ class Agent4(KartAgent):
         self.expert_edge = AgentEdge(self.conf.edge,self.conf.steering)
         """@private"""
         #print(OmegaConf.to_yaml(conf))
-        
+        self.skin = 'adiumy'        
         
     def reset(self) -> None:
         """Réinitialise les variables d'instances de l'agent en début de course."""

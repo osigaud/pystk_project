@@ -12,6 +12,8 @@ from agents.team1.agent_rescue import AgentRescue
 from agents.team1.agent_items import AgentItems
 from agents.team1.agent_drift import AgentDrift
 
+# kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
+
 class Agent1(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)
@@ -20,6 +22,7 @@ class Agent1(KartAgent):
         self.obs = None
         self.isEnd = False
         self.name = "Tasty Crousteam"
+        self.skin = 'adiumy'
 
         path_conf = Path(__file__).resolve().parent
         path_conf = str(path_conf) + '/ConfigFileTeam1.yaml'   #Chemin du fichier de configuration
