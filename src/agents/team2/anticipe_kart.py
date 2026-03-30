@@ -20,7 +20,7 @@ import numpy as np
 class AnticipeKart:
 
     ## @brief   Initialise les attributs de détection de virage.
-    def __init__(self):
+    def __init__(self, cfg):
 
         ## @var virage_long
         #  @brief Vrai si le virage courant est long (courbure persistante au-delà de 7 nœuds).
@@ -29,6 +29,9 @@ class AnticipeKart:
         ## @var path_lookahead
         #  @brief Nombre de nœuds anticipés, mis à jour dynamiquement par get_dynamicLookahead().
         self.path_lookahead = 5
+        
+        self.look_limite = cfg.
+        
 
     ## @brief   Calcule la courbure de la piste devant le kart.
     #
