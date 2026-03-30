@@ -75,10 +75,14 @@ rescue:
   seuil_blocked_trigger : 7
 
 opponent:
-  radar_x : 0.8
+  radar_x : 1.25
   radar_zmin : 0.1
-  radar_zmax : 1.3
-  decalage_lateral : 4.0
+  radar_zmax : 12
+  ecart_danger : 0.5
+  securite_nz : 3.5
+  timer : 4
+  duration : 15
+  decalage_lateral : 2.5
   default_gain : 7.0
 
 nitro:

@@ -1,5 +1,6 @@
 from .steering import Steering
 from omegaconf import DictConfig
+import numpy as np
 
 class AgentEsquiveAdv:
 
@@ -15,11 +16,23 @@ class AgentEsquiveAdv:
         """@private"""
         self.pilotage = Steering(config_pilote)
         """@private"""
+        self.curr_dist = 0
+        """@private"""
+        self.timer = 0
+        """@private"""
+        self.duration = 0
+        """@private"""
+        self.locked_ax = 0
+        """@private"""
     
     def reset(self) -> None:
 
         """Réinitialise les variables d'instances de l'agent expert"""
         self.pilotage.reset()
+        self.curr_dist = 0
+        self.timer = 0
+        self.duration = 0
+        self.locked_ax = 0
         
     def esquive_adv(self,obs : dict) -> tuple[bool,float,float]:
         """
@@ -41,14 +54,44 @@ class AgentEsquiveAdv:
         if len(kart_pos) == 0:
             return False, 0.0, 0.0
 
-        adv=kart_pos[0]
-        devant=False
-        if -self.c.radar_x <= adv[0] <=self.c.radar_x and  self.c.radar_zmin<= adv[2]<=self.c.radar_zmax:
-            devant=True
+        adv=kart_pos[0] # On récupère le kart adverse le plus proche
 
-        return devant,adv[0],adv[2]
+        #print(self.timer)
+        
+        distance = np.linalg.norm(adv) # Calcul de la norme du vecteur distance
+        
+        nx, nz = adv[0], adv[2] # Récupération du décalage latéral et de la profondeur
+
+        # Si l'adversaire est assez proche et dans notre couloir
+        if abs(nx) <= self.c.radar_x and self.c.radar_zmin < nz <= self.c.radar_zmax :
+            
+            # Si il est en train de se rapprocher, on incremente le timer
+            if self.curr_dist ==0 or (self.curr_dist - distance) > self.c.ecart_danger: 
+                self.timer += 1
+            self.curr_dist = distance
+            
+            # Sécurité, s'il est trop proche de nous, c'est un danger
+            if nz <= self.c.securite_nz:
+                #print("On esquive par sécurité !!")
+                #print(nx,nz)
+                self.timer =0
+                self.curr_dist = 0
+                return True,nx,nz
+            
+            # Si pendant 4 frames, on a continué à s'approcher du kart, c'est un danger
+            if self.timer >= self.c.timer:
+                #print("On esquive !!")
+                #print(nx,nz)
+                self.timer = 0
+                self.curr_dist = 0
+                return True,nx,nz
+        else:
+            self.timer = 0
+            self.curr_dist = 0
+            
+        return False, 0,0
+
     
-
     def choose_action(self,obs : dict,gx : float,gz : float,acceleration : float) -> tuple[bool,dict]:
 
         """
@@ -69,10 +112,20 @@ class AgentEsquiveAdv:
         
         """
         
+        # Appel de la fonction de détection
         danger_adv, a_x,a_z = self.esquive_adv(obs)
-            
+
+        # Tant qu'on capte un danger, on mets à jour le decalage ainsi que le timer permettant de maintenir l'esquive sur x frames
         if danger_adv:
-            if a_x >= 0:
+            
+            self.locked_ax = a_x
+            self.duration = self.c.duration
+        
+        # Si le timer > 0, on esquive
+        if self.duration > 0:    
+            
+            self.duration -= 1
+            if self.locked_ax >= 0:
                 gx -= self.c.decalage_lateral # On se décale à gauche 
             else:
                 gx += self.c.decalage_lateral # On se décale à droite
