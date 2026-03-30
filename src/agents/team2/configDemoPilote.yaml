@@ -11,7 +11,7 @@ braquage: 0.8374079786428565
 champs_vision:
   angle: 20.162036738469265
   dist: 24.514755260973594
-correction: 0.5
+correction: 6.5
 curvature: 0.5274503214873205
 recovery: 18
 steps: 2
