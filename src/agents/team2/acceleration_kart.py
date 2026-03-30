@@ -28,7 +28,7 @@ class AccelerationControl(AnticipeKart):
     #                Utilise les clés virages.drift, virages.serrer.i1/i2,
     #                virages.moyen.i1/i2 et acceleration.virage_*.
     def __init__(self, cfg):
-        super().__init__()
+        super().__init__(cfg)
 
         ## @var seuildrift
         #  @brief Seuil de courbure au-delà duquel le virage est considéré très serré.

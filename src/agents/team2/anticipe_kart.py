@@ -30,8 +30,14 @@ class AnticipeKart:
         #  @brief Nombre de nœuds anticipés, mis à jour dynamiquement par get_dynamicLookahead().
         self.path_lookahead = 5
         
-        self.look_limite = cfg.
-        
+        self.look_limite = cfg.look_limite 
+        self.look_droite = cfg.look_droite 
+        self.look_leger = cfg.look_leger
+        self.droite = cfg.lookahead.droite        
+        self.leger = cfg.lookahead.leger        
+        self.serrer = cfg.lookahead.serrer
+        self.long = cfg.lookahead.long
+        self.dist = cfg.lookahead.dist
 
     ## @brief   Calcule la courbure de la piste devant le kart.
     #
@@ -94,23 +100,23 @@ class AnticipeKart:
     #  @see     detectVirage()
     def get_dynamicLookahead(self, obs):
         node_path = obs.get("paths_start")
-        if len(node_path) < 6:
+        if len(node_path) < self.look_limite:
             return self.path_lookahead
 
         angle = abs(self.detectVirage(obs))
 
-        if angle < 0.1:       # ligne droite
-            lookahead = 7
-        elif angle <= 0.5:    # virage léger
-            lookahead = 5
+        if angle < self.look_droite:       # ligne droite
+            lookahead = self.droite
+        elif angle <= self.look_leger:    # virage léger
+            lookahead = self.leger
         else:                 # virage serré
-            lookahead = 3
+            lookahead = self.serrer
             # Vérification si le virage est long (courbure persistante)
             i = min(7, len(node_path) - 1)
             distance = np.linalg.norm(node_path[i] - node_path[0])
-            self.virage_long = distance > 20
+            self.virage_long = distance > self.dist
             if self.virage_long:
-                lookahead = 7   # on regarde loin pour anticiper la sortie
+                lookahead = self.long   # on regarde loin pour anticiper la sortie
 
         self.path_lookahead = lookahead
         return self.path_lookahead

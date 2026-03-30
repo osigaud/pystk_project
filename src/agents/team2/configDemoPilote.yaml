@@ -24,3 +24,15 @@ virages:
     i1: 0.07593688267397228
     i2: 0.16259576810108756
 vitesse: 0.1730058694074001
+
+
+look_limite: 6
+look_droite: 0.1
+look_leger: 0.5
+
+lookahead:
+  droite: 7
+  leger: 5
+  serrer: 3
+  long: 7
+  dist: 20
