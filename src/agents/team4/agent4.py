@@ -104,6 +104,11 @@ class Agent4(KartAgent):
         points = obs.get("paths_start",[]) # On récupère la liste des points
         #points_end = obs.get("paths_end",[])
         
+        # Appel de la fonction start pour le début de course
+        start, action_start = self.expert_start.choose_action(obs)
+        if start:
+            return action_start
+        
         # Appel de la fonction end pour la fin de course
         end, action_end = self.expert_end.choose_action(obs)
         if end : 
@@ -118,11 +123,6 @@ class Agent4(KartAgent):
         steering = self.steering.manage_pure_pursuit(gx,gz,gain_volant)
         acceleration, brake = self.speedcontroller.manage_speed(obs) # Appel à la fonction gerer_vitesse
         nitro = self.expert_nitro.manage_nitro(obs,steering) # Appel à la fonction manage_nitro
-        
-        # Appel de la fonction start pour le début de course
-        start, action_start = self.expert_start.choose_action(obs)
-        if start:
-            return action_start
         
         # Appel en priorité de la fonction rescue
         is_stuck, action_stuck = self.expert_rescue.choose_action(obs,steering)
