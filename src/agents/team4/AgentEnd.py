@@ -17,7 +17,7 @@ class AgentEnd:
     def choose_action(self, obs : dict) -> tuple[bool,dict]:
         
         """
-        Gère la fin de course.
+        Gère la fin de course
 
         Args:
             

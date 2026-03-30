@@ -16,7 +16,7 @@ class AgentNitro:
         """Réinitialise les variables d'instances de l'agent expert"""
         pass
     
-    def manage_nitro(self,obs : dict,steer : float,energy : float) -> bool:
+    def manage_nitro(self,obs : dict,steer : float) -> bool:
 
         """
         Gère l'activation du nitro
@@ -25,19 +25,19 @@ class AgentNitro:
             
             obs(dict) : Les données fournies par le simulateur.
             steer(float) : Angle de braquage des roues.
-            energy(float) : Mesure donnant le taux restant de nitro.
-        
+            
         Returns:
             
             bool : Variable permettant d'affirmer ou non l'utilisation du nitro.
         """
+        
+        energy = float(obs.get("energy", [0.0])[0])
         
         points = obs['paths_start'] # Récupération des points 
         
         target_now = points[2][0] # Récuperation du decalage lateral du point d'indice 2
         target_soon = points[3][0] # Récuperation du decalage lateral du point d'indice 3
         target_late = points[4][0] # Récuperation du decalage lateral du point d'indice 4
-        
         
         nit = False
         # On active le nitro si on s'est assure qu'aucun virage serre n'arrive

@@ -17,7 +17,7 @@ class AgentStart:
     def choose_action(self, obs : dict) -> tuple[bool,dict]:
         
         """
-        Gère le début de course.
+        Gère le début de course
 
         Args:
             
