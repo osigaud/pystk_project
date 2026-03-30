@@ -9,6 +9,7 @@ class AgentEnd:
         """Initialise les variables d'instances de l'agent expert"""
         
         self.c = config
+        """@private"""
     
     def reset(self) -> None:
         """Réinitialise les variables d'instances de l'agent expert"""
