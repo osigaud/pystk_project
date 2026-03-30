@@ -9,6 +9,8 @@ from .AgentEsquiveAdv import AgentEsquiveAdv
 from .AgentDrift import AgentDrift
 from .AgentItems import AgentItems
 from .AgentEdge import AgentEdge
+from .AgentEnd import AgentEnd
+from .AgentStart import AgentStart
 from omegaconf import OmegaConf
 from pathlib import Path
 
@@ -59,8 +61,12 @@ class Agent4(KartAgent):
         """@private"""
         self.expert_edge = AgentEdge(self.conf.edge,self.conf.steering)
         """@private"""
-        #print(OmegaConf.to_yaml(conf))
-        self.skin = 'adiumy'        
+        self.expert_end = AgentEnd(self.conf.end)
+        """@private"""
+        self.expert_start = AgentStart(self.conf.start)
+        """@private"""
+        self.skin = 'adiumy'
+        """@private"""        
         
     def reset(self) -> None:
         """Réinitialise les variables d'instances de l'agent en début de course."""
@@ -75,6 +81,8 @@ class Agent4(KartAgent):
         self.expert_drift.reset()
         self.expert_items.reset()
         self.expert_edge.reset()
+        self.expert_end.reset()
+        self.expert_start.reset()
         
     def endOfTrack(self) -> bool:
         """Indique si la course est fini."""
@@ -96,50 +104,28 @@ class Agent4(KartAgent):
         points = obs.get("paths_start",[]) # On récupère la liste des points
         #points_end = obs.get("paths_end",[])
         
-        if len(points) <= self.c.seuil_lenpoints: # Si la longueur de la liste est inferieur à 2, on accèlère à fond (ligne d'arrivée proche)
-            return {
-                "acceleration": 1.0,
-                "steer": 0.0,
-                "brake": False,
-                "drift": False,
-                "nitro": True,
-                "rescue":False,
-                "fire": False,
-            }
+        # Appel de la fonction end pour la fin de course
+        end, action_end = self.expert_end.choose_action(obs)
+        if end : 
+            return action_end
         
         target = points[self.path_lookahead] # On récupère le x-ème point de la liste defini par la variable de classe
         gx = target[0] # On récupère x, le décalage latéral
         gz = target[2] # On récupère z, la profondeur
-
-        distance = float(obs.get("distance_down_track", [0.0])[0])
-        vel = obs.get("velocity", [0.0, 0.0, 0.0])
-        speed = float(vel[2])
-        energy = float(obs.get("energy", [0.0])[0])
-
+        
         drift = False
         gain_volant = self.c.default_gain  #Gain par défaut
         steering = self.steering.manage_pure_pursuit(gx,gz,gain_volant)
-        #drift, modified_steer = self.expert_drift.choose_action(obs,steering,vel)
         acceleration, brake = self.speedcontroller.manage_speed(obs) # Appel à la fonction gerer_vitesse
-        nitro = self.expert_nitro.manage_nitro(obs,steering,energy) # Appel à la fonction manage_nitro
+        nitro = self.expert_nitro.manage_nitro(obs,steering) # Appel à la fonction manage_nitro
         
-        # Au depart on avance tout droit pour eviter de se cogner contre les adversaires
-        if obs['distance_down_track'] <= self.c.seuil_distance:
-            steering = 0.0
-            acceleration = 1.0
-            action = {
-            "acceleration": acceleration,
-            "steer": steering,
-            "brake": False,
-            "drift": False,
-            "nitro": False,
-            "rescue":False,
-            "fire": False,
-            }
-            return action
-
+        # Appel de la fonction start pour le début de course
+        start, action_start = self.expert_start.choose_action(obs)
+        if start:
+            return action_start
+        
         # Appel en priorité de la fonction rescue
-        is_stuck, action_stuck = self.expert_rescue.choose_action(steering,speed,distance)
+        is_stuck, action_stuck = self.expert_rescue.choose_action(obs,steering)
         if is_stuck and obs['distance_down_track'] >= self.c.seuil_distance_stuck:
             return action_stuck
         
