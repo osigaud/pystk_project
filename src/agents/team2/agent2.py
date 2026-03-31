@@ -160,7 +160,7 @@ class Agent2(KartAgent):
 
 
         # Activation de la nitro en ligne droite si énergie disponible
-        nitro = obs["energy"][0] > 0 and abs(steering) < 0.2
+        nitro = obs["energy"][0] > 0 and abs(steering) < cfg.ligne_droite
 
         # Correction latérale pour rester au centre de la piste
         correction_piste = self.steering.correction_centrePiste(obs)

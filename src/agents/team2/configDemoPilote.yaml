@@ -36,3 +36,8 @@ lookahead:
   serrer: 3
   long: 7
   dist: 20
+
+hit:
+  dist_centre: 40
+
+ligne_droite: 0.2

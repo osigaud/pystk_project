@@ -28,10 +28,12 @@ class HitRivals:
         return False
 
     def hit_karts(self, obs):
-        #conditions pour attaquer
+        
+        #conditions pour attaquer:
+            #pas d'item en vu,pas de virage,adv loin du centre 
         if (not self.item_present(obs) and self.anticipe_kart.detectVirage(obs) <= 0.2):
             karts_pos = obs.get('karts_position', [])
-            pos = np.array(karts_pos[0])
+            pos = np.array(karts_pos[1])
             x, z = pos[0], pos[2]
 
             center_path = obs.get("center_path", [])
@@ -39,7 +41,7 @@ class HitRivals:
             distance_centre = np.linalg.norm(pos - centre)
 
             #ne pas attaquer si adversaire trop éloigné du centre
-            if distance_centre > 0.2:
+            if distance_centre > cfg.hit.dist_centre:
                 return None
 
             acceleration = 1
@@ -57,12 +59,13 @@ class HitRivals:
             correction_piste = self.steering.correction_centrePiste(obs)
 
             final_steering = np.clip(target_angle + correction_piste ,-1, 1)
-
+            virage = self.anticipe_kart.detectVirage(obs)
+            drift = virage > 0.2
             return {
                 "acceleration": acceleration,
                 "steer": final_steering,
-                "brake": True,   # marche arrière dans STK
-                "drift": False,
+                "brake": False, 
+                "drift": drift,
                 "nitro": False,
                 "rescue": False,
                 "fire": False,
