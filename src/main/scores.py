@@ -16,21 +16,22 @@ class Scores:
         self.dict = {}
     
     def init(self, name):
-        self.dict[name] = [[], [], [], [], []]
+        self.dict[name] = [[], [], [], [], [], []]
 
-    def append(self, name, pos, pos_std, steps, wins, blocked):
+    def append(self, name, pos, pos_std, steps, wins, blocked, points):
         self.dict[name][0].append(pos)
         self.dict[name][1].append(pos_std)
         self.dict[name][2].append(steps)
         self.dict[name][3].append(wins)
         self.dict[name][4].append(blocked)
+        self.dict[name][5].append(points)
 
     def display(self):
         print(self.dict)
 
     def display_mean(self):
         for k in self.dict:
-            print(f"{k}: {np.array(self.dict[k][0]).mean()}, {np.array(self.dict[k][1]).mean()}, {np.array(self.dict[k][2]).mean()}, {np.array(self.dict[k][2]).std()}, {np.array(self.dict[k][3]).sum()}, {np.array(self.dict[k][4]).sum()}")
+            print(f"{k}: {np.array(self.dict[k][0]).mean()}, {np.array(self.dict[k][1]).mean()}, {np.array(self.dict[k][2]).mean()}, {np.array(self.dict[k][2]).std()}, {np.array(self.dict[k][3]).sum()}, {np.array(self.dict[k][4]).sum()}, {np.array(self.dict[k][5]).sum()}")
 
     def display_html(self, fp):
         for k in self.dict:
@@ -42,6 +43,7 @@ class Scores:
                     f"""<td>{np.array(self.dict[k][2]).std():.2f}</td>"""
                     f"""<td>{np.array(self.dict[k][3]).sum()}</td>"""
                     f"""<td>{np.array(self.dict[k][4]).sum()}</td>"""
+                    f"""<td>{np.array(self.dict[k][5]).sum()}</td>"""
                     "</tr>"
                 )
             
@@ -66,6 +68,7 @@ def output_html(output: Path, scores: Scores):
       <th class="no-sort">±</th>
       <th id="position">Nb wins</th>
       <th id="position">Nb blocked</th>
+      <th id="position">Points</th>
     </tr>
   </thead>
   <tbody>"""
