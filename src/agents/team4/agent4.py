@@ -59,7 +59,7 @@ class Agent4(KartAgent):
         """@private"""
         self.expert_items = AgentItems(self.conf.powerup_type, self.conf.steering)
         """@private"""
-        self.expert_edge = AgentEdge(self.conf.edge,self.conf.steering)
+        self.expert_edge = AgentEdge(self.conf.edge,self.conf.steering,path_lookahead=self.path_lookahead)
         """@private"""
         self.expert_end = AgentEnd(self.conf.end)
         """@private"""
@@ -130,7 +130,7 @@ class Agent4(KartAgent):
             return action_stuck
         
         # Appel de la fonction edge
-        edge, action_edge = self.expert_edge.choose_action(obs, gx, gz)
+        edge, action_edge = self.expert_edge.choose_action(obs)
         if edge:
             self.expert_esquive_adv.reset()
             self.expert_banana_dodge.reset()
