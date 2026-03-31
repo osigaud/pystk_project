@@ -38,6 +38,6 @@ lookahead:
   dist: 20
 
 hit:
-  dist_centre: 40
+  dist_centre: 50
 
 ligne_droite: 0.2
