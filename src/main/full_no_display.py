@@ -30,6 +30,8 @@ MAPS = ['abyss', 'black_forest', 'candela_city', 'cocoa_temple', 'cornfield_cros
 MAX_STEPS = 2000
 NB_REPEAT = 2
 
+POINTS = [10, 6, 4, 2, 1, -1]
+
 # Get the current timestamp
 current_timestamp = datetime.now()
 
@@ -85,9 +87,10 @@ def single_race(env, agents, names, scores):
     steps = 0
     nb_finished = 0
     positions = []
-    first = True
     wins = np.zeros(MAX_TEAMS)
     blocked = np.zeros(MAX_TEAMS)
+    ranking = np.zeros(MAX_TEAMS)
+    rank = 1
     for i in range(MAX_TEAMS):
         agents[i].steps = MAX_STEPS
     while not done and steps < MAX_STEPS:
@@ -104,14 +107,15 @@ def single_race(env, agents, names, scores):
             # check if agents have finished the race
             kart = env.world.karts[i]
             if kart.has_finished_race and not agents[i].isEnd:
-                print(f"{names[i]} has finished the race at step {steps}")
+                print(f"{names[i]} has finished the race at step {steps} ({rank})")
                 nb_finished += 1
                 agents[i].isEnd = True
                 agents[i].steps = steps
-                if first:
+                ranking[i] = rank
+                if rank == 1:
                     wins[i] = 1
                     print(f"{names[i]} is first")
-                first = False
+                rank += 1
 
         obs, _, _, _, info = env.step(actions)
 
@@ -129,8 +133,9 @@ def single_race(env, agents, names, scores):
         if agents[i].steps == MAX_STEPS:
             blocked[i] = 1
             print(f"{names[i]} is blocked")
+            ranking[i] = 6
     for i in range(MAX_TEAMS):
-        scores.append(names[i], pos_avg[i], pos_std[i], agents[i].steps, wins[i], blocked[i])
+        scores.append(names[i], pos_avg[i], pos_std[i], agents[i].steps, wins[i], blocked[i], POINTS[int(ranking[i])])
         agents[i].isEnd = False
     print("race duration:", steps)
 
