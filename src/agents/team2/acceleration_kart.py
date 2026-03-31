@@ -89,7 +89,7 @@ class AccelerationControl(AnticipeKart):
     def decideDrift(self, obs):
         curvature = self.detectVirage(obs)
         changement_direction = self.changementDirection(obs)
-        if abs(curvature) > 0.275 and not changement_direction : 
+        if abs(curvature) > self.seuildrift and not changement_direction : 
             drift = True 
         else : 
             drift = False
