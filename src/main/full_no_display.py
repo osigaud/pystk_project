@@ -135,7 +135,7 @@ def single_race(env, agents, names, scores):
             print(f"{names[i]} is blocked")
             ranking[i] = 6
     for i in range(MAX_TEAMS):
-        scores.append(names[i], pos_avg[i], pos_std[i], agents[i].steps, wins[i], blocked[i], POINTS[int(ranking[i])])
+        scores.append(names[i], pos_avg[i], pos_std[i], agents[i].steps, wins[i], blocked[i], POINTS[int(ranking[i])-1])
         agents[i].isEnd = False
     print("race duration:", steps)
 
