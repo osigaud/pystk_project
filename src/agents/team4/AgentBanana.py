@@ -183,7 +183,7 @@ class AgentBanana:
             #print(banana_list)
             
             # Prendre l'interieur des virages sur des virages pas trop serrés
-            if abs(center_path_distance) <= self.c.limite_centre and abs(b_x) <= self.c.limite_banane_courbe and abs(courbe) <= self.c.limite_courbe:
+            """if abs(center_path_distance) <= self.c.limite_centre and abs(b_x) <= self.c.limite_banane_courbe and abs(courbe) <= self.c.limite_courbe:
                 self.use_corde = True
                 #print(courbe)
                 if -courbe >= self.c.true_virage: # Seuleument si la courbe tourne assez pour eviter l'instabilité
@@ -199,14 +199,14 @@ class AgentBanana:
                     else:
                         new_side = 1
 
-            else:   
+            else:"""
                 #print("choix normal")
-                self.use_corde = False
-                if b_x>=0:
-                    new_side = -1
-                    
-                else:
-                    new_side = 1
+            
+            self.use_corde = False
+            if b_x>=0:
+                new_side = -1
+            else:
+                new_side = 1
 
             # Utilisation d'un compteur pour maintenir le cap d'esquive sur x frames
             if self.dodge_timer == 0 or (self.lock_mode == "SINGLE" and self.dodge_side != new_side):
