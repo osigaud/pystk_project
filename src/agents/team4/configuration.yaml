@@ -92,12 +92,14 @@ nitro:
 
 edge:
   correction_steer : 0.2
-  epsilon_limite_max : 0.5
+  epsilon_limite_max : 1.0
   epsilon_limite_min : 0.05
   epsilon_gz : 0.01
   gain : 7.0
   new_accel : 0.4
-  decalage_lateral : 0.5
+  decalage_lateral : 2.0
+  timer : 3
+  duree : 6
 
 end:
   seuil_lenpoints : 2
