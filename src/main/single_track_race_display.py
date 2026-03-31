@@ -22,7 +22,7 @@ from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 7
+MAX_TEAMS = 5
 MAX_STEPS = 1000
 NB_RACES = 1
 
