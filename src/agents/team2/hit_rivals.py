@@ -58,14 +58,14 @@ class HitRivals:
 
             correction_piste = self.steering.correction_centrePiste(obs)
 
-            final_steering = np.clip(target_angle + correction_piste ,-1, 1)
-            virage = self.anticipe_kart.detectVirage(obs)
-            drift = virage > 0.2
+            final_steering = np.clip(target_angle + correction_piste +steering,-1, 1)
+            #virage = self.anticipe_kart.detectVirage(obs)
+            #drift = virage > cfg.ligne_droite
             return {
                 "acceleration": acceleration,
                 "steer": final_steering,
                 "brake": False, 
-                "drift": drift,
+                "drift": False,
                 "nitro": False,
                 "rescue": False,
                 "fire": False,
