@@ -15,7 +15,7 @@ from agents.team1.agent_drift import AgentDrift
 # kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
 
 class Agent1(KartAgent):
-    def __init__(self, env, path_lookahead=3):
+    def __init__(self, env, path_lookahead=3, dist=None, ajust=None):
         super().__init__(env)
         self.path_lookahead = path_lookahead
         self.agent_positions = []
@@ -27,7 +27,12 @@ class Agent1(KartAgent):
         path_conf = Path(__file__).resolve().parent
         path_conf = str(path_conf) + '/ConfigFileTeam1.yaml'   #Chemin du fichier de configuration
         self.conf = OmegaConf.load(path_conf)                           #Importation du fichier de configuration
-
+        
+        if dist is not None:
+        	self.conf.dist = dist
+        if ajust is not None:
+        	self.conf.ajust = ajust
+        
         self.agentCenter = AgentCenter(env, self.conf, self.path_lookahead)
         self.agentSpeed = AgentSpeed(env, self.conf, self.agentCenter, self.path_lookahead)
         self.agentObstacles = AgentObstacles(env, self.conf, self.agentSpeed, self.path_lookahead)

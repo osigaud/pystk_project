@@ -10,13 +10,11 @@ from dataclasses import dataclass
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src"))) #Changement du path ici pour que ce soit adapté
 
 from agents.team1.agent1 import Agent1
-from agents.team1.agentwrappers import AgentCenter
-from agents.team1.agentwrappers import AgentCenter2
 
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 3
+MAX_TEAMS = 2
 NB_RACES = 1
 
 # Get the current timestamp
@@ -77,7 +75,7 @@ agents_specs = [
 def create_race(distance, ajustement):
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="cornfield_crossing", num_kart=MAX_TEAMS) #track="xr591"
+        env = STKRaceMultiEnv(agents=agents_specs, track="abyss", num_kart=MAX_TEAMS) #track="xr591"
     else:
         env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
 
@@ -87,8 +85,8 @@ def create_race(distance, ajustement):
     names = []
 
     agents.append(Agent1(env, path_lookahead=3, dist=distance, ajust=ajustement))
-    agents.append(AgentCenter2(env, path_lookahead=3))  
-    agents.append(AgentCenter2(env, path_lookahead=3))
+    agents.append(Agent1(env, path_lookahead=3))
+
 
     for i in range(MAX_TEAMS):
         names.append(agents[i].name)
@@ -146,9 +144,9 @@ def main_loop():
     return scores
 """
 
-def run_once(dist, ajust, speed_threshold, steer_threshold, stop_drift_speed):
+def run_once(dist, ajust):
 
-    env, agents, names = create_race(dist, ajust, speed_threshold, steer_threshold, stop_drift_speed )
+    env, agents, names = create_race(dist, ajust)
     obs, _ = env.reset()
     done = False
     steps = 0
@@ -180,17 +178,13 @@ def objective(trial):
     dist = trial.suggest_float("dist", 0.2, 1.5)
     ajust = trial.suggest_float("ajust", 0.08, 0.9)
     
-    #tester AgentDrift
-    speed_threshold = trial.suggest_float("speed_threshold",5.0, 15.0) 
-    steer_threshold = trial.suggest_float("steer_threshold", 0.1, 0.5) 
-    stop_drift_speed = trial.suggest_float("stop_drift_speed", 2.0, 8.0)
     
-    score = run_once(dist, ajust, speed_threshold, steer_threshold, stop_drift_speed )
+    score = run_once(dist, ajust)
 
     return score  # plus petit = meilleure position
 
 study = optuna.create_study(direction="minimize")
-study.optimize(objective, n_trials= 3000)
+study.optimize(objective, n_trials= 30)
 
 print(study.best_params)
 
