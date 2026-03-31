@@ -47,12 +47,14 @@ obstacles:
 range_bonus_x : 2
 range_bonus_y : 3
 range_bonus_z : 3
+range_enemy_x : 3
 #seuils d'activation des items 
 range_cake : 80
 range_bowling_z : 25
-range_enemy_x : 3
 seuil_vitesse : 20
 range_plunger : 50
+range_swatter : 9
+range_swatter_y : 5
 
 
 #       AGENT RESCUE
