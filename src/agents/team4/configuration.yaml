@@ -86,9 +86,8 @@ opponent:
 nitro:
   seuil_energy : 0.5
   seuil_steer : 0.45
-  seuil_target_now : 5
-  seuil_target_soon : 5
-  seuil_target_late : 7
+  nb_max_points : 4
+  max_curvature_for_nitro : 0.5
 
 edge:
   correction_steer : 0.2
