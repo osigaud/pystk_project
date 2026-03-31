@@ -87,7 +87,7 @@ class AgentItems(KartAgent) :
             return action
 
         if current_item == ZIPPER : 
-            if obs["velocity"][2] >=25:
+            if obs["velocity"][2] >=23:
                 action["fire"] = False
                 return action
             action["fire"] = True         	      
