@@ -38,7 +38,7 @@ class ActiveShield:
     #                Doit contenir les clés "powerup_type" et "karts_position".
     #  @return  bool : True si l'item doit être utilisé, False sinon.
     #  @see     AttackRivals.attack_rivals()
-    def fire_shield(self, obs):
+    def fire_shield(self, obs): # a ameliorer faire en sorte d activer le shield quand il y a quelqu un derriere nous 
         item        = obs["powerup_type"]
         kart_devant = self.attack_rival.attack_rivals(obs)
 
