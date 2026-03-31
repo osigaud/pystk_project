@@ -51,7 +51,13 @@ class AgentItems(KartAgent) :
         action["fire"] = False        
 
         if current_item == BUBBLEGUM :
+            if obs["attachment"] == 6 :
+                action["fire"] = False
+                return action
             action["fire"] = True
+            return action
+
+
             return action
 
         if current_item == CAKE :
@@ -66,23 +72,31 @@ class AgentItems(KartAgent) :
             return action
             
         if current_item == BOWLING :
+            if obs["powerup_count"] >1:
+                action["fire"] = True
+                return action
             premier_kart = obs["karts_position"][0]
             if premier_kart[self.conf.z]<0:
                 action["fire"] = False
             if self.is_bonus_close(obs) : 
                 action ["fire"] = True
             for kart in obs["karts_position"]:
-                if kart[self.conf.z]>=0 and kart[self.conf.z]<=25:         #optimiser valeurs
+                if kart[self.conf.z]>=0 and kart[self.conf.z]<=25:         
                     if abs(kart[self.conf.x]) <= 3:
                         action["fire"] = True                
             return action
 
         if current_item == ZIPPER : 
-            #if virage_serre = false and self.target_obstacle = None:
+            if obs["velocity"][2] >=25:
+                action["fire"] = False
+                return action
             action["fire"] = True         	      
-            return action
+            return action 
 
         if current_item == PLUNGER :
+            if obs["powerup_count"] >1:
+                action["fire"] = True
+                return action
             premier_kart = obs["karts_position"][0]
             if premier_kart[self.conf.z]<0:
                 action["fire"] = False
@@ -100,12 +114,15 @@ class AgentItems(KartAgent) :
             return action
 
         if current_item == SWATTER :
+            if obs["attachment"] == 3:
+                action["fire"] = False
+                return action
             for kart in obs["karts_position"]:
                 if abs(kart[self.conf.z]) <= 9 and abs(kart[self.conf.x]) <= 9 and abs(kart[self.conf.y])<=5:
                     action["fire"] = True
             return action
 
-        if current_item == RUBBERBALL :
+        if current_item == RUBBERBALL :  #basket
             premier_kart = obs["karts_position"][0]
             if premier_kart[self.conf.z] > 0:
                 action["fire"] = True
