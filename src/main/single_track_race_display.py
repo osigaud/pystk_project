@@ -38,7 +38,7 @@ agents_specs = [
 
 def create_race():
     # Create the multi-agent environment for N karts.
-    env = STKRaceMultiEnv(agents=agents_specs, track="abyss", render_mode="human", num_kart=MAX_TEAMS)
+    env = STKRaceMultiEnv(agents=agents_specs, track="stk_enterprise", render_mode="human", num_kart=MAX_TEAMS)
 
     # Instantiate the agents.
 
