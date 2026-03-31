@@ -82,9 +82,11 @@ stop_drift_speed: 4.0
 
 seuil_intensite: 0.1
 seuil_delta: 0.035
-seuil_corde : 0.8
 steer1: 0.07
 steer2: 0.15
-acceleration: 0.08561080277373714
+seuil_corde: 0.18
+acceleration: -0.08
 brake: 0.19667823752517477
-
+min_speed: 10.0
+seuil_drift: 0.15
+marge_drift: 1.0

@@ -1,4 +1,3 @@
-# Attributs : self.intensite_precedente self.seuil_intensite self.seuil_delta
 from agents.kart_agent import KartAgent
 import numpy as np
 
@@ -14,19 +13,21 @@ class AgentVirage(KartAgent):
         self.steer1 = self.conf.steer1
         self.steer2 = self.conf.steer2
         self.acceleration = self.conf.acceleration
-        self.brake = self.conf.brake
+        self.min_speed = self.conf.min_speed
+        self.seuil_drift = self.conf.seuil_drift
+        self.marge_drift = self.conf.marge_drift
 
     def calcul_vecteur(self, v1, v2):
-        nv_x = v2[self.conf.x] - v1[self.conf.x]
-        nv_z = v2[self.conf.z] - v1[self.conf.z]
+        nv_x = v2[0] - v1[0]
+        nv_z = v2[2] - v1[2]
 
         return np.array([nv_x, nv_z], dtype=float)
 
 
     def direction_virage(self, vecteur):
-        if (vecteur[self.conf.x] > 0):
+        if (vecteur[0] > 0):
             return 1
-        elif (vecteur[self.conf.x] < 0):
+        elif (vecteur[0] < 0):
             return -1
         else:
             return 0
@@ -36,7 +37,7 @@ class AgentVirage(KartAgent):
         v1 = np.array(v1, dtype=float)
         v2 = np.array(v2, dtype=float)
 
-        epsilon = 0.0001  #eviter de diviser a 0
+        epsilon = 0.0001
         prod_scal = np.dot(v1, v2)
 
         norm_v1 = np.linalg.norm(v1)
@@ -86,9 +87,6 @@ class AgentVirage(KartAgent):
             accel += self.acceleration * self.intensite_precedente
             act["acceleration"] = np.clip(accel, 0, 1)
 
-        if (phase == 2):
-            act["drift"] = True
-
         return act
 
     def modif_steer(self, act, phase, direction):
@@ -101,15 +99,60 @@ class AgentVirage(KartAgent):
         
         act["steer"] = np.clip(steer, -1, 1) 
         return act
+    
 
-    def modif_brake(self, act, phase):
+    def modif_steer(self, obs, act, phase, direction):
+        steer = act["steer"]
 
-        if (phase == 2):
-            brake = act["brake"]
-            brake += self.brake * self.intensite_precedente
-            act["brake"] = np.clip(brake, 0, 1)
+        distance_center = obs["center_path_distance"][0]
+        half_track = obs["paths_width"][0] / 2
+
+        marge = 1.0
+        facteur = 1.0
+
+        trop_a_droite = distance_center > half_track - marge
+        trop_a_gauche = distance_center < -half_track + marge
+
+        # réduction au lieu de blocage
+        if direction == -1 and trop_a_droite:
+            facteur = 0.2
+        elif direction == 1 and trop_a_gauche:
+            facteur = 0.2
+
+        if phase == 1:
+            steer += facteur * self.steer1 * direction * self.intensite_precedente
+
+        elif phase == 2:
+            steer += facteur * self.steer2 * direction * self.intensite_precedente
+
+        act["steer"] = np.clip(steer, -1, 1)
         return act
 
+
+
+    def gestion_drift(self, obs, act, phase):
+        speed = np.linalg.norm(obs["velocity"])
+        distance_center = abs(obs["center_path_distance"][0])
+        half_track = obs["paths_width"][0][0] / 2
+
+        if phase != 2:
+            act["drift"] = False
+            return act
+
+        if speed < self.min_speed:
+            act["drift"] = False
+            return act
+
+        if self.intensite_precedente < self.seuil_drift:
+            act["drift"] = False
+            return act
+
+        if distance_center > half_track - self.marge_drift:
+            act["drift"] = False
+            return act
+
+        act["drift"] = True
+        return act
 
     def gestion_virage(self, obs, act):
 
@@ -118,11 +161,11 @@ class AgentVirage(KartAgent):
         phase = self.phase_virage(obs)
 
         if phase == 0 or direction == 0:
+            act["drift"] = False
             return act
 
         act = self.modif_accel(act, phase)
-        act = self.modif_steer(act, phase, direction)
-        act = self.modif_brake(act, phase)
-
+        act = self.modif_steer(obs, act, phase, direction)
+        act = self.gestion_drift(obs, act, phase)
        
         return act
