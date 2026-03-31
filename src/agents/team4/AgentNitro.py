@@ -38,10 +38,9 @@ class AgentNitro:
         points = obs['paths_start'] # Récupération des points 
 
         courbe = compute_curvature(points[:self.c.nb_max_points]) # Calcul de la courbe
-        
         nit = False
         # On active le nitro si on s'est assure qu'aucun virage serre n'arrive
-        if (energy > self.c.seuil_energy and abs(steer) < self.c.seuil_steer and abs(target_now)<= self.c.seuil_target_now and abs(target_soon) <= self.c.seuil_target_soon and target_late <= self.c.seuil_target_late):
+        if (energy > self.c.seuil_energy and abs(steer) < self.c.seuil_steer and abs(courbe)<self.c.max_curvature_for_nitro):
             nit = True
         return nit
 
