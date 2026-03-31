@@ -12,6 +12,7 @@ from .rival_attack import AttackRivals
 from .kart_rescue import StuckControl
 from .acceleration_kart import AccelerationControl
 from .shield_kart import ActiveShield
+from .hit_rivals import HitRivals
 
 ## @var cfg
 #  @brief Configuration globale chargée depuis configDemoPilote.yaml.
@@ -73,6 +74,8 @@ class Agent2(KartAgent):
         ## @var active_shield
         #  @brief Module de gestion du shield et des items défensifs/offensifs.
         self.active_shield = ActiveShield()
+        
+        self.hit_rivals = HitRivals()
 
         ## @var agent_positions
         #  @brief Historique des positions du kart (utilisé pour la visualisation).
@@ -150,6 +153,11 @@ class Agent2(KartAgent):
             steering = np.clip(angle_target * 2, -1, 1)
         else:
             steering = 0
+
+        attack_karts = self.hit_rivals.hit_karts(obs)       
+        if attack_karts is not None:
+            return attack_karts
+
 
         # Activation de la nitro en ligne droite si énergie disponible
         nitro = obs["energy"][0] > 0 and abs(steering) < 0.2
