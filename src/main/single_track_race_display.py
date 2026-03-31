@@ -22,7 +22,7 @@ from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 7
+MAX_TEAMS = 5
 MAX_STEPS = 1000
 NB_RACES = 1
 
@@ -38,7 +38,7 @@ agents_specs = [
 
 def create_race():
     # Create the multi-agent environment for N karts.
-    env = STKRaceMultiEnv(agents=agents_specs, track="olivermath", render_mode="human", num_kart=MAX_TEAMS)
+    env = STKRaceMultiEnv(agents=agents_specs, track="abyss", render_mode="human", num_kart=MAX_TEAMS)
 
     # Instantiate the agents.
 
@@ -105,4 +105,3 @@ def main_loop():
         
 if __name__ == "__main__":
     main_loop()
-
