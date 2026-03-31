@@ -38,6 +38,7 @@ class AnticipeKart:
         self.serrer = cfg.lookahead.serrer
         self.long = cfg.lookahead.long
         self.dist = cfg.lookahead.dist
+        self.prec_angle = 0.0
 
     ## @brief   Calcule la courbure de la piste devant le kart.
     #
@@ -87,6 +88,16 @@ class AnticipeKart:
         angle_final = sum(top3) / len(top3)
 
         return angle_final
+    
+    def changementDirection(self, obs):
+        changement = False
+        angle=self.detectVirage(obs)
+        if abs(angle) > 0.27 and abs(self.prec_angle) > 0.27 : 
+            if angle * self.prec_angle < 0 : 
+                changement = True
+        self.prec_angle = angle
+        print(changement)
+        return changement 
 
     ## @brief   Détermine dynamiquement le nombre de nœuds à anticiper.
     #
@@ -120,3 +131,4 @@ class AnticipeKart:
 
         self.path_lookahead = lookahead
         return self.path_lookahead
+

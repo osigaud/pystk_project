@@ -169,7 +169,8 @@ class Agent2(KartAgent):
         # Tir de l'item si un adversaire est dans le champ de vision
         has_item = obs.get("attachment", 0) != 0
         fire = has_item and self.active_shield.fire_shield(obs)
-
+        #drift = self.acceleration.decideDrift(obs)
+        
         return {
             "acceleration": acceleration,
             "steer":        final_steering,
