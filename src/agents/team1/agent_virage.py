@@ -1,19 +1,22 @@
-# Attributs : self.intensite_precedente self.seuil_intensite self.seuil_delta
 from agents.kart_agent import KartAgent
 import numpy as np
 
 class AgentVirage(KartAgent):
 
-    def __init__(self, env, conf ):
+    def __init__(self, env, conf, agent ):
         super().__init__(env)
+        self.agent = agent
         self.intensite_precedente = None
         self.conf = conf
         self.seuil_intensite = self.conf.seuil_intensite
+        self.seuil_corde = self.conf.seuil_corde
         self.seuil_delta = self.conf.seuil_delta
         self.steer1 = self.conf.steer1
         self.steer2 = self.conf.steer2
         self.acceleration = self.conf.acceleration
-        self.brake = self.conf.brake
+        self.min_speed = self.conf.min_speed
+        self.seuil_drift = self.conf.seuil_drift
+        self.marge_drift = self.conf.marge_drift
 
     def calcul_vecteur(self, v1, v2):
         nv_x = v2[0] - v1[0]
@@ -68,8 +71,10 @@ class AgentVirage(KartAgent):
                 phase = 1
             elif delta < -self.seuil_delta:
                 phase = 3
-            else:
+            elif (self.intensite_precedente > self.seuil_corde):
                 phase = 2
+            else:
+                phase = 0
 
         
         self.intensite_precedente = intensite_actuelle
@@ -95,15 +100,60 @@ class AgentVirage(KartAgent):
         
         act["steer"] = np.clip(steer, -1, 1) 
         return act
+    
 
-    def modif_brake(self, act, phase):
+    def modif_steer(self, obs, act, phase, direction):
+        steer = act["steer"]
 
-        if (phase == 2):
-            brake = act["brake"]
-            brake += self.brake * self.intensite_precedente
-            act["brake"] = np.clip(brake, 0, 1)
+        distance_center = obs["center_path_distance"][0]
+        half_track = obs["paths_width"][0] / 2
+
+        marge = 1.0
+        facteur = 1.0
+
+        trop_a_droite = distance_center > half_track - marge
+        trop_a_gauche = distance_center < -half_track + marge
+
+        # réduction au lieu de blocage
+        if direction == -1 and trop_a_droite:
+            facteur = 0.2
+        elif direction == 1 and trop_a_gauche:
+            facteur = 0.2
+
+        if phase == 1:
+            steer += facteur * self.steer1 * direction * self.intensite_precedente
+
+        elif phase == 2:
+            steer += facteur * self.steer2 * direction * self.intensite_precedente
+
+        act["steer"] = np.clip(steer, -1, 1)
         return act
 
+
+
+    def gestion_drift(self, obs, act, phase):
+        speed = np.linalg.norm(obs["velocity"])
+        distance_center = abs(obs["center_path_distance"][0])
+        half_track = obs["paths_width"][0][0] / 2
+
+        if phase != 2:
+            act["drift"] = False
+            return act
+
+        if speed < self.min_speed:
+            act["drift"] = False
+            return act
+
+        if self.intensite_precedente < self.seuil_drift:
+            act["drift"] = False
+            return act
+
+        if distance_center > half_track - self.marge_drift:
+            act["drift"] = False
+            return act
+
+        act["drift"] = True
+        return act
 
     def gestion_virage(self, obs, act):
 
@@ -112,11 +162,11 @@ class AgentVirage(KartAgent):
         phase = self.phase_virage(obs)
 
         if phase == 0 or direction == 0:
+            act["drift"] = False
             return act
 
         act = self.modif_accel(act, phase)
-        act = self.modif_steer(act, phase, direction)
-        act = self.modif_brake(act, phase)
-
+        act = self.modif_steer(obs, act, phase, direction)
+        act = self.gestion_drift(obs, act, phase)
        
         return act

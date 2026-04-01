@@ -22,6 +22,7 @@ class AgentSpeed(KartAgent):
         self.conf = conf
         self.agent = agent
         self.path_lookahead = path_lookahead
+        self.step_count = 0
     
     @staticmethod
     def detecter_virage(conf, obs):
@@ -98,12 +99,21 @@ class AgentSpeed(KartAgent):
 
         direction_segment = obs["paths_end"][0] - obs["paths_start"][0]
         if direction_segment[1] > 0.05:
-            act["acceleration"] = np.clip(act["acceleration"], 0.1, 1) 
+            act["acceleration"] = min(act["acceleration"] + 0.3, 1)
+        elif direction_segment[1] < -0.05:
+        	act["acceleration"] = max(act["acceleration"] - 0.1, 0.5)
 
         return act
   
     def choose_action(self, obs):
         act = self.agent.choose_action(obs)
+        
+        if self.step_count < 30:
+        	act["acceleration"] = 1
+        	act["brake"] = False
+        	self.step_count += 1
+        	return act
+        
         virage_serre = self.detecter_virage(self.conf, obs)
         action_ajustee = self.ajuster_acceleration(virage_serre, act, obs)
         return action_ajustee

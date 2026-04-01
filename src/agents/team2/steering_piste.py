@@ -43,7 +43,7 @@ class SteeringPiste:
             return 0.0
 
         # le point au centre de la piste juste devant le kart
-        point_proche_kart = obs["paths_start"][2]
+        point_proche_kart = obs["paths_start"][1]
         x = point_proche_kart[0]  # coordonnées du point qui nous indique gauche ou droite
         z = point_proche_kart[2]  # coordonnées du point qui nous indique devant ou derrière
 

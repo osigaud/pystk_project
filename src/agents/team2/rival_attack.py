@@ -4,7 +4,8 @@
 #  @date    20-01-2026
 
 import numpy as np
-
+from omegaconf import OmegaConf
+cfg = OmegaConf.load("../agents/team2/configDemoPilote.yaml")
 
 ## @class   AttackRivals
 #  @brief   Décide d'utiliser l'item offensif selon la position des adversaires.
@@ -34,6 +35,6 @@ class AttackRivals:
             dist = np.linalg.norm(pos)
             if pos[2] > 0:  # si l'adversaire est devant nous
                 angle = np.degrees(np.arctan2(pos[0], pos[2]))
-                if dist < 40 and abs(angle) < 15.0:  # si l'adversaire est près et dans l'axe de tir
+                if dist < cfg.champs_vision.dist and abs(angle) < cfg.champs_vision.angle:  # si l'adversaire est près et dans l'axe de tir
                     return True
         return False

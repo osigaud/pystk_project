@@ -4,7 +4,6 @@ import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 
-
 class Agent6(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)

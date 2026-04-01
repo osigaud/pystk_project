@@ -4,8 +4,6 @@
 #  @date    20-01-2026
 
 import numpy as np
-import random
-from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 from omegaconf import OmegaConf
 from .steering_piste import SteeringPiste
@@ -13,6 +11,8 @@ from .react_items import ReactionItems
 from .rival_attack import AttackRivals
 from .kart_rescue import StuckControl
 from .acceleration_kart import AccelerationControl
+from .shield_kart import ActiveShield
+from .hit_rivals import HitRivals
 
 # kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
 
@@ -21,21 +21,24 @@ from .acceleration_kart import AccelerationControl
 #         Contient les seuils de virage, les gains de correction et les angles d'items.
 cfg = OmegaConf.load("../agents/team2/configDemoPilote.yaml")
 
+
 ## @class   Agent2
 #  @brief   Agent de pilotage heuristique pour SuperTuxKart.
 #
 #  Agent2 orchestre plusieurs sous-modules spécialisés pour piloter le kart :
-#  - SteeringPiste    : maintien au centre de la piste.
-#  - ReactionItems    : gestion des items (collecte / évitement).
-#  - AttackRivals     : utilisation des items offensifs contre les adversaires.
-#  - StuckControl     : détection et sortie des situations de blocage.
+#  - SteeringPiste       : maintien au centre de la piste.
+#  - ReactionItems       : gestion des items (collecte / évitement).
+#  - AttackRivals        : utilisation des items offensifs contre les adversaires.
+#  - StuckControl        : détection et sortie des situations de blocage.
 #  - AccelerationControl : adaptation de l'accélération selon la courbure.
+#  - ActiveShield        : activation du shield ou tir selon l'item possédé.
 #
 #  @see SteeringPiste
 #  @see ReactionItems
 #  @see AttackRivals
 #  @see StuckControl
 #  @see AccelerationControl
+#  @see ActiveShield
 class Agent2(KartAgent):
 
     ## @brief   Initialise l'agent et ses sous-modules de pilotage.
@@ -69,6 +72,12 @@ class Agent2(KartAgent):
         ## @var acceleration
         #  @brief Module d'adaptation de l'accélération selon la courbure.
         self.acceleration = AccelerationControl(cfg)
+
+        ## @var active_shield
+        #  @brief Module de gestion du shield et des items défensifs/offensifs.
+        self.active_shield = ActiveShield()
+        
+        self.hit_rivals = HitRivals()
 
         ## @var agent_positions
         #  @brief Historique des positions du kart (utilisé pour la visualisation).
@@ -104,14 +113,13 @@ class Agent2(KartAgent):
     ## @brief   Calcule l'action complète à effectuer pour le step courant.
     #
     #  Fusionne les décisions de tous les sous-modules dans l'ordre de priorité :
-    #  1. Sortie de blocage (StuckControl)         — priorité absolue.
+    #  1. Sortie de blocage (StuckControl)              — priorité absolue.
     #  2. Steering vers le nœud cible (path_lookahead nœuds devant).
-    #  3. Activation du rescue si le kart est hors piste.
-    #  4. Nitro si énergie disponible et trajectoire droite.
-    #  5. Correction de centrage (SteeringPiste).
-    #  6. Accélération adaptée au virage (AccelerationControl).
-    #  7. Réaction aux items (ReactionItems).
-    #  8. Attaque des adversaires si item en main (AttackRivals).
+    #  3. Nitro si énergie disponible et trajectoire droite.
+    #  4. Correction de centrage (SteeringPiste).
+    #  5. Accélération adaptée au virage (AccelerationControl).
+    #  6. Réaction aux items (ReactionItems).
+    #  7. Attaque des adversaires si item en main (ActiveShield).
     #
     #  Le steer final est la somme clampée dans [-1, 1] de :
     #  item_steering + correction_piste + steering_lookahead.
@@ -129,65 +137,57 @@ class Agent2(KartAgent):
     #  @see     SteeringPiste.correction_centrePiste()
     #  @see     AccelerationControl.adapteAcceleration()
     #  @see     ReactionItems.reaction_items()
-    #  @see     AttackRivals.attack_rivals()
+    #  @see     ActiveShield.fire_shield()
     def choose_action(self, obs):
         velocity = np.array(obs["velocity"])
         speed = np.linalg.norm(velocity)
 
+        # Priorité absolue : sortie de blocage (marche arrière si nécessaire)
         action_secours = self.rescue_kart.gerer_recul(obs, speed, self.steering)
         if action_secours is not None:
             return action_secours
 
-        phase = obs.get("phase", 0)
+        nodes_path = obs.get("paths_start", [])
 
-        if "paths_start" in obs:
-            nodes_path = obs["paths_start"]
-        else:
-            nodes_path = []
-
-        angle = 0
-
+        # Calcul du steering vers le nœud cible
         if len(nodes_path) > self.path_lookahead:
             target_node = nodes_path[self.path_lookahead]
             angle_target = np.arctan2(target_node[0], target_node[2])
             steering = np.clip(angle_target * 2, -1, 1)
-            angle = angle_target
         else:
             steering = 0
 
-        #eviter les murs/ revenir sur la piste si kart bloqué
-        if abs(obs["center_path_distance"]) > obs["paths_width"][0] / 2:
-            rescue = True
-        else:
-            rescue = False
+        #attack_karts = self.hit_rivals.hit_karts(obs)       
+        #if attack_karts is not None:
+         #   return attack_karts
 
-        #utiliser les boost: (nitro->pour activer bouteille bleu, fire->pour activer les cadeaux)
-        if obs["energy"][0] > 0 and abs(steering) < 0.2:
-            nitro = True
-        else:
-            nitro = False
 
-        #Calcul de la correction pour rester au centre de la piste
-        correction_piste = self.steering.correction_centrePiste(obs) # appel de la fonction de maintien sur la piste
+        # Activation de la nitro en ligne droite si énergie disponible
+        nitro = obs["energy"][0] > 0 and abs(steering) < cfg.ligne_droite
 
-        # ADAPTATION DE L'ACCELERATION SELON LE VIRAGE POUR NE PAS SORTIR DE LA PISTE
+        # Correction latérale pour rester au centre de la piste
+        correction_piste = self.steering.correction_centrePiste(obs)
+
+        # Adaptation de l'accélération selon la courbure détectée
         acceleration = self.acceleration.adapteAcceleration(obs)
 
+        # Ajustement du steering selon les items visibles sur la piste
         item_steering = self.items_steering.reaction_items(obs)
 
+        # Steering final : somme pondérée clampée dans [-1, 1]
         final_steering = np.clip(item_steering + correction_piste + steering, -1, 1)
 
-        has_item = obs.get("attachment", 0) != 0 #0 si il ne possede pas l'item
-        fire = has_item and self.attack_rival.attack_rivals(obs)
-
-        action = {
+        # Tir de l'item si un adversaire est dans le champ de vision
+        has_item = obs.get("attachment", 0) != 0
+        fire = has_item and self.active_shield.fire_shield(obs)
+        #drift = self.acceleration.decideDrift(obs)
+        
+        return {
             "acceleration": acceleration,
-            "steer": final_steering,
-            "brake": False,
-            "drift": False,
-            "nitro": nitro,
-            "rescue": rescue,
-            "fire": fire,
+            "steer":        final_steering,
+            "brake":        False,
+            "drift":        False,
+            "nitro":        nitro,
+            "rescue":       False,
+            "fire":         fire,
         }
-
-        return action

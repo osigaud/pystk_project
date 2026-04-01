@@ -12,20 +12,23 @@ from .anticipe_kart import AnticipeKart
 #
 #  Appelle AnticipeKart.detectVirage() pour mesurer la courbure courante,
 #  puis retourne une accélération réduite selon le type de virage :
-#  - Virage très serré (> cfg.virages.drift)        : 0.80
-#  - Virage serré      (cfg.virages.serrer.i1 à i2) : 0.85
-#  - Virage moyen      (cfg.virages.moyen.i1 à i2)  : 0.95
-#  - Ligne droite      (courbure faible)             : 1.00
+#  - Virage très serré (> cfg.virages.drift)        : cfg.acceleration.virage_tres_serré
+#  - Virage serré      (cfg.virages.serrer.i1 à i2) : cfg.acceleration.virage_serré
+#  - Virage moyen      (cfg.virages.moyen.i1 à i2)  : cfg.acceleration.virage_moyen
+#  - Ligne droite      (courbure faible)             : 1.0
+#
+#  Les valeurs d'accélération sont optimisées automatiquement par Optuna.
 #
 #  @see AnticipeKart
-class AccelerationControl:
+class AccelerationControl(AnticipeKart):
 
     ## @brief   Initialise les seuils de classification des virages.
     #
     #  @param   cfg  Configuration OmegaConf issue de configDemoPilote.yaml.
-    #                Utilise les clés virages.drift, virages.serrer.i1/i2
-    #                et virages.moyen.i1/i2.
+    #                Utilise les clés virages.drift, virages.serrer.i1/i2,
+    #                virages.moyen.i1/i2 et acceleration.virage_*.
     def __init__(self, cfg):
+        super().__init__(cfg)
 
         ## @var seuildrift
         #  @brief Seuil de courbure au-delà duquel le virage est considéré très serré.
@@ -47,9 +50,21 @@ class AccelerationControl:
         #  @brief Borne supérieure de l'intervalle des virages moyens.
         self.moyeni2 = cfg.virages.moyen.i2
 
-        ## @var anticipe_kart
-        #  @brief Instance utilisée pour mesurer la courbure à chaque step.
-        self.anticipe_kart = AnticipeKart()
+        ## @var amax
+        #  @brief Accélération maximale appliquée en ligne droite (toujours 1.0).
+        self.amax = 1.0
+
+        ## @var virage_tres_serré
+        #  @brief Accélération appliquée lors d'un virage très serré, optimisée par Optuna.
+        self.virage_tres_serré = cfg.acceleration.virage_tres_serré
+
+        ## @var virage_serré
+        #  @brief Accélération appliquée lors d'un virage serré, optimisée par Optuna.
+        self.virage_serré = cfg.acceleration.virage_serré
+
+        ## @var virage_moyen
+        #  @brief Accélération appliquée lors d'un virage moyen, optimisée par Optuna.
+        self.virage_moyen = cfg.acceleration.virage_moyen
 
     ## @brief   Retourne l'accélération adaptée à la situation courante.
     #
@@ -57,18 +72,25 @@ class AccelerationControl:
     #  @return  float : valeur d'accélération dans [0.0, 1.0].
     #  @see     AnticipeKart.detectVirage()
     def adapteAcceleration(self, obs):
-        acceleration = 1.0
-        curvature = abs(self.anticipe_kart.detectVirage(obs))  # valeur absolue de l'angle
+        acceleration = self.amax
+        curvature = abs(self.detectVirage(obs))
 
         if curvature > self.seuildrift:
-            # virage très serré : fort freinage anticipé
-            acceleration = 0.80
-        elif curvature > self.serreri1 and curvature <= self.serreri2:  # virage serré
-            acceleration = 0.85
-        elif curvature > self.moyeni1 and curvature <= self.moyeni2:    # virage moyen
-            acceleration = 0.95
+            acceleration = self.virage_tres_serré
+        elif curvature > self.serreri1 and curvature <= self.serreri2:
+            acceleration = self.virage_serré
+        elif curvature > self.moyeni1 and curvature <= self.moyeni2:
+            acceleration = self.virage_moyen
         else:
-            # ligne droite ou courbe très légère : pleine accélération
-            acceleration = 1.0
+            acceleration = self.amax
 
         return acceleration
+    
+    def decideDrift(self, obs):
+        curvature = self.detectVirage(obs)
+        changement_direction = self.changementDirection(obs)
+        if abs(curvature) > self.seuildrift and not changement_direction : 
+            drift = True 
+        else : 
+            drift = False
+        return drift
