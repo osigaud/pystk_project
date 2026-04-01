@@ -45,13 +45,14 @@ def create_race():
     agents = []
     names = []
 
+    #En laissant Agent 6 et Agent 7, etant donné que le nombre d'agent est limite à 5 et qu'il y a un shuffle, on se retrouve avec certaines courses où un ou deux des 5 premiers agents manquent
     agents.append(Agent1(env, path_lookahead=3))
     agents.append(Agent2(env, path_lookahead=3))
     agents.append(Agent3(env, path_lookahead=3))
     agents.append(Agent4(env, path_lookahead=3))
     agents.append(Agent5(env, path_lookahead=3))
-    agents.append(Agent6(env, path_lookahead=3))
-    agents.append(Agent7(env, path_lookahead=3))
+    #agents.append(Agent6(env, path_lookahead=3))
+    #agents.append(Agent7(env, path_lookahead=3)) 
     np.random.shuffle(agents)
 
     for i in range(MAX_TEAMS):
@@ -105,4 +106,3 @@ def main_loop():
         
 if __name__ == "__main__":
     main_loop()
-

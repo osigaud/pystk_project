@@ -66,22 +66,25 @@ class AgentRescue:
         
         return self.times_blocked >= self.c.seuil_blocked_trigger
 
-    def choose_action(self, current_steer : float, speed : float, distance : float) -> tuple[bool,dict]:
+    def choose_action(self,obs : dict,current_steer : float) -> tuple[bool,dict]:
         """
         Gère la réaction à un blocage
 
         Args:
             
+            obs(dict) : Les données fournies par le simulateur.
             current_steer(float) : Angle actuel du braquage des roues.
-            speed(float) : Vitesse actuelle de l'agent.
-            distance(float) : Distance parcourue depuis le debut de la course.
-        
+            
         Returns:
             
             bool : Permet de confirmer la détection d'un blocage de l'agent.
             dict : Dictionnaire d'actions à effectué pour sortir d'un blocage.
         """
     
+        distance = float(obs.get("distance_down_track", [0.0])[0])
+        vel = obs.get("velocity", [0.0, 0.0, 0.0])
+        speed = float(vel[2])
+        
         stuck = self.is_stuck(distance,speed)
 
         if stuck or self.recovery_cd > 0:
