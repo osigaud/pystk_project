@@ -17,9 +17,6 @@ from agents.team2.agent2 import Agent2
 from agents.team3.agent3 import Agent3
 from agents.team4.agent4 import Agent4
 from agents.team5.agent5 import Agent5
-from agents.hidden.median_agent import MedianAgent
-from agents.hidden.euler_agent import EulerAgent
-from agents.hidden.items_agent import ItemsAgent
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 

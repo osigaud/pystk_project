@@ -34,7 +34,6 @@ default_action = {
             "fire": False, # bool(random.getrandbits(1)),
         }
 
-
 # Make AgentSpec hashable.
 def agent_spec_hash(self):
     return hash((self.name, self.rank_start, self.use_ai, self.camera_mode))
