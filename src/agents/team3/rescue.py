@@ -20,13 +20,14 @@ class Rescue(KartAgent):
         rescue = False
         if speed < 1.0:
             self.time_blocked += 1
-        else:
-            self.time_blocked = 0
-		# Si on est bloqué trop longtemps alors
-		# Le kart est secouru par l'oiseau bleue
-		# A revoir ! Car ne fonctionne plus correctement
-        if self.time_blocked >= 35:
-            rescue = True
+            
+        if self.time_blocked > 30 and speed < 1.0:
+        	x = np.array(obs["paths_end"][2][0])
+        	acceleration = 0.0
+        	brake = True
+        	steer = -x
+            
+        if self.time_blocked > 45:
             self.time_blocked = 0
 
         action["rescue"] = rescue
