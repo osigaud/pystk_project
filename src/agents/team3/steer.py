@@ -13,7 +13,7 @@ class Steer(KartAgent):
     def choose_action(self, obs):
     
         speed = math.sqrt(obs["velocity"][0]**2 + obs["velocity"][2]**2)
-        idx = int(speed / 8.0) + 1 
+        idx = int(speed / 12.0) + 1 
         
         target_ctr_x = (obs["paths_start"][idx][0] + obs["paths_end"][idx][0]) / 2.0
         target_ctr_z = (obs["paths_start"][idx][2] + obs["paths_end"][idx][2]) / 2.0
@@ -24,7 +24,7 @@ class Steer(KartAgent):
         items_type = obs["items_type"]
         items_pos = obs["items_position"]
         danger = False
-        bonus_available = False
+        #bonus_available = False
         closest_bad_z = 20.0
         closest_bad_x = 0.0
         #closest_good_z = 10.0
@@ -52,23 +52,31 @@ class Steer(KartAgent):
             if abs(closest_bad_x) < 0.2:
                 offset_force += avoid_force 
             else:
-                offset_force += -avoid_force if closest_bad_x > 0 else avoid_force 
+                if closest_bad_x > 0:
+                    offset_force += -avoid_force 
+                else:
+                    offset_force += avoid_force 
+ 
+
         #elif bonus_available:
          #   offset_force = closest_good_x * 0.5 
 
         if danger:
-        	safe_margin = 0.5
+        	safe_margin = 0.5   
         else:
         	safe_margin = 1.5
         offset_force = max(-half_width + safe_margin, min(offset_force, half_width - safe_margin))
         target_ctr_x += offset_force
 
-        err = math.atan2(target_ctr_x, target_ctr_z)
+        err = math.atan2(target_ctr_x, target_ctr_z)#angle entre x cible et z cible , 
         p_k = 0.8
         d_k = 1.5 
         drv = err - self.prev_err
         self.prev_err = err
         steer = max(-1.0, min(p_k * err + d_k * drv, 1.0))
+
+
+
 
         k=3
         if speed>15: 
@@ -79,13 +87,23 @@ class Steer(KartAgent):
         #print("decalage_x", decalage_x)
 
         if(abs(decalage_x)>26.5):
-            if speed>18: 
+            if speed>=18: 
                 brake=True 
-                acceleration=0.0
+                acceleration=0.12
+            else:
+                acceleration=0.4
+
 
             if 12<speed<17:
                 if acceleration>0.70:
                     acceleration=0.70
+                else:
+                    acceleration=0.6
+            
+        else:
+            acceleration=0.5
+
+
 
 
 
