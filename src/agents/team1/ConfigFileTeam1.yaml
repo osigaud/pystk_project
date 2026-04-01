@@ -81,16 +81,10 @@ stop_drift_speed: 4.0
 #AgentVirage
 seuil_intensite: 0.1
 seuil_delta: 0.035
-
 seuil_corde: 0.22
-
 steer1: 0.07
-
 steer2: 0.20
-
 acceleration: -0.06
-
 min_speed: 13.0
 seuil_drift: 0.18
 marge_drift: 1.3
-
