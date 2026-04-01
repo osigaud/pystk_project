@@ -13,6 +13,8 @@ SWATTER = 7
 RUBBERBALL = 8
 PARACHUTE = 9
 
+BONUS_BOX = 0
+BUBBLEGUM_SHIELD = 6
 
 class AgentItems(KartAgent) : 
 
@@ -26,8 +28,8 @@ class AgentItems(KartAgent) :
     def is_bonus_close(self, obs) :
         """Renvoie True si on est très proche d'une boîte cadeau, False sinon"""
         next_item = obs["items_position"][0]
-        if obs["items_type"][0] == 0 : #BONUS BOX
-            if abs(next_item[self.conf.x]) < 2 and next_item[self.conf.z] < 3 and abs(next_item[self.conf.y]) < 3 :
+        if obs["items_type"][0] == BONUS_BOX :
+            if abs(next_item[self.conf.x]) < self.conf.range_bonus_x and next_item[self.conf.z] < self.conf.range_bonus_z and abs(next_item[self.conf.y]) < self.conf.range_bonus_y :
                 return True
         return False
     
@@ -51,44 +53,58 @@ class AgentItems(KartAgent) :
         action["fire"] = False        
 
         if current_item == BUBBLEGUM :
+            if obs["attachment"] == BUBBLEGUM_SHIELD :
+                action["fire"] = False
+                return action
             action["fire"] = True
+            return action
+
+
             return action
 
         if current_item == CAKE :
             premier_kart = obs["karts_position"][0]
-            if premier_kart[self.conf.z]<0:
+            if premier_kart[self.conf.z] < 0:
                 action["fire"] = False
                 return action 
             for kart in obs["karts_position"]:
-                if kart[self.conf.z] >= 0 and kart[self.conf.z] < 80:
+                if kart[self.conf.z] >= 0 and kart[self.conf.z] < self.conf.range_cake :
                    action["fire"] = True
                    return action
             return action
             
         if current_item == BOWLING :
+            if obs["powerup_count"] >1:
+                action["fire"] = True
+                return action
             premier_kart = obs["karts_position"][0]
             if premier_kart[self.conf.z]<0:
                 action["fire"] = False
             if self.is_bonus_close(obs) : 
                 action ["fire"] = True
             for kart in obs["karts_position"]:
-                if kart[self.conf.z]>=0 and kart[self.conf.z]<=25:         #optimiser valeurs
-                    if abs(kart[self.conf.x]) <= 3:
+                if kart[self.conf.z]>=0 and kart[self.conf.z]<=self.conf.range_bowling_z :         
+                    if abs(kart[self.conf.x]) <= self.conf.range_enemy_x :
                         action["fire"] = True                
             return action
 
         if current_item == ZIPPER : 
-            #if virage_serre = false and self.target_obstacle = None:
+            if obs["velocity"][2] >= self.conf.seuil_vitesse :
+                action["fire"] = False
+                return action
             action["fire"] = True         	      
-            return action
+            return action 
 
         if current_item == PLUNGER :
+            if obs["powerup_count"] >1:
+                action["fire"] = True
+                return action
             premier_kart = obs["karts_position"][0]
             if premier_kart[self.conf.z]<0:
                 action["fire"] = False
             for kart in obs["karts_position"]:
-                if kart[self.conf.z]>=0 and kart[self.conf.z] < 50:
-                    if abs(kart[self.conf.x]) <= 3:
+                if kart[self.conf.z]>=0 and kart[self.conf.z] < self.conf.range_plunger :
+                    if abs(kart[self.conf.x]) <= self.conf.range_enemy_x :
                         action["fire"] = True 
             return action
 
@@ -100,12 +116,15 @@ class AgentItems(KartAgent) :
             return action
 
         if current_item == SWATTER :
+            if obs["attachment"] == 3:
+                action["fire"] = False
+                return action
             for kart in obs["karts_position"]:
-                if abs(kart[self.conf.z]) <= 9 and abs(kart[self.conf.x]) <= 9 and abs(kart[self.conf.y])<=5:
+                if abs(kart[self.conf.z]) <= self.conf.range_swatter and abs(kart[self.conf.x]) <= self.conf.range_swatter and abs(kart[self.conf.y])<= self.conf.range_swatter_y :
                     action["fire"] = True
             return action
 
-        if current_item == RUBBERBALL :
+        if current_item == RUBBERBALL :  #basket
             premier_kart = obs["karts_position"][0]
             if premier_kart[self.conf.z] > 0:
                 action["fire"] = True
@@ -137,7 +156,7 @@ class AgentItems(KartAgent) :
         """
         nit = obs["energy"]
         virage_serre = AgentSpeed.detecter_virage(self.conf, obs)
-        if nit > 0.05 :
+        if nit > 1 :
             act["nitro"] = True
         return act 
 
