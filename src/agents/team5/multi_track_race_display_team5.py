@@ -34,7 +34,7 @@ from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 5
-NB_RACES = 1   # Nombre de courses à chaque fois qu'on lance multi_track_race_team5
+NB_RACES = 5   # Nombre de courses à chaque fois qu'on lance multi_track_race_team5
 MAX_STEPS = 1300
 
 # Get the current timestamp
@@ -99,9 +99,10 @@ agents_specs = [
 def create_race(cfg=None):
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode=None, num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
+        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
     else:
-        env = STKRaceMultiEnv(agents=agents_specs, render_mode=None, num_kart=MAX_TEAMS)
+        env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS) # render_node = None = Aucune fenêtre graphique
+    # Pour avoir la fenêtre graphique, mettre "human" au lieu des None
 
     # Instantiate the agents.
 
@@ -181,7 +182,7 @@ def single_race_worker(cfg_dict):
     cfg = OmegaConf.create(cfg_dict) if cfg_dict is not None else None
     return single_race(cfg)
 
-def main_loop(cfg=None, race_jobs=1):
+def main_loop(cfg=None, nb_courses=NB_RACES, race_jobs=1):
     scores = Scores()
 
     env, agents, names = create_race(cfg)
@@ -191,7 +192,9 @@ def main_loop(cfg=None, race_jobs=1):
         scores.init(name)
 
     if race_jobs == 1:
-        for j in range(NB_RACES):
+
+        # On utilise le nb course passé en paramètres
+        for j in range(nb_courses):
             print(f"race : {j}")
             race_data = single_race(cfg)
             for name, pos, pos_std, steps in race_data:
@@ -205,7 +208,7 @@ def main_loop(cfg=None, race_jobs=1):
             # Chaque tâche correspond à UNE course parmis toutes les NB_RACES courses d'une recherche
             futures = [
                 executor.submit(single_race_worker, cfg_dict)
-                for _ in range(NB_RACES)
+                for _ in range(nb_courses)  # On utilise le nb course passé en paramètres
             ]
 
             # "as_completed" permet de traiter les courses dès qu'elles se terminent
@@ -259,5 +262,18 @@ def output_html(output: Path, scores: Scores):
 
         
 if __name__ == "__main__":
-    scores = main_loop()
-    output_html(Path("../../docs/index.html"), scores)
+    input_config = input("Voulez vous utiliser le fichier config_opti.yaml ? [o/n] : ")
+    input_nb_races = int(input("Entrez le nombre de courses : "))
+
+    if input_config == 'o':
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(current_dir, "config_opti.yaml")
+        cfg = OmegaConf.load(config_path)
+        print("Le kart utilise le fichier config_opti.yaml\n")
+        scores = main_loop(cfg=cfg)
+
+    else : 
+        # Si cfg=None alors on utilise le fichier config.yaml classique. Voir le __init__() de agent5.py
+        print("Le kart utilise le fichier config.yaml\n")
+        scores = main_loop(cfg=None, nb_courses=input_nb_races)
+    #output_html(Path("../../docs/index.html"), scores)
