@@ -17,14 +17,23 @@ from agents.team2.agent2 import Agent2
 from agents.team3.agent3 import Agent3
 from agents.team4.agent4 import Agent4
 from agents.team5.agent5 import Agent5
-from agents.team6.agent6 import Agent6
-from agents.team7.agent7 import Agent7
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
 MAX_TEAMS = 5
 MAX_STEPS = 1000
 NB_RACES = 1
+
+default_action = {
+            "acceleration": 0.0,
+            "steer": 0.0,
+            "brake": False, # bool(random.getrandbits(1)),
+            "drift": False, # bool(random.getrandbits(1)),
+            "nitro": False, # bool(random.getrandbits(1)),
+            "rescue":False, # bool(random.getrandbits(1)),
+            "fire": False, # bool(random.getrandbits(1)),
+        }
+
 
 # Make AgentSpec hashable.
 def agent_spec_hash(self):
@@ -51,8 +60,6 @@ def create_race():
     agents.append(Agent3(env, path_lookahead=3))
     agents.append(Agent4(env, path_lookahead=3))
     agents.append(Agent5(env, path_lookahead=3))
-    #agents.append(Agent6(env, path_lookahead=3))
-    #agents.append(Agent7(env, path_lookahead=3)) 
     np.random.shuffle(agents)
 
     for i in range(MAX_TEAMS):
