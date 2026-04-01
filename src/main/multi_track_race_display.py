@@ -147,7 +147,7 @@ def single_race(env, agents, names, scores):
             str = f"{i}"
             pos[i] = info['infos'][str]['position']
         steps = steps + 1
-        done = (nb_finished == 5)
+        done = (nb_finished == MAX_TEAMS)
         positions.append(pos)
     pos_avg = np.array(positions).mean(axis=0)
     pos_std = np.array(positions).std(axis=0)

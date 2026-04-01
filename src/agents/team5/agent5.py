@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import random
 from utils.track_utils import compute_curvature, compute_slope
@@ -10,9 +11,9 @@ from .agent5_NitroPilot import Agent5Nitro
 from .agent5_ItemPilot import Agent5Item
 from .agent5_AvoidKart import Agent5AvoidKart
 from omegaconf import OmegaConf 
-import os
 from .agent5_RescuePilot import Agent5Rescue
 
+# kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
 
 class Agent5(KartAgent):
     """
@@ -33,14 +34,15 @@ class Agent5(KartAgent):
         self.path_lookahead = path_lookahead
         self.name = "Donkey Bombs"
         self.isEnd = False
-
+        self.skin = 'adiumy'
+        
         # On trouve le chemin de notre fichier actuel
         current_dir = os.path.dirname(os.path.abspath(__file__))
 
 
         
         # On créer le chemin /src/agent/team5/config.yaml
-        config_path = os.path.join(current_dir, "config_opti.yaml")
+        config_path = os.path.join(current_dir, "config.yaml")
 
         # On charge le fichier conf avec ce chemin
         self.conf = OmegaConf.load(config_path)

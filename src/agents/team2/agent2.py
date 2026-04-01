@@ -14,6 +14,8 @@ from .acceleration_kart import AccelerationControl
 from .shield_kart import ActiveShield
 from .hit_rivals import HitRivals
 
+# kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
+
 ## @var cfg
 #  @brief Configuration globale chargée depuis configDemoPilote.yaml.
 #         Contient les seuils de virage, les gains de correction et les angles d'items.
@@ -92,7 +94,8 @@ class Agent2(KartAgent):
         ## @var name
         #  @brief Nom affiché du pilote dans l'interface de la course.
         self.name = "DemoPilote "
-
+        self.skin = 'adiumy'
+        
     ## @brief   Réinitialise l'état de l'agent pour une nouvelle course.
     #
     #  Remet à zéro les positions enregistrées et les compteurs de blocage.

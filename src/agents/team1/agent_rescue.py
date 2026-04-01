@@ -77,15 +77,33 @@ class AgentRescue(KartAgent) :
         else : 
             self.is_braking = False
             return act
+
+    def call_bird(self, obs) :
+
+        """Observe si on tombe de la piste. Si oui, appelle l'oiseau de secours. Sinon, ne fait rien.
+
+        Args: 
+            obs (dict): Observations de l'environnement.
+
+        Returns:
+            boolean: True ou False selon si on a besoin d'un sauvetage ou non.
+        """
+        is_jumping = obs["jumping"]
+        if is_jumping : 
+            next_node_y = obs["paths_end"][0][self.conf.y]
+            if next_node_y >= 2 : 
+                return True
+        return False
     
     def choose_action(self, obs):
 
-        """Choisit une action et déclenche un déblocage si nécessaire.
+        """Choisit une action et déclenche un déblocage ou un sauvetage si nécessaire.
 
         Étapes :
         1) Vérifie si le kart est bloqué.
         2) Récupère l’action normale (centre + obstacles).
         3) Si blocage est prolongé, lance un recul.
+        4) Observe si besoin d'un sauvetage et agit en conséquence.
 
         Args:
             obs (dict): Observations de l’environnement.
@@ -102,4 +120,5 @@ class AgentRescue(KartAgent) :
             self.unblock_steps = self.conf.unblock_steps_default
         if self.is_braking : 
             action = self.unblock_action(action)
+        action["rescue"] = self.call_bird(obs)
         return action
