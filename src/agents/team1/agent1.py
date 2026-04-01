@@ -11,6 +11,7 @@ from agents.team1.agent_obstacles import AgentObstacles
 from agents.team1.agent_rescue import AgentRescue
 from agents.team1.agent_items import AgentItems
 from agents.team1.agent_drift import AgentDrift
+from agents.team1.agent_virage import AgentVirage
 
 # kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
 
@@ -38,7 +39,8 @@ class Agent1(KartAgent):
         self.agentObstacles = AgentObstacles(env, self.conf, self.agentSpeed, self.path_lookahead)
         self.agentRescue = AgentRescue(env, self.conf, self.agentObstacles)
         self.agentItems = AgentItems(env, self.conf, self.agentRescue)
-        self.AgentDrift = AgentDrift(env, self.conf, self.agentItems)
+        self.agentDrift = AgentDrift(env, self.conf, self.agentItems)
+        self.agentVirage = AgentVirage(env,self.conf, self.agentDrift)
 
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -48,4 +50,4 @@ class Agent1(KartAgent):
         return self.isEnd
 
     def choose_action(self, obs):
-        return self.agentItems.choose_action(obs)
+        return self.agentVirage.gestion_virage(obs)

@@ -3,8 +3,9 @@ import numpy as np
 
 class AgentVirage(KartAgent):
 
-    def __init__(self, env, conf ):
+    def __init__(self, env, conf, agent ):
         super().__init__(env)
+        self.agent = agent
         self.intensite_precedente = None
         self.conf = conf
         self.seuil_intensite = self.conf.seuil_intensite
