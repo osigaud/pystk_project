@@ -40,7 +40,7 @@ class Agent1(KartAgent):
         self.agentRescue = AgentRescue(env, self.conf, self.agentObstacles)
         self.agentItems = AgentItems(env, self.conf, self.agentRescue)
         self.agentDrift = AgentDrift(env, self.conf, self.agentItems)
-        self.agentVirage = AgentVirage(env,self.conf, self.agentDrift)
+        self.agentVirage = AgentVirage(env, self.conf, self.agentDrift)
 
     def reset(self):
         self.obs, _ = self.env.reset()
@@ -50,4 +50,6 @@ class Agent1(KartAgent):
         return self.isEnd
 
     def choose_action(self, obs):
-        return self.agentVirage.gestion_virage(obs)
+        action = self.agentItems.choose_action(obs)
+        action = self.agentVirage.gestion_virage(obs, action)
+        return action
