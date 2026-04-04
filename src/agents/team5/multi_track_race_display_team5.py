@@ -18,7 +18,6 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 SRC_DIR = Path(__file__).resolve().parents[2]
 MAIN_DIR = SRC_DIR / "main"
-
 os.chdir(MAIN_DIR)
 sys.path.append(str(SRC_DIR))
 
@@ -33,8 +32,8 @@ from agents.team5.agent5 import Agent5
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 5
-NB_RACES = 5   # Nombre de courses à chaque fois qu'on lance multi_track_race_team5
+MAX_TEAMS = 3
+NB_RACES = 6   # Nombre de courses à chaque fois qu'on lance multi_track_race_team5
 MAX_STEPS = 1300
 
 # Get the current timestamp
@@ -99,7 +98,7 @@ agents_specs = [
 def create_race(cfg=None):
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
+        env = STKRaceMultiEnv(agents=agents_specs, track="minigolf", render_mode="human", num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
     else:
         env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS) # render_node = None = Aucune fenêtre graphique
     # Pour avoir la fenêtre graphique, mettre "human" au lieu des None
@@ -109,9 +108,9 @@ def create_race(cfg=None):
     agents = []
     names = []
 
-    agents.append(Agent1(env, path_lookahead=3))
+    #agents.append(Agent1(env, path_lookahead=3))
     agents.append(Agent2(env, path_lookahead=3))
-    agents.append(Agent3(env, path_lookahead=3))
+    #agents.append(Agent3(env, path_lookahead=3))
     agents.append(Agent4(env, path_lookahead=3))
     agents.append(Agent5(env, path_lookahead=3, cfg=None))   # On donne le fichier de configuration chargé en mémoire à notre Agent5
     np.random.shuffle(agents)
@@ -263,17 +262,17 @@ def output_html(output: Path, scores: Scores):
         
 if __name__ == "__main__":
     input_config = input("Voulez vous utiliser le fichier config_opti.yaml ? [o/n] : ")
-    input_nb_races = int(input("Entrez le nombre de courses : "))
+    NB_RACES = int(input("Entrez le nombre de courses : "))
 
     if input_config == 'o':
         current_dir = os.path.dirname(os.path.abspath(__file__))
         config_path = os.path.join(current_dir, "config_opti.yaml")
         cfg = OmegaConf.load(config_path)
         print("Le kart utilise le fichier config_opti.yaml\n")
-        scores = main_loop(cfg=cfg)
+        scores = main_loop(cfg=cfg, nb_courses=NB_RACES)
 
     else : 
         # Si cfg=None alors on utilise le fichier config.yaml classique. Voir le __init__() de agent5.py
         print("Le kart utilise le fichier config.yaml\n")
-        scores = main_loop(cfg=None, nb_courses=input_nb_races)
+        scores = main_loop(cfg=None, nb_courses=NB_RACES)
     #output_html(Path("../../docs/index.html"), scores)
