@@ -98,9 +98,9 @@ agents_specs = [
 def create_race(cfg=None, track_name=None):
     
     if track_name is not None:
-        env = STKRaceMultiEnv(agents=agents_specs, track=track_name, render_mode="human", num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
+        env = STKRaceMultiEnv(agents=agents_specs, track=track_name, render_mode=None, num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
     else:
-        env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS) # render_node = None = Aucune fenêtre graphique
+        env = STKRaceMultiEnv(agents=agents_specs, render_mode=None, num_kart=MAX_TEAMS) # render_node = None = Aucune fenêtre graphique
 
     agents = []
     names = []
