@@ -105,6 +105,9 @@ class AgentBanana:
                 if dist_obj_centre > limit_path: # Si l'objet est hors des limites de la piste, on ne le prend pas en compte
                     continue
 
+                """if abs(nx) > self.c.limite_danger_lateral:
+                    continue"""
+
                 if -self.c.radar_x <= nx <= self.c.radar_x and self.c.radar_zmin <= nz <= self.c.radar_zmax: # Si la banana est dans notre radar, on l'ajoute dans notre liste
                     banana.append((nx,nz))
 
@@ -121,11 +124,19 @@ class AgentBanana:
             second = banana[1] # On récupère la seconde
             x = second[0]
             z = second[1]
-            if abs(z-first_z) <= self.c.seuil_ligne: # Si les bananes forment une ligne (un barrage)
-                gap_x = (x+first_x)/2.0
-                return "LIGNE", gap_x, banana
-            else:
-                return "SINGLE", first_x,banana # On revient sur le cas de la banane seule
+            
+            # Si on capte un cas qui contredit l'hypothese d'une ligne, on renvoie SINGLE
+            for i in range(len(banana)):
+                for j in range(i+1,len(banana)):
+                    if abs(banana[i][1] - banana[j][1]) > self.c.seuil_ligne:
+                        banana.sort(key=lambda x : x[0])
+                        first = banana[0]
+                        first_x = first[0]
+                        return "SINGLE",first_x,banana
+                    
+            gap_x = (x+first_x)/2.0
+            return "LIGNE", gap_x, banana 
+        
         else:
             return "SINGLE",first_x,banana # Cas d'une seule banane
         
@@ -222,6 +233,8 @@ class AgentBanana:
             #print(banana_list)
             #print("Esquive Ligne")
 
+        #print(f"Timer : {self.dodge_timer}")
+        
         if self.dodge_timer >0: # On est dans le mode Single
             #print("Esquive SINGLE")
             #print(banana_list)
@@ -234,12 +247,8 @@ class AgentBanana:
         elif (mode == "SINGLE" or mode == "LIGNE") and self.lock_mode == "LIGNE":
             #print("Esquive LIGNE")
             #print(banana_list)
-
-            # Tant qu'on capte le mode ligne, on recalcule notre gap
-            if mode == "LIGNE":
-                gx = b_x
-            else:
-                gx = self.locked_gx # On vise le gap calculé pour le mode ligne
+            gx = self.locked_gx
+            #print(f"Gap : {gx}")
             gain_volant = self.c.adjusted_gain # Ajustement du gain pour le mode ligne
 
         # Appel de la fonction de steering avec les paramètres modifiés.

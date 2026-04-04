@@ -47,13 +47,13 @@ drift:
 banana:
   dodge_timer_basic : 0
   dodge_timer_start : 10
-  decalage_lateral : 3.0
+  decalage_lateral : 2.5
   radar_x : 5.0
   radar_zmin : 0.0
   radar_zmax : 17.0
   seuil_ligne : 2.0
   default_gain : 7.0
-  adjusted_gain : 9.0
+  adjusted_gain : 10.0
   seuil_limite_path : 1.5
   nb_noeuds : 5
   limite_banane_single : 1.8
@@ -62,6 +62,7 @@ banana:
   limite_banane_courbe : 1.8
   decalage_lateral_courbe : 4.0
   true_virage : 0.5
+  limite_danger_lateral : 3.5
 
 rescue:
   recovery_timer : 10
