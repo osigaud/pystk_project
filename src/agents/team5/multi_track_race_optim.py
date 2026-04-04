@@ -32,7 +32,7 @@ from agents.team5.agent5 import Agent5
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 3
+MAX_TEAMS = 1
 NB_RACES = 6   # Nombre de courses à chaque fois qu'on lance multi_track_race_team5
 MAX_STEPS = 1300
 
@@ -98,17 +98,17 @@ agents_specs = [
 def create_race(cfg=None, track_name=None):
     
     if track_name is not None:
-        env = STKRaceMultiEnv(agents=agents_specs, track=track_name, render_mode=None, num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
+        env = STKRaceMultiEnv(agents=agents_specs, track=track_name, render_mode="human", num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
     else:
-        env = STKRaceMultiEnv(agents=agents_specs, render_mode=None, num_kart=MAX_TEAMS) # render_node = None = Aucune fenêtre graphique
+        env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS) # render_node = None = Aucune fenêtre graphique
 
     agents = []
     names = []
 
     #agents.append(Agent1(env, path_lookahead=3))
-    agents.append(Agent2(env, path_lookahead=3))
+    #agents.append(Agent2(env, path_lookahead=3))
     #agents.append(Agent3(env, path_lookahead=3))
-    agents.append(Agent4(env, path_lookahead=3))
+    #agents.append(Agent4(env, path_lookahead=3))
     agents.append(Agent5(env, path_lookahead=3, cfg=None))   # On donne le fichier de configuration chargé en mémoire à notre Agent5
     np.random.shuffle(agents)
 
