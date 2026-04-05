@@ -1,4 +1,5 @@
 ﻿import numpy as np
+import math
 import random
 from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
@@ -105,15 +106,21 @@ class Agent5F1(KartAgent):
     def compute_turning_pps(self, obs, target_x, target_z):
 
         l_squared = target_x**2 + target_z**2
+        gamma =  np.arctan(self.K * (2*target_x)/(l_squared + 1e-5))
 
-        gamma =  self.K * (2*target_x)/(l_squared + 1e-5)
-        steering = np.clip(np.arctan(gamma), -1, 1)
+        # D'autres implémentations de gamma, n'y prêtez pas attention
+        #ld = np.sqrt(target_x**2 + target_z**2)
+        #alpha = np.arctan(target_x/(target_z+1e-5))
+        # #gamma2 = (2*target_x*target_z) / (target_z**2 + target_x**2 + 1e-5) 
+        # gamma3 = (2 * self.K * np.sin(alpha)) / ld
 
-        width_path = obs["paths_width"][0]
-        near_node = obs["paths_end"][0]
-        x_nn = near_node[0]
+        steering = np.clip(gamma, -1, 1)
 
-        dist_wall = (width_path/2) - np.abs(x_nn)
+        # width_path = obs["paths_width"][0]
+        # near_node = obs["paths_end"][0]
+        # x_nn = near_node[0]
+
+        # dist_wall = (width_path/2) - np.abs(x_nn)
 
         #print("largeur demi wall : ", width_path/2)
         #print("Abs distance kart - mur : ", dist_wall)
@@ -180,6 +187,6 @@ class Agent5F1(KartAgent):
             "steer": steering,
             "brake": brake,
             "drift": False, "nitro": False, "rescue": False,
-            "fire": False
+            "fire": True
         }
         return action

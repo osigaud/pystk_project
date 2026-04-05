@@ -5,6 +5,7 @@ from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
 from .agent5_DriftPilot import Agent5Drift
 from .agent5_MidPilot import Agent5Mid
+from .agent5_F1 import Agent5F1
 from .agent5_BananaPilot import Agent5Banana
 #from .agent5_Rescue import Agent5Rescue
 from .agent5_NitroPilot import Agent5Nitro
@@ -50,16 +51,16 @@ class Agent5(KartAgent):
             self.conf = cfg
         
         # On crée le Pilote qui suit la piste 
-        self.pilot = Agent5Mid(env, self.conf, path_lookahead)
+        self.pilot = Agent5F1(env, self.conf, path_lookahead)
         
         # Enveloppement de l'agent de base dans l'agent de gestion du nitro
         self.nitro = Agent5Nitro(env, self.pilot, self.conf, path_lookahead)
 
         # On créer le pilote qui drift sur la piste
-        self.drift = Agent5Drift(env, self.nitro, self.conf, path_lookahead)
+        #self.drift = Agent5Drift(env, self.nitro, self.conf, path_lookahead)
 
         # On l'enveloppe dans l'agent qui evite les karts
-        self.avoidkart = Agent5AvoidKart(env, self.drift, self.conf, path_lookahead)
+        self.avoidkart = Agent5AvoidKart(env, self.nitro, self.conf, path_lookahead)
 
         # On l'enveloppe dans l'agent qui esquive les bananes
         self.banana = Agent5Banana(env, self.avoidkart, self.conf, path_lookahead)

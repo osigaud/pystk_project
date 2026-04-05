@@ -20,11 +20,11 @@ OUTPUT_CONFIG_PATH = BASE_DIR / "config_opti.yaml"
 def objective(trial, coeurs_course):
     params = {
         # Brain
-        "pilot.brain.kp":trial.suggest_float("kp", 0.5, 12.0),
-        "pilot.brain.kd":trial.suggest_float("kd", 0.5, 8.0),
+        "pilot.brain.kp":trial.suggest_float("kp", 1, 11),
+        "pilot.brain.kd":trial.suggest_float("kd", 1, 11),
 
         # Navigation
-        "pilot.navigation.lookahead_meters":trial.suggest_float("lookahead_meters", 3.0, 12.0),
+        "pilot.navigation.lookahead_meters":trial.suggest_float("lookahead_meters", 5, 12.0),
         "pilot.navigation.lookahead_max":trial.suggest_float("lookahead_max", 5.0, 20.0),
         "pilot.navigation.min_dist_safety":trial.suggest_float("min_dist_safety", 0.5, 3.0),
         "pilot.navigation.lookahead_speed_factor":trial.suggest_float("lookahead_speed_factor", 0.05, 0.6),
@@ -34,7 +34,7 @@ def objective(trial, coeurs_course):
         "pilot.speed_control.cornering_accel":trial.suggest_float("cornering_accel", 0.1, 0.8),
         "pilot.speed_control.steering_threshold":trial.suggest_float("steering_threshold", 0.3, 0.9),
         "pilot.speed_control.hairpin_threshold":trial.suggest_float("hairpin_threshold", 0.6, 1.0),
-        "pilot.speed_control.hairpin_accel":trial.suggest_float("hairpin_accel", 0.1, 0.7),
+        "pilot.speed_control.hairpin_accel":trial.suggest_float("hairpin_accel", 0.1, 0.5),
         "pilot.speed_control.hairpin_brake_speed":trial.suggest_float("hairpin_brake_speed", 8.0, 25.0),
         
 
@@ -44,7 +44,7 @@ def objective(trial, coeurs_course):
 
         # Banana avoidance
         "banana.avoidance.steering_force":trial.suggest_float("steering_force", 0.3, 1.0),
-        "banana.avoidance.acceleration":trial.suggest_float("banana_acceleration", 0.1, 0.8),
+        "banana.avoidance.acceleration":trial.suggest_float("acceleration", 0.1, 0.8),
 
         # Banana edge safety
         #"banana.edge_safety.max_center_dist":trial.suggest_float("max_center_dist", 2.0, 14.0),
@@ -82,6 +82,7 @@ def objective(trial, coeurs_course):
     # race_jobs permet de spécifier le nombre de coeurs utilisés pour paralléliser les courses lancées quand on éxécute le main_loop()
     # En tout, en parallélise les recherches ET les courses lancées.
     # Note : Soyez raisonables avec les valeurs de race_jobs et de n_jobs (tout en bas, pour la recherche avec optuna) pour éviter les crasher lors des recherches.
+
     track_names_list = [
         "abyss",
         "black_forest",
@@ -165,7 +166,7 @@ if __name__ == "__main__":
 
         # Banana avoidance
         "banana.avoidance.steering_force": "steering_force",
-        "banana.avoidance.acceleration": "banana_acceleration",
+        "banana.avoidance.acceleration": "acceleration",
 
         # Banana edge safety
         #"banana.edge_safety.max_center_dist": "max_center_dist",
