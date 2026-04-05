@@ -130,6 +130,9 @@ class Agent4(KartAgent):
         # Appel en priorité de la fonction rescue
         is_stuck, action_stuck = self.expert_rescue.choose_action(obs,steering)
         if is_stuck and obs['distance_down_track'] >= self.c.seuil_distance_stuck:
+            self.expert_banana_dodge.reset()
+            self.expert_esquive_adv.reset()
+            self.expert_apex.reset()
             return action_stuck
         
         # Appel de la fonction edge
