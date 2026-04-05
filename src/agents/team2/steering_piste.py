@@ -56,7 +56,7 @@ class SteeringPiste:
         # if abs(angle_vers_centre)<0.03:
         #     return 0.0
 
-        correction = angle_vers_centre * self.correction
+        correction = angle_vers_centre #* self.correction
 
         # np.clip = barrière de sécurité : sécurise pour que le résultat ne dépasse pas
         # l'intervalle [-0.6, 0.6] (limites physiques du volant)
