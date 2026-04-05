@@ -102,6 +102,16 @@ edge:
   timer : 3
   duree : 6
 
+apex:
+  marge_secu : 0.85
+  seuil_prepa : 1.8
+  seuil_apex : 1.25
+  seuil_idle : 0.3
+  timer_prepa : 20
+  timer_apex : 25
+  reduction_decalage : 1.5
+  gain : 7.0
+
 end:
   seuil_lenpoints : 2
 
