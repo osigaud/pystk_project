@@ -52,7 +52,7 @@ class AgentItems:
         if item_count < 1 :
             return False, steer #cas où nous n'avons pas d'item
         
-        karts = obs.get("karts_positions", [])
+        karts = obs.get("karts_position", [])
 
         # Bubblegum Cake Switch
         if item_type in (ItemType.BUBBLEGUM, ItemType.CAKE, ItemType.SWITCH):
