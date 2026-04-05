@@ -3,12 +3,12 @@ pilot:
     kp: 9
     kd: 6
   navigation:
-    lookahead_meters: 10.99771223077839
+    lookahead_meters: 10
     lookahead_max: 14.65533391278857
     min_dist_safety: 1.9050938421276995
     apex_offset: 0.6
-    lookahead_speed_factor: 0.2
-    k: 16.46946813046176
+    lookahead_speed_factor: 0.1
+    k: 16.5
   speed_control:
     default_accel: 1.0
     cornering_accel: 0.412314499739835
