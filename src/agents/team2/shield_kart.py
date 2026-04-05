@@ -22,7 +22,7 @@ class ActiveShield:
 
     def fire_shield(self, obs):
         """
-        Gère l'activation des items en fonction de la proximité des rivaux.
+        Gère l'activation du shield en fonction de la proximité des rivaux.
         """
         #récupère le chiffre qui correspond au type de l'item 
         p_type = obs.get("powerup_type")
