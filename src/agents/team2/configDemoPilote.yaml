@@ -16,9 +16,9 @@ curvature: 0.5274503214873205
 recovery: 18
 steps: 2
 virages:
-  drift: 0.27
+  drift: 0.30
   moyen:
-    i1: 0.0
+    i1: 0.05
     i2: 0.15
   serrer:
     i1: 0.15
