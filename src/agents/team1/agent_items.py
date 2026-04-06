@@ -89,11 +89,12 @@ class AgentItems(KartAgent) :
             return action
 
         if current_item == ZIPPER : 
-            if obs["velocity"][2] >= self.conf.seuil_vitesse :
-                action["fire"] = False
-                return action
-            action["fire"] = True         	      
-            return action 
+            if obs["powerup_count"] >= 1:
+                #if obs["velocity"][2] >= self.conf.seuil_vitesse :
+                    #action["fire"] = False
+                    #return action
+                action["fire"] = True         	      
+                return action 
 
         if current_item == PLUNGER :
             if obs["powerup_count"] >1:
