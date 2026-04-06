@@ -96,7 +96,6 @@ class AnticipeKart:
             if angle * self.prec_angle < 0 : 
                 changement = True
         self.prec_angle = angle
-        print(changement)
         return changement 
 
     ## @brief   Détermine dynamiquement le nombre de nœuds à anticiper.
