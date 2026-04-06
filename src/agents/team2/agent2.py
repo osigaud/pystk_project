@@ -159,7 +159,7 @@ class Agent2(KartAgent):
 
         #attack_karts = self.hit_rivals.hit_karts(obs)       
         #if attack_karts is not None:
-         #   return attack_karts
+        #   return attack_karts
 
 
         # Activation de la nitro en ligne droite si énergie disponible
@@ -177,10 +177,21 @@ class Agent2(KartAgent):
         # Steering final : somme pondérée clampée dans [-1, 1]
         final_steering = np.clip(item_steering + correction_piste + steering, -1, 1)
 
+        """
+        if abs(item_steering) > 0.2 : 
+            final_steering = np.clip(0.6*item_steering+steering+0.9*correction_piste,-1,1)
+        else : 
+            final_steering = np.clip(correction_piste*0.9+ steering, -1, 1)
+        """
+        
         # Tir de l'item si un adversaire est dans le champ de vision
         has_item = obs.get("attachment", 0) != 0
+        
         fire = has_item and (self.active_shield.fire_shield(obs) or self.attack_rival.attack_rivals(obs))
+        
         #drift = self.acceleration.decideDrift(obs)
+        #if drift :
+            #nitro=False
         
         return {
             "acceleration": acceleration,
