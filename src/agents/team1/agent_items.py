@@ -161,7 +161,8 @@ class AgentItems(KartAgent) :
         nit = obs["energy"]
         virage_serre = AgentSpeed.detecter_virage(self.conf, obs)
         if nit > 1 :
-            act["nitro"] = True
+            if obs["velocity"][2] >= self.conf.seuil_vitesse:
+                act["nitro"] = True
         return act 
 
     def choose_action(self, obs) : 
