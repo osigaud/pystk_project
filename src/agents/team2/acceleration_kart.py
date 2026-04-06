@@ -77,7 +77,7 @@ class AccelerationControl(AnticipeKart):
         acceleration = self.amax
         curvature = abs(self.detectVirage(obs))
         
-        phase = obs.get("race_phase", 0)
+        phase = obs.get("phase", 0)
         vitesse = np.linalg.norm(obs.get("velocity", [0, 0, 0]))
         
         if phase <= 3 and vitesse < self.speed and curvature < self.serreri1:
