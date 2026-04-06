@@ -117,6 +117,9 @@ class AgentItems(KartAgent) :
             return action
 
         if current_item == SWATTER :
+            if obs["powerup_count"] > 1:
+                action["fire"] = True
+                return action
             if obs["attachment"] == 3:
                 action["fire"] = False
                 return action
