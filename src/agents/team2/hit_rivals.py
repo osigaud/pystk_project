@@ -48,7 +48,8 @@ class HitRivals:
             target_angle = np.arctan2(x, z)
 
             nodes_path = obs.get("paths_start", [])
-
+            
+            #peut causer des zigzag en raisons de 3 corrections du steering à revoir cette partie
             if len(nodes_path) > 3:
                 target_node = nodes_path[3]
                 angle_target = np.arctan2(target_node[0], target_node[2])
@@ -58,6 +59,8 @@ class HitRivals:
 
             correction_piste = self.steering.correction_centrePiste(obs)
 
+            
+            #on peut peut etre enlever le correction_piste puisque c un tout au autre steering pour se rapprocher des autres kart
             final_steering = np.clip(target_angle + correction_piste +steering,-1, 1)
             #virage = self.anticipe_kart.detectVirage(obs)
             #drift = virage > cfg.ligne_droite
