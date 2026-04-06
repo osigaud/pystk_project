@@ -6,14 +6,7 @@
 import numpy as np
 
 ## @class   ActiveShield
-#  @brief   Décide d'utiliser l'item en possession selon la situation de course.
-#
-#  Utilise AttackRivals pour détecter la présence d'un adversaire devant
-#  le kart, puis décide si l'item courant doit être activé.
-#  Le bubblegum est posé derrière (item défensif), les autres items
-#  sont tirés vers l'avant (items offensifs).
-#
-#  @see AttackRivals
+
 
 class ActiveShield:
     def __init__(self):
