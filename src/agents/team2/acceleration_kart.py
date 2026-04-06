@@ -74,7 +74,13 @@ class AccelerationControl(AnticipeKart):
     def adapteAcceleration(self, obs):
         acceleration = self.amax
         curvature = abs(self.detectVirage(obs))
-
+        
+        phase = obs.get("race_phase", 0)
+        vitesse = np.linalg.norm(obs.get("velocity", [0, 0, 0]))
+        
+        if phase <= 3 and vitesse < 4.0 and curvature < self.serreri1:
+            return self.amax
+            
         if curvature > self.seuildrift:
             acceleration = self.virage_tres_serré
         elif curvature > self.serreri1 and curvature <= self.serreri2:
