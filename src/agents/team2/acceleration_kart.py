@@ -65,6 +65,8 @@ class AccelerationControl(AnticipeKart):
         ## @var virage_moyen
         #  @brief Accélération appliquée lors d'un virage moyen, optimisée par Optuna.
         self.virage_moyen = cfg.acceleration.virage_moyen
+        
+        self.speed = cfg.acceleration.speed
 
     ## @brief   Retourne l'accélération adaptée à la situation courante.
     #
@@ -78,7 +80,7 @@ class AccelerationControl(AnticipeKart):
         phase = obs.get("race_phase", 0)
         vitesse = np.linalg.norm(obs.get("velocity", [0, 0, 0]))
         
-        if phase <= 3 and vitesse < 4.0 and curvature < self.serreri1:
+        if phase <= 3 and vitesse < self.speed and curvature < self.serreri1:
             return self.amax
             
         if curvature > self.seuildrift:
