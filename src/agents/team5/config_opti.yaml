@@ -3,18 +3,18 @@ pilot:
     kp: 9
     kd: 6
   navigation:
-    lookahead_meters: 3
+    lookahead_meters: 2
     lookahead_max: 12
     min_dist_safety: 1.8542240285959828
     apex_offset: 0.6
-    lookahead_speed_factor: 0.4
+    lookahead_speed_factor: 0.6
     l: 16
     k: 1.5
   speed_control:
     default_accel: 1.0
-    cornering_accel: 0.4
+    cornering_accel: 0.45
     steering_threshold: 0.5
-    hairpin_threshold: 0.8410799671704858
+    hairpin_threshold: 0.80
     hairpin_accel: 0.1
     hairpin_brake_speed: 5
   rescue:

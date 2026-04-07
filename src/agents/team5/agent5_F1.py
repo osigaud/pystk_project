@@ -146,7 +146,7 @@ class Agent5F1(KartAgent):
     def compute_turning_pps(self, obs, target_x, target_z):
 
         l_squared = target_x**2 + target_z**2
-        gamma =  np.arctan(self.L * 2 *target_x/ l_squared + 1e-4)
+        gamma =  np.arctan(self.L * 2 *target_x / l_squared + 1e-4)
         
         
         #gamma2 =  np.arctan2(self.L * (2*target_x), (l_squared))
@@ -161,6 +161,7 @@ class Agent5F1(KartAgent):
         steering = np.clip(gamma, -1, 1)
         if target_x < 0.4 and abs(steering) < 0.05:
             return 0.0
+
 
         return steering
 
@@ -220,11 +221,24 @@ class Agent5F1(KartAgent):
         steering = self.compute_turning_pps(obs, target_x, target_z)
         accel, brake, steering = self.manage_speed(obs, steering)
 
-        action = {
-            "acceleration": accel,
-            "steer": steering,
-            "brake": brake,
-            "drift": False, "nitro": False, "rescue": False,
-            "fire": True
-        }
-        return action
+        if(float(obs['distance_down_track'].item()) < 8):
+            action = {
+                "acceleration": 1.0,
+                "steer": 0.0,
+                "brake": False,
+                "drift": False, "nitro": False, "rescue": False,
+                "fire": False
+            }
+            return action    
+
+        else : 
+             
+            action = {
+                "acceleration": accel,
+                "steer": steering,
+                "brake": brake,
+                "drift": False, "nitro": False, "rescue": False,
+                "fire": True
+            }
+            print(accel)
+            return action
