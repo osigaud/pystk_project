@@ -71,7 +71,6 @@ class Agent5(KartAgent):
         # On crée le pilot qui gère les items
         # self.item = Agent5Item(env, self.brain, self.conf, path_lookahead)
 
-        #self.rescue = Agent5Rescue(env, self.brain, self.conf, path_lookahead)
 
     def endOfTrack(self):
         """
