@@ -48,7 +48,7 @@ class Agent5Rescue(KartAgent):
         action = self.pilot.choose_action(obs)
 
         # LOGIQUE DE DÉTECTION
-        if obs["attachment"] != 0 :
+        if obs["attachment"] == 0 :
             if self.is_rescuing:
                 self.stuck_counter += 1
                 if self.stuck_counter < self.rescue_duration:
