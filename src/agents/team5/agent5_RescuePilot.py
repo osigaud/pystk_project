@@ -35,24 +35,22 @@ class Agent5Rescue(KartAgent):
 
         action = self.pilot.choose_action(obs)
 
-        # Phase de rescue en cours
-        if self.is_rescuing:
-            self.rescue_counter += 1
-            if self.rescue_counter < self.rescue_duration:
-                return {
-                    "acceleration": 0.0,
-                    "steer": -action["steer"],
-                    "brake": True,
-                    "drift": False,
-                    "nitro": False,
-                    "rescue": False,
-                    "fire": False,
-                }
-            else:
-                self.is_rescuing = False
-                self.rescue_counter = 0
-                self.stuck_counter = 0
-                self.last_distance = dist_now
+        # LOGIQUE DE DÉTECTION
+        if obs["attachment"] == 0 :
+            if self.is_rescuing:
+                self.stuck_counter += 1
+                if self.stuck_counter < self.rescue_duration:
+                    # Manoeuvre de secours : On recule en inversant le volant
+                    return {
+                        "acceleration": 0.0,
+                        "steer": -action["steer"],
+                        "brake": True,
+                        "drift": False, "nitro": False, "rescue": False, "fire": False
+                    }
+                else:
+                    self.is_rescuing = False
+                    self.stuck_counter = 0
+                    self.last_distance = dist_now
 
         # Détection de blocage si on reste bloqué pendant un certain temps 
         elif dist_now > self.conf.pilot.rescue.active_after_meters:
