@@ -47,8 +47,8 @@ drift:
 banana:
   dodge_timer_basic : 0
   dodge_timer_start : 10
-  decalage_lateral : 2.5
-  radar_x : 5.0
+  decalage_lateral : 2.75
+  radar_x : 2.0
   radar_zmin : 0.0
   radar_zmax : 17.0
   seuil_ligne : 2.0
