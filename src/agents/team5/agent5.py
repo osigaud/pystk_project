@@ -9,7 +9,6 @@ from .agent5_F1 import Agent5F1
 from .agent5_BananaPilot import Agent5Banana
 #from .agent5_Rescue import Agent5Rescue
 from .agent5_NitroPilot import Agent5Nitro
-from .agent5_ItemPilot import Agent5Item
 from .agent5_AvoidKart import Agent5AvoidKart
 from omegaconf import OmegaConf 
 from .agent5_RescuePilot import Agent5Rescue
@@ -71,6 +70,7 @@ class Agent5(KartAgent):
         # On crée le pilot qui gère les items
         # self.item = Agent5Item(env, self.brain, self.conf, path_lookahead)
 
+        #self.rescue = Agent5Rescue(env, self.brain, self.conf, path_lookahead)
 
     def endOfTrack(self):
         """
