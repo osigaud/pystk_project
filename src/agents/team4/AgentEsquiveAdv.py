@@ -70,14 +70,6 @@ class AgentEsquiveAdv:
                 self.timer += 1
             self.curr_dist = distance
             
-            # Sécurité, s'il est trop proche de nous, c'est un danger
-            if nz <= self.c.securite_nz:
-                #print("On esquive par sécurité !!")
-                #print(nx,nz)
-                self.timer =0
-                self.curr_dist = 0
-                return True,nx,nz
-            
             # Si pendant 4 frames, on a continué à s'approcher du kart, c'est un danger
             if self.timer >= self.c.timer:
                 #print("On esquive !!")
