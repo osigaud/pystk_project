@@ -180,7 +180,7 @@ class Agent5Banana(KartAgent):
                 "nitro": False,
                 "rescue": False,
                 "brake": False,
-                "fire": True
+                "fire": False
             }
 
         # Ensuite sécurité bordures
