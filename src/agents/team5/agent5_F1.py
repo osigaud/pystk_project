@@ -27,7 +27,9 @@ class Agent5F1(KartAgent):
         self.conf = conf
 
         self.ahead_dist = self.conf.pilot.navigation.lookahead_meters
+        self.L = self.conf.pilot.navigation.l
         self.K = self.conf.pilot.navigation.k
+
         self.locked_node = False
         self.node_idx = -1
         self.last_error = 0.0   # Contient l'erreur de l'angle précédent 
@@ -47,8 +49,7 @@ class Agent5F1(KartAgent):
 
 
 
-
-    def position_track(self, obs):
+    def position_track_lock(self, obs):
             """
             Analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique
             La distance de visée (lookahead) augmente proportionnellement à la vitesse
@@ -79,7 +80,7 @@ class Agent5F1(KartAgent):
             dist = tuple()
             boolen_locked = self.locked_node
             if boolen_locked:
-                node_vect = obs["paths_end"][self.node_idx]
+                node_vect = obs["paths_start"][self.node_idx]
                 dist = (node_vect[0], node_vect[2])
             else:
                 
@@ -102,11 +103,53 @@ class Agent5F1(KartAgent):
 
             return x, z
 
+    
+    def position_track(self, obs):
+        """
+        Analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique
+        La distance de visée (lookahead) augmente proportionnellement à la vitesse
+
+        Args:
+            obs (dict): Dictionnaire contenant les observations de l'environnement
+
+        Returns:
+            tuple: (target_vector[0], target_vector[2])
+                - target_vector[0] (float): Écart latéral (x) du point cible
+                - target_vector[2] (float): Distance frontale (z) du point cible
+        """
+        # La fonction analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique
+        paths = obs['paths_end']
+
+        if len(paths) == 0:
+            return 0, self.ahead_dist  # par défaut si aucun noeud n'est donné dans la liste paths_end
+
+        # On calcule la vitesse actuelle pour adapter la distance de visée.
+        speed = np.linalg.norm(obs['velocity'])
+
+        # Plus on va vite, plus on regarde loin
+        lookahead = self.ahead_dist + (speed * self.lookahead_factor)
+
+        # On plafonne la visée
+        lookahead = min(lookahead, self.lookahead_max)
+
+        target_vector = paths[-1]  # Par défaut on prend le noeud le plus loin pour éviter tout bug
+
+        # On cherche le premier point qui dépasse notre distance de visée calculée
+        for p in paths:
+            if p[2] > lookahead:
+                target_vector = p
+                break
+
+        # On retourne l'écart latéral x et l'écart avant z du point cible
+        return target_vector[0], target_vector[2]
 
     def compute_turning_pps(self, obs, target_x, target_z):
 
         l_squared = target_x**2 + target_z**2
-        gamma =  np.arctan(self.K * (2*target_x)/(l_squared + 1e-5))
+        gamma =  np.arctan(self.L * 2 *target_x/ l_squared + 1e-4)
+        
+        
+        #gamma2 =  np.arctan2(self.L * (2*target_x), (l_squared))
 
         # D'autres implémentations de gamma, n'y prêtez pas attention
         #ld = np.sqrt(target_x**2 + target_z**2)
@@ -114,16 +157,11 @@ class Agent5F1(KartAgent):
         # #gamma2 = (2*target_x*target_z) / (target_z**2 + target_x**2 + 1e-5) 
         # gamma3 = (2 * self.K * np.sin(alpha)) / ld
 
+        #steering = np.clip(self.K * gamma, -1, 1)
         steering = np.clip(gamma, -1, 1)
+        if target_x < 0.4 and abs(steering) < 0.05:
+            return 0.0
 
-        # width_path = obs["paths_width"][0]
-        # near_node = obs["paths_end"][0]
-        # x_nn = near_node[0]
-
-        # dist_wall = (width_path/2) - np.abs(x_nn)
-
-        #print("largeur demi wall : ", width_path/2)
-        #print("Abs distance kart - mur : ", dist_wall)
         return steering
 
 
