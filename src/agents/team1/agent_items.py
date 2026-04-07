@@ -93,10 +93,10 @@ class AgentItems(KartAgent) :
 
         if current_item == ZIPPER : 
             if obs["powerup_count"] >= 1:
-                if  abs(obs["paths_end"][1][0]) >=2:
+                if  abs(obs["paths_end"][1][self.conf.x]) >=2:
                     action["fire"] = False
                     return action
-                if obs["velocity"][2] >= self.conf.seuil_vitesse :
+                if obs["velocity"][self.conf.z] >= self.conf.seuil_vitesse :
                     action["fire"] = False
                 action["fire"] = True         	      
                 return action 
