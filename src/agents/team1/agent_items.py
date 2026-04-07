@@ -23,7 +23,8 @@ class AgentItems(KartAgent) :
     def __init__(self, env, conf, agent) :
         super().__init__(env)
         self.conf = conf
-        self.agent = agent 
+        self.agent = agent
+        self.last_action = False
 
     def is_bonus_close(self, obs) :
         """Renvoie True si on est très proche d'une boîte cadeau, False sinon"""
@@ -49,17 +50,19 @@ class AgentItems(KartAgent) :
         Returns:
             dict: Action corrigée avec la clé `fire` mise à jour.
         """
-        current_item = obs["powerup_type"]        
-        action["fire"] = False        
+        current_item = obs["powerup_type"]
+        action["fire"] = False
+
+        if (self.last_action) :
+            self.last_action = False
+            action["fire"] = False
+            return action
 
         if current_item == BUBBLEGUM :
             if obs["attachment"] == BUBBLEGUM_SHIELD :
                 action["fire"] = False
                 return action
             action["fire"] = True
-            return action
-
-
             return action
 
         if current_item == CAKE :
@@ -90,9 +93,11 @@ class AgentItems(KartAgent) :
 
         if current_item == ZIPPER : 
             if obs["powerup_count"] >= 1:
-                #if obs["velocity"][2] >= self.conf.seuil_vitesse :
-                    #action["fire"] = False
-                    #return action
+                if  abs(obs["paths_end"][1][0]) >=2:
+                    action["fire"] = False
+                    return action
+                if obs["velocity"][2] >= self.conf.seuil_vitesse :
+                    action["fire"] = False
                 action["fire"] = True         	      
                 return action 
 
@@ -117,7 +122,7 @@ class AgentItems(KartAgent) :
             return action
 
         if current_item == SWATTER :
-            if obs["powerup_count"] > 1:
+            if obs["powerup_count"] > 1 or self.is_bonus_close(obs):
                 action["fire"] = True
                 return action
             if obs["attachment"] == 3:
@@ -128,7 +133,7 @@ class AgentItems(KartAgent) :
                     action["fire"] = True
             return action
 
-        if current_item == RUBBERBALL :  #basket
+        if current_item == RUBBERBALL :
             premier_kart = obs["karts_position"][0]
             if premier_kart[self.conf.z] > 0:
                 action["fire"] = True
@@ -143,7 +148,6 @@ class AgentItems(KartAgent) :
         return action
 
     def use_nitro(self, obs, act):
-
         """Active le nitro si le niveau d'énergie est suffisant.
 
         Vérifie la quantité d'énergie disponivble dans
@@ -173,4 +177,5 @@ class AgentItems(KartAgent) :
         action = self.agent.choose_action(obs)
         action = self.observation_item(obs, action)
         action = self.use_nitro(obs, action)
+        self.last_action = action["fire"]
         return action
