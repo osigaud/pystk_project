@@ -8,6 +8,7 @@ from .agent5_MidPilot import Agent5Mid
 from .agent5_F1 import Agent5F1
 from .agent5_BananaPilot import Agent5Banana
 from .agent5_NitroPilot import Agent5Nitro
+from .agent5_UseItems import Agent5UseItems
 from .agent5_AvoidKart import Agent5AvoidKart
 from omegaconf import OmegaConf 
 from .agent5_RescuePilot import Agent5Rescue
@@ -57,8 +58,10 @@ class Agent5(KartAgent):
         # On créer le pilote qui drift sur la piste
         #self.drift = Agent5Drift(env, self.nitro, self.conf, path_lookahead)
 
+        self.use_items = Agent5UseItems(env, self.nitro, self.conf, path_lookahead)
+
         # On l'enveloppe dans l'agent qui evite les karts
-        self.avoidkart = Agent5AvoidKart(env, self.nitro, self.conf, path_lookahead)
+        self.avoidkart = Agent5AvoidKart(env, self.use_items, self.conf, path_lookahead)
 
         # On l'enveloppe dans l'agent qui esquive les bananes
         self.banana = Agent5Banana(env, self.avoidkart, self.conf, path_lookahead)
@@ -67,10 +70,7 @@ class Agent5(KartAgent):
         self.brain = Agent5Rescue(env, self.banana, self.conf, path_lookahead)
         
         # On crée le pilot qui gère les items
-        # self.item = Agent5Item(env, self.brain, self.conf, path_lookahead)
-
-        #self.rescue = Agent5Rescue(env, self.brain, self.conf, path_lookahead)
-
+        #self.item = Agent5Item(env, self.brain, self.conf, path_lookahead)
     def endOfTrack(self):
         """
         Indique si le kart a atteint la fin de la piste.
