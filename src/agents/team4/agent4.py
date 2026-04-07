@@ -157,9 +157,9 @@ class Agent4(KartAgent):
             return action_adv
         
         # Appel de apex
-        apex, action_apex = self.expert_apex.choose_action(obs,acceleration)
+        """apex, action_apex = self.expert_apex.choose_action(obs,acceleration)
         if apex:
-            return action_apex
+            return action_apex"""
         
         # Mécanisme Anti Vibration
         epsilon = self.c.epsilon
