@@ -7,7 +7,6 @@ from .agent5_DriftPilot import Agent5Drift
 from .agent5_MidPilot import Agent5Mid
 from .agent5_F1 import Agent5F1
 from .agent5_BananaPilot import Agent5Banana
-#from .agent5_Rescue import Agent5Rescue
 from .agent5_NitroPilot import Agent5Nitro
 from .agent5_AvoidKart import Agent5AvoidKart
 from omegaconf import OmegaConf 
