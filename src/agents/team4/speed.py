@@ -17,6 +17,20 @@ class SpeedController:
         """@private"""
         self.amax = self.c.acceleration_max
         """@private"""
+        self.azero = self.c.acceleration_czero
+        """@private"""
+        self.alow = self.c.acceleration_low 
+        """@private"""
+        self.amid = self.c.acceleration_mid 
+        """@private"""
+        self.smax = self.c.seuil_decalage_max
+        """@private"""
+        self.smid = self.c.seuil_decalage_mid
+        """"@private"""
+        self.slow = self.c.seuil_decalage_low
+        """@private"""
+        self.smin = self.c.seuil_decalage_min
+        """@private"""
     
     def reset(self) -> None:
         """Réinitialise les variables d'instances de l'agent expert"""
@@ -37,10 +51,24 @@ class SpeedController:
 
         """
         points = obs.get("paths_start",[]) # On récupère la liste des points
+        dx = points[3][0] #on prend le decalage latéral x du troisieme point devant l'agent
 
-        k = abs(compute_curvature(points[1:5][:3]))
+        a = abs(dx)
+        #print("décal x = ",a)
 
-        v_test = np.clip(self.amax/np.sqrt(1+k),0, self.amax)
+        if a < 4.0:
+            return 0.98, False
+        return self.amax, False
+        if a < self.slow :
+            return self.amax, False
 
-        return np.clip(v_test*self.g,0,self.amax), False #on ajoute un gain 
-        
+        if a > self.smax:
+            return self.azero, True
+
+        if (a > self.smin and a < self.smid):
+            return self.amid, False
+
+        if (a > self.smid and a < self.smax):
+            return self.alow, True
+
+        return self.amax, False
