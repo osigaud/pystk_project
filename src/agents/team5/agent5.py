@@ -39,7 +39,7 @@ class Agent5(KartAgent):
         # On trouve le chemin de notre fichier actuel
         current_dir = os.path.dirname(os.path.abspath(__file__))
         # On créer le chemin /src/agent/team5/config.yaml
-        config_path = os.path.join(current_dir, "config.yaml")
+        config_path = os.path.join(current_dir, "config_opti.yaml")
         # On charge le fichier conf avec ce chemin
         self.conf = OmegaConf.load(config_path)
 
@@ -49,19 +49,19 @@ class Agent5(KartAgent):
         # On crée le Pilote qui suit la piste 
         self.pilot = Agent5F1(env, self.conf, path_lookahead)
         
+        self.use_items = Agent5UseItems(env, self.pilot, self.conf, path_lookahead)
+
         # Enveloppement de l'agent de base dans l'agent de gestion du nitro
-        self.nitro = Agent5Nitro(env, self.pilot, self.conf, path_lookahead)
+        self.nitro = Agent5Nitro(env, self.use_items, self.conf, path_lookahead)
 
         # On créer le pilote qui drift sur la piste
         #self.drift = Agent5Drift(env, self.nitro, self.conf, path_lookahead)
 
-        self.use_items = Agent5UseItems(env, self.nitro, self.conf, path_lookahead)
-
         # On l'enveloppe dans l'agent qui evite les karts
-        self.avoidkart = Agent5AvoidKart(env, self.use_items, self.conf, path_lookahead)
+        self.avoidkart = Agent5AvoidKart(env, self.nitro, self.conf, path_lookahead)
 
         # On l'enveloppe dans l'agent qui esquive les bananes
-        self.banana = Agent5Banana(env, self.nitro, self.conf, path_lookahead)
+        self.banana = Agent5Banana(env, self.avoidkart, self.conf, path_lookahead)
 
         # On l'enveloppe dans l'agent qui s'occupe de quand le kart est bloqué
         self.brain = Agent5Rescue(env, self.banana, self.conf, path_lookahead)
