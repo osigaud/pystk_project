@@ -177,12 +177,12 @@ class Agent2(KartAgent):
         # Steering final : somme pondérée clampée dans [-1, 1]
         final_steering = np.clip(item_steering + correction_piste + steering, -1, 1)
 
-        """
-        if abs(item_steering) > 0.2 : 
-            final_steering = np.clip(0.6*item_steering+steering+0.9*correction_piste,-1,1)
+        
+        if abs(item_steering) > 0.3 : 
+            final_steering = np.clip(0.7*item_steering+steering+0.7*correction_piste,-1,1)
         else : 
             final_steering = np.clip(correction_piste*0.9+ steering, -1, 1)
-        """
+
         
         # Tir de l'item si un adversaire est dans le champ de vision
         has_item = obs.get("attachment", 0) != 0
@@ -192,6 +192,7 @@ class Agent2(KartAgent):
         #drift = self.acceleration.decideDrift(obs)
         #if drift :
             #nitro=False
+            #final_steering =correction_piste*2+steering
         
         return {
             "acceleration": acceleration,
