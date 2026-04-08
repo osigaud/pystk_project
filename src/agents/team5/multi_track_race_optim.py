@@ -32,7 +32,7 @@ from agents.team5.agent5 import Agent5
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
-MAX_TEAMS = 3
+MAX_TEAMS = 1
 NB_RACES = 6   # Nombre de courses à chaque fois qu'on lance multi_track_race_team5
 MAX_STEPS = 1300
 
@@ -95,23 +95,20 @@ agents_specs = [
     AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.ON) for i in range(MAX_TEAMS)
 ]
 
-def create_race(cfg=None):
-    # Create the multi-agent environment for N karts.
-    if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="xr591", render_mode="human", num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
+def create_race(cfg=None, track_name=None):
+    
+    if track_name is not None:
+        env = STKRaceMultiEnv(agents=agents_specs, track=track_name, render_mode=None, num_kart=MAX_TEAMS)  # render_mode = None = Aucune fenêtre graphique
     else:
-        env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS) # render_node = None = Aucune fenêtre graphique
-    # Pour avoir la fenêtre graphique, mettre "human" au lieu des None
-
-    # Instantiate the agents.
+        env = STKRaceMultiEnv(agents=agents_specs, render_mode=None, num_kart=MAX_TEAMS) # render_node = None = Aucune fenêtre graphique
 
     agents = []
     names = []
 
     #agents.append(Agent1(env, path_lookahead=3))
-    agents.append(Agent2(env, path_lookahead=3))
+    #agents.append(Agent2(env, path_lookahead=3))
     #agents.append(Agent3(env, path_lookahead=3))
-    agents.append(Agent4(env, path_lookahead=3))
+    #agents.append(Agent4(env, path_lookahead=3))
     agents.append(Agent5(env, path_lookahead=3, cfg=None))   # On donne le fichier de configuration chargé en mémoire à notre Agent5
     np.random.shuffle(agents)
 
@@ -122,8 +119,8 @@ def create_race(cfg=None):
     return env, agents, names
 
 
-def single_race(cfg=None):
-    env, agents, names = create_race(cfg)
+def single_race(cfg=None, track_name=None):
+    env, agents, names = create_race(cfg, track_name)
     obs, _ = env.reset()
     done = False
     steps = 0
@@ -177,11 +174,11 @@ def single_race(cfg=None):
     print("race duration:", steps)
     return race_data
 
-def single_race_worker(cfg_dict):
+def single_race_worker(cfg_dict, track_name):
     cfg = OmegaConf.create(cfg_dict) if cfg_dict is not None else None
-    return single_race(cfg)
+    return single_race(cfg, track_name)
 
-def main_loop(cfg=None, nb_courses=NB_RACES, race_jobs=1):
+def main_loop(cfg=None, track_names_list = None, race_jobs=1):
     scores = Scores()
 
     env, agents, names = create_race(cfg)
@@ -192,10 +189,10 @@ def main_loop(cfg=None, nb_courses=NB_RACES, race_jobs=1):
 
     if race_jobs == 1:
 
-        # On utilise le nb course passé en paramètres
-        for j in range(nb_courses):
-            print(f"race : {j}")
-            race_data = single_race(cfg)
+        # On utilise le nom des courses passés en paramètres
+        for track in track_names_list:
+            print(f"race : {track}")
+            race_data = single_race(cfg, track_name = track)
             for name, pos, pos_std, steps in race_data:
                 scores.append(name, pos, pos_std, steps)
     else:
@@ -206,8 +203,8 @@ def main_loop(cfg=None, nb_courses=NB_RACES, race_jobs=1):
 
             # Chaque tâche correspond à UNE course parmis toutes les NB_RACES courses d'une recherche
             futures = [
-                executor.submit(single_race_worker, cfg_dict)
-                for _ in range(nb_courses)  # On utilise le nb course passé en paramètres
+                executor.submit(single_race_worker, cfg_dict, track_name)
+                for track_name in track_names_list  # On utilise le nb course passé en paramètres
             ]
 
             # "as_completed" permet de traiter les courses dès qu'elles se terminent
@@ -261,18 +258,5 @@ def output_html(output: Path, scores: Scores):
 
         
 if __name__ == "__main__":
-    input_config = input("Voulez vous utiliser le fichier config_opti.yaml ? [o/n] : ")
-    NB_RACES = int(input("Entrez le nombre de courses : "))
-
-    if input_config == 'o':
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        config_path = os.path.join(current_dir, "config_opti.yaml")
-        cfg = OmegaConf.load(config_path)
-        print("Le kart utilise le fichier config_opti.yaml\n")
-        scores = main_loop(cfg=cfg, nb_courses=NB_RACES)
-
-    else : 
-        # Si cfg=None alors on utilise le fichier config.yaml classique. Voir le __init__() de agent5.py
-        print("Le kart utilise le fichier config.yaml\n")
-        scores = main_loop(cfg=None, nb_courses=NB_RACES)
+    print("Tu n'es pas censé utiliser ce fichier py, utilise plutôt le fichier multi_track_race_display_team5.py\n Ce script est reservé aux optimisations :)")
     #output_html(Path("../../docs/index.html"), scores)

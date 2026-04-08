@@ -107,6 +107,70 @@ class Agent5Banana(KartAgent):
 
 
 
+    # def edge_safety(self, obs):
+    #     dist_center = obs["center_path_distance"]
+    #     width_path = obs["paths_width"][0]
+    #     max_percentage = self.conf.banana.edge_safety.max_border_dist_percentage
+
+    #     dist_seuil = (width_path / 2) * max_percentage
+
+    #     print(
+    #         "center_path_distance=", obs["center_path_distance"],
+    #         "path_width=", obs["paths_width"][0]
+    #     )
+
+    #     if abs(dist_center) > dist_seuil:
+    #         if dist_center > 0:
+    #             steering = -self.conf.banana.edge_safety.steering_correction
+    #         else:
+    #             steering = self.conf.banana.edge_safety.steering_correction
+
+    #         accel = self.conf.banana.edge_safety.correction_accel
+    #         return True, steering, accel
+
+    #     return False, 0.0, 1.0
+
+    def detect_banana_old(self, obs):
+        """
+        Identifie les menaces et calcule une manoeuvre d'esquive perpendiculaire
+
+        Args:
+            obs (dict): Les observations courantes du simulateur
+
+        Returns:
+            tuple: (danger_detected, steering, acceleration)
+                - danger_detected (bool): True si une banane est sur la trajectoire
+                - steering (float): Force de braquage pour éviter l'objet
+                - acceleration (float): Accélération pendant l'esquive
+        """
+        items_pos = np.array(obs["items_position"])
+        items_type = obs["items_type"]
+
+        if items_type is None or len(items_type) == 0:
+            return False, 0.0, 1.0
+
+        index_bananas = [i for i, j in enumerate(items_type) if (j == 1 or j == 4 or j == 5)]
+        bananas = items_pos[index_bananas]
+
+        if len(index_bananas) == 0:
+            return False, 0.0, 1.0
+
+        for b in bananas:
+            x_b = b[0]
+            z_b = b[2]
+
+            if 0 < z_b < self.conf.banana.detection.max_distance and np.abs(x_b) < self.conf.banana.detection.safety_width:
+                # Si la banane est à gauche, on tourne à droite, et inversement
+                if x_b < 0:
+                    steering = self.conf.banana.avoidance.steering_force 
+                else:
+                    steering = -self.conf.banana.avoidance.steering_force
+                accel = self.conf.banana.avoidance.acceleration
+                return True, steering, accel
+
+        return False, 0.0, 1.0
+
+
     def detect_banana(self, obs):
         """
         Identifie les menaces et calcule une manoeuvre d'esquive perpendiculaire
@@ -171,7 +235,7 @@ class Agent5Banana(KartAgent):
             dict: Le dictionnaire d'actions final
         """
         # Priorité aux évitement de bananes
-        danger, steer, accel = self.detect_banana(obs)
+        danger, steer, accel = self.detect_banana_old(obs)
         if danger:
             return {
                 "acceleration": accel,
@@ -180,7 +244,7 @@ class Agent5Banana(KartAgent):
                 "nitro": False,
                 "rescue": False,
                 "brake": False,
-                "fire": True
+                "fire": False
             }
 
         # Ensuite sécurité bordures

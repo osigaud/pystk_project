@@ -1,20 +1,21 @@
-pilot:
+﻿pilot:
   brain:
-    kp: 4.075427823862479
-    kd: 0.840441370162391
+    kp: 4
+    kd: 2.5
   navigation:
-    lookahead_meters: 10.691485877357758
-    lookahead_max: 8.087857540800112
+    lookahead_meters: 8
+    lookahead_max: 13
     min_dist_safety: 1.7682473924739406
-    apex_offset: 0.65
-    lookahead_speed_factor: 0.052311658852028785
+    apex_offset: 0.6
+    lookahead_speed_factor: 0.40
+    k: 16
   speed_control:
     default_accel: 1.0
-    cornering_accel: 0.10203522124880332
-    steering_threshold: 0.4493573370083238
-    hairpin_threshold: 0.9747934080522285
-    hairpin_accel: 0.5121351863962483
-    hairpin_brake_speed: 24.417931123099827
+    cornering_accel: 0.48145467905075606
+    steering_threshold: 0.6595061483071734
+    hairpin_threshold: 0.9608223369368285
+    hairpin_accel: 0.2
+    hairpin_brake_speed: 23.01835850769345
   rescue:
     stuck_frames_limit: 40
     active_after_meters: 10
@@ -28,7 +29,7 @@ banana:
     steering_force: 0.6188542065815514
     acceleration: 0.3245332473678898
   edge_safety:
-    max_center_dist: 8.08115627417354
+    max_center_dist: 7
     steering_correction: 0.8768385213063147
     correction_accel: 0.39479755112263587
 nitro:
@@ -36,17 +37,17 @@ nitro:
     steering_threshold_nitro: 0.4404211270076367
     min_acceleration: 0.6166195263114425
 drift:
-  drift_steer_angle: 0.5
-  far_lookahead: 14
+  drift_steer_angle: 0.6
+  far_lookahead: 15
   near_lookahead: 2.716552385567403
-  far_target_threshold: 1.8882054480896024
-  steer_trigger: 0.86
-  confirmation_frames: 5
-  min_speed: 14
-  max_dist_center: 4
-  exit_target_threshold: 0.38822082889023735
-  cooldown_frames: 8
-  drift_accel: 0.6
+  far_target_threshold: 2
+  steer_trigger: 0.7
+  confirmation_frames: 10
+  min_speed: 10
+  max_dist_center: 5
+  exit_target_threshold: 0.5
+  cooldown_frames: 15
+  drift_accel: 1.0
 avoid_karts:
   safe_distance: 8
   avoid_steer: 0.3

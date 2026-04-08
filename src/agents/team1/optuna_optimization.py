@@ -14,6 +14,7 @@ from agents.team1.agent1 import Agent1
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
 from pystk2_gymnasium.definitions import CameraMode
 
+TRACKS = ["abyss","fortmagma","xr591","minigolf","stk_enterprise","zengarden","hacienda","snowtuxpeak"]
 MAX_TEAMS = 2
 NB_RACES = 1
 
@@ -72,10 +73,10 @@ agents_specs = [
     AgentSpec(name=f"Team{i+1}", rank_start=i, use_ai=False, camera_mode=CameraMode.ON) for i in range(MAX_TEAMS)
 ]
 
-def create_race(distance, ajustement):
+def create_race(distance, ajustement, track):
     # Create the multi-agent environment for N karts.
     if NB_RACES==1:
-        env = STKRaceMultiEnv(agents=agents_specs, track="zengarden", num_kart=MAX_TEAMS) #track="xr591"
+        env = STKRaceMultiEnv(agents=agents_specs, track=track, num_kart=MAX_TEAMS)
     else:
         env = STKRaceMultiEnv(agents=agents_specs, render_mode="human", num_kart=MAX_TEAMS)
 
@@ -145,38 +146,43 @@ def main_loop():
 """
 
 def run_once(dist, ajust):
-
-    env, agents, names = create_race(dist, ajust)
-    obs, _ = env.reset()
-    done = False
-    steps = 0
-
-    max_distance = 0
-
-    while not done and steps < 1500:
-        actions = {}
-        for i in range(MAX_TEAMS):
-            actions[str(i)] = agents[i].choose_action(obs[str(i)])
-
-        obs, _, terminated, truncated, info = env.step(actions)
-        done = terminated or truncated
-        steps += 1
-
-        distance_i = info['infos']["0"]['distance']
-        max_distance = max(max_distance, distance_i)
-
-    env.close()
-
-    if not terminated: #si le kart ne termine pas la course
-        return 4000
+    total_steps = 0
+    nb_finished = 0
+    
+    for track in TRACKS:
+        env, agents, names = create_race(dist, ajust, track)
+        obs, _ = env.reset()
+        done = False
+        steps =0
+        max_distance = 0
+        
+        while not done and steps < 1500:
+            actions = {}
+            for i in range(MAX_TEAMS):
+                actions[str(i)] = agents[i].choose_action(obs[str(i)])
+                
+            obs, _, terminated, truncated, info = env.step(actions)
+            done = terminated or truncated
+            steps += 1
+            
+            distance_i = info['infos']["0"]['distance']
+            max_distance = max(max_distance, distance_i)
+            
+        env.close()
+        
+        if terminated: #si le kart termine la course
+            total_steps += steps
+            nb_finished += 1
+        else:
+            total_steps += 4000
 
     
-    return steps
+    return total_steps / len(TRACKS)
 
 def objective(trial):
 
-    dist = trial.suggest_float("dist", 0.2, 1.5)
-    ajust = trial.suggest_float("ajust", 0.08, 0.9)
+    dist = trial.suggest_float("dist", 0.2, 1.5, step=0.05)
+    ajust = trial.suggest_float("ajust", 0.08, 0.9, step=0.05)
     
     
     score = run_once(dist, ajust)
@@ -184,7 +190,7 @@ def objective(trial):
     return score  # plus petit = meilleure position
 
 study = optuna.create_study(direction="minimize")
-study.optimize(objective, n_trials= 30)
+study.optimize(objective, n_trials= 200)
 
 print(study.best_params)
 
