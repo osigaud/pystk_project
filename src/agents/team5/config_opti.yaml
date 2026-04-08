@@ -12,7 +12,7 @@ pilot:
     k: 1.5
   speed_control:
     default_accel: 1.0
-    cornering_accel: 0.45
+    cornering_accel: 0.4
     steering_threshold: 0.5
     hairpin_threshold: 0.80
     hairpin_accel: 0.1

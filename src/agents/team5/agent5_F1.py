@@ -238,7 +238,6 @@ class Agent5F1(KartAgent):
                 "steer": steering,
                 "brake": brake,
                 "drift": False, "nitro": False, "rescue": False,
-                "fire": True
+                "fire": False
             }
-            print(accel)
             return action
