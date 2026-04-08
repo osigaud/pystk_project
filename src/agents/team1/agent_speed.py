@@ -109,10 +109,10 @@ class AgentSpeed(KartAgent):
         act = self.agent.choose_action(obs)
         
         if self.step_count < 30:
-        	act["acceleration"] = 1
-        	act["brake"] = False
-        	self.step_count += 1
-        	return act
+            act["acceleration"] = 1
+            act["brake"] = False
+            self.step_count += 1
+            return act
         
         virage_serre = self.detecter_virage(self.conf, obs)
         action_ajustee = self.ajuster_acceleration(virage_serre, act, obs)

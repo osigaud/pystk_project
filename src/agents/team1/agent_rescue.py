@@ -23,6 +23,7 @@ class AgentRescue(KartAgent) :
         self.unblock_steps = 0
         self.is_braking = False
 
+
     def is_blocked(self, obs):
         
         """Détecte si le kart est bloqué et met à jour le compteur interne.
@@ -48,7 +49,7 @@ class AgentRescue(KartAgent) :
             self.block_counter = 0
             self.last_distance = distance_down_track
 
-    def unblock_action(self, act):
+    def unblock_action(self, act, obs):
 
         """Applique un recul pour tenter de débloquer le kart.
 
@@ -63,11 +64,17 @@ class AgentRescue(KartAgent) :
                   sinon l’action originale.
         """
 
+        if ((obs["center_path_distance"][0])<0):
+            direction = -1
+        else:
+            direction = 1
+        
+
         if self.unblock_steps > 0 : 
             self.unblock_steps -= 1
             return {
                 "acceleration" : 0, 
-                "steer" : 0, 
+                "steer" : direction, 
                 "brake" : True,
                 "drift" : False,
                 "nitro" : False,
@@ -77,33 +84,17 @@ class AgentRescue(KartAgent) :
         else : 
             self.is_braking = False
             return act
-
-    def call_bird(self, obs) :
-
-        """Observe si on tombe de la piste. Si oui, appelle l'oiseau de secours. Sinon, ne fait rien.
-
-        Args: 
-            obs (dict): Observations de l'environnement.
-
-        Returns:
-            boolean: True ou False selon si on a besoin d'un sauvetage ou non.
-        """
-        is_jumping = obs["jumping"]
-        if is_jumping : 
-            next_node_y = obs["paths_end"][0][self.conf.y]
-            if next_node_y >= 2 : 
-                return True
-        return False
+        
+        
     
     def choose_action(self, obs):
 
-        """Choisit une action et déclenche un déblocage ou un sauvetage si nécessaire.
+        """Choisit une action et déclenche un déblocage si nécessaire.
 
         Étapes :
         1) Vérifie si le kart est bloqué.
         2) Récupère l’action normale (centre + obstacles).
         3) Si blocage est prolongé, lance un recul.
-        4) Observe si besoin d'un sauvetage et agit en conséquence.
 
         Args:
             obs (dict): Observations de l’environnement.
@@ -114,11 +105,10 @@ class AgentRescue(KartAgent) :
 
         self.is_blocked(obs)
         action = self.agent.choose_action(obs)
-                
+     
         if self.block_counter > self.conf.block_counter_threshold :
             self.is_braking = True
             self.unblock_steps = self.conf.unblock_steps_default
         if self.is_braking : 
-            action = self.unblock_action(action)
-        action["rescue"] = self.call_bird(obs)
+            action = self.unblock_action(action, obs)
         return action
