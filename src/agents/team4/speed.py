@@ -38,7 +38,7 @@ class SpeedController:
         """
         points = obs.get("paths_start",[]) # On récupère la liste des points
 
-        k = abs(compute_curvature(points[1:5][:3]))
+        k = abs(compute_curvature(points[1:5]))
 
         v_test = np.clip(self.amax/np.sqrt(1+k),0, self.amax)
 
