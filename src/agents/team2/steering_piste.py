@@ -23,6 +23,7 @@ class SteeringPiste:
         #  @brief Gain multiplicatif appliqué à l'angle de correction.
         #         Plus la valeur est élevée, plus la correction est agressive.
         self.correction = cfg.correction
+        self.len_nodes = cfg.len_nodes
 
     ## @brief   Calcule la correction latérale pour rester au centre de la piste.
     #
@@ -39,7 +40,7 @@ class SteeringPiste:
     #  @see     Agent2.choose_action()
     def correction_centrePiste(self, obs):
         # si paths_start n'existe pas, on renvoie 0 et on veut qu'il y ait au moins 3 points devant le kart
-        if "paths_start" not in obs or len(obs["paths_start"]) < 3:
+        if "paths_start" not in obs or len(obs["paths_start"]) < self.len_nodes:
             return 0.0
 
         # le point au centre de la piste juste devant le kart
@@ -56,7 +57,7 @@ class SteeringPiste:
         # if abs(angle_vers_centre)<0.03:
         #     return 0.0
 
-        correction = angle_vers_centre * self.correction
+        correction = angle_vers_centre #* self.correction
 
         # np.clip = barrière de sécurité : sécurise pour que le résultat ne dépasse pas
         # l'intervalle [-0.6, 0.6] (limites physiques du volant)

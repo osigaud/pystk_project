@@ -48,7 +48,7 @@ class ReactionItems:
         GOOD_ITEM_IDS  = [0, 2, 3, 6]  # BONUS_BOX, NITRO_BIG, NITRO_SMALL, EASTER_EGG
         best_good_dist = 1000.0         # distance du meilleur bon item vu jusqu'ici
         angle_evite    = 0.0            # angle d'esquive si un mauvais item est détecté
-        dist_min_evite = 15.0           # distance déclenchant l'esquive d'un mauvais item
+        dist_min_evite = 20.0           # distance déclenchant l'esquive d'un mauvais item
 
         for i, pos in enumerate(items_pos):  # i sert à faire le lien entre la position et le type
             pos  = np.array(pos)

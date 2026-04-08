@@ -4,44 +4,38 @@
 #  @date    20-01-2026
 
 import numpy as np
-from .rival_attack import AttackRivals
-
 
 ## @class   ActiveShield
-#  @brief   Décide d'utiliser l'item en possession selon la situation de course.
-#
-#  Utilise AttackRivals pour détecter la présence d'un adversaire devant
-#  le kart, puis décide si l'item courant doit être activé.
-#  Le bubblegum est posé derrière (item défensif), les autres items
-#  sont tirés vers l'avant (items offensifs).
-#
-#  @see AttackRivals
+
+
 class ActiveShield:
-
-    ## @var BUBBLEGUM
-    #  @brief Identifiant de l'item bubblegum dans l'énumération pystk2.Powerup.
-    BUBBLEGUM = 1
-
-    ## @brief   Initialise le module avec un détecteur d'adversaires.
     def __init__(self):
+        #détection autour du kart 
+        self.proximite= 10.0 
 
-        ## @var attack_rival
-        #  @brief Module de détection des adversaires dans le champ de vision.
-        self.attack_rival = AttackRivals()
+    def fire_shield(self, obs):
+        """
+        Gère l'activation du shield en fonction de la proximité des rivaux.
+        """
+        #récupère le chiffre qui correspond au type de l'item 
+        p_type = obs.get("powerup_type")
+        karts_pos = obs.get('karts_position', [])
+        
+        for pos in karts_pos:
+            #calcul de la distance entre notre kart et l'adversaire
+            dist = np.linalg.norm(pos)
+            z = pos[2] 
 
-    ## @brief   Indique si l'item en possession doit être utilisé maintenant.
-    #
-    #  Retourne True si un adversaire est détecté devant le kart,
-    #  quel que soit le type d'item possédé.
-    #
-    #  @param   obs  Dictionnaire d'observation retourné par l'environnement.
-    #                Doit contenir les clés "powerup_type" et "karts_position".
-    #  @return  bool : True si l'item doit être utilisé, False sinon.
-    #  @see     AttackRivals.attack_rivals()
-    def fire_shield(self, obs): # a ameliorer faire en sorte d activer le shield quand il y a quelqu un derriere nous 
-        item        = obs["powerup_type"]
-        kart_devant = self.attack_rival.attack_rivals(obs)
-
-        if kart_devant:
-            return True
+            # Si un kart est dans notre cercle de proximité
+            if dist < self.proximite:
+                
+                #si c'est un Bubblegum (type 1) -> le lâcher que si le kart est derrière nous (z < 0)
+                if p_type == 1:
+                    if z < 0:
+                        return True
+                
+                #pour tous les autres types d'items (bouclier, gateau, ventouse...)
+                else:
+                    return True #activation peu importe z
+                    
         return False
