@@ -104,7 +104,7 @@ class Agent5F1(KartAgent):
             return x, z
 
     
-    def position_track(self, obs):
+    def position_track_dist(self, obs):
         """
         Analyse les noeuds devant et renvoie le vecteur (x, z) du point cible situé à une distance dynamique
         La distance de visée (lookahead) augmente proportionnellement à la vitesse
@@ -143,13 +143,31 @@ class Agent5F1(KartAgent):
         # On retourne l'écart latéral x et l'écart avant z du point cible
         return target_vector[0], target_vector[2]
 
+
+    def position_track_fixe(self, obs):
+        """
+        La fonction retourne un noeud en fonction d'un indice et non pas en fonction d'une distance.
+        """
+
+        speed = np.linalg.norm(obs['velocity'])
+        lookahead = min(int(2 + 0.05 * speed), 4)
+
+        paths = obs['paths_start'][lookahead]
+
+
+        # On retourne l'écart latéral x et l'écart avant z du point cible
+        return paths[0], paths[2]
+
+
+
     def compute_turning_pps(self, obs, target_x, target_z):
+        
 
         l_squared = target_x**2 + target_z**2
         gamma =  np.arctan(self.L * 2 *target_x / l_squared + 1e-4)
         
         
-        #gamma2 =  np.arctan2(self.L * (2*target_x), (l_squared))
+        #gamma =  np.arctan2(self.L * (2*target_x), (l_squared))
 
         # D'autres implémentations de gamma, n'y prêtez pas attention
         #ld = np.sqrt(target_x**2 + target_z**2)
@@ -217,7 +235,7 @@ class Agent5F1(KartAgent):
         Returns:
             dict: Dictionnaire d'actions (acceleration, steer, brake, drift, nitro, rescue, fire)
         """
-        target_x, target_z = self.position_track(obs)
+        target_x, target_z = self.position_track_fixe(obs)
         steering = self.compute_turning_pps(obs, target_x, target_z)
         accel, brake, steering = self.manage_speed(obs, steering)
 
