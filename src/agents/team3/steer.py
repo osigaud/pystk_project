@@ -78,34 +78,6 @@ class Steer(KartAgent):
 
 
 
-        k=3
-        if speed>15: 
-            k=4
-
-        decalage_x = abs(obs["paths_start"][k][0])
-        #print("speed", speed)
-        #print("decalage_x", decalage_x)
-
-        if(abs(decalage_x)>26.5):
-            if speed>=18: 
-                brake=True 
-                acceleration=0.12
-            else:
-                acceleration=0.4
-
-
-            if 12<speed<17:
-                if acceleration>0.70:
-                    acceleration=0.70
-                else:
-                    acceleration=0.6
-            
-        else:
-            acceleration=0.5
-
-
-
-
 
         action = {
             "acceleration": 1.0,
