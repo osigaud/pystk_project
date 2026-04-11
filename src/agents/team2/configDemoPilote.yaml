@@ -5,7 +5,8 @@ acceleration:
   virage_serré: 0.90 
   # 0.8261081593205882
   
-  virage_tres_serré: 0.8067896957489046
+  virage_tres_serré: 0.85 
+  #67896957489046
   speed: 4.0
  
 angle_evite_n: -0.7560262910779454
