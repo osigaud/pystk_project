@@ -178,8 +178,8 @@ class Agent2(KartAgent):
         final_steering = np.clip(item_steering + correction_piste + steering, -1, 1)
 
         
-        if abs(item_steering) > 0.3 : 
-            final_steering = np.clip(0.7*item_steering+steering+0.7*correction_piste,-1,1)
+        if abs(item_steering) > 0.2 : 
+            final_steering = np.clip(0.7*item_steering+steering+correction_piste,-1,1)
         else : 
             final_steering = np.clip(correction_piste*0.9+ steering, -1, 1)
 
