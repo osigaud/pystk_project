@@ -179,9 +179,9 @@ class Agent2(KartAgent):
 
         
         if abs(item_steering) > 0.2 : 
-            final_steering = np.clip(0.7*item_steering+steering+correction_piste,-1,1)
+            final_steering = np.clip(cfg.steering.item_steer*item_steering+steering+correction_piste,-1,1)
         else : 
-            final_steering = np.clip(correction_piste*0.9+ steering, -1, 1)
+            final_steering = np.clip(correction_piste*cfg.steering.correction_steer+ steering, -1, 1)
 
         
         # Tir de l'item si un adversaire est dans le champ de vision

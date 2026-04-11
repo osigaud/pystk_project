@@ -43,3 +43,7 @@ hit:
   dist_centre: 50
 
 ligne_droite: 0.2
+
+steering : 
+  item_steer: 0.7
+  correction_steer: 0.9
