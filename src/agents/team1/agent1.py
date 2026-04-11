@@ -36,8 +36,7 @@ class Agent1(KartAgent):
         
         self.agentCenter = AgentCenter(env, self.conf, self.path_lookahead)
         self.agentSpeed = AgentSpeed(env, self.conf, self.agentCenter, self.path_lookahead)
-        self.agentObstacles = AgentObstacles(env, self.conf, self.agentSpeed, self.path_lookahead)
-        self.agentRescue = AgentRescue(env, self.conf, self.agentObstacles)
+        self.agentRescue = AgentRescue(env, self.conf, self.agentSpeed)
         self.agentItems = AgentItems(env, self.conf, self.agentRescue)
         self.agentDrift = AgentDrift(env, self.conf, self.agentItems)
         self.agentVirage = AgentVirage(env, self.conf, self.agentDrift)
