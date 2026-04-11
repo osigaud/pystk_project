@@ -146,3 +146,42 @@ class Kart_drift(Agent2):
     #         rescue=True
     #     else:
     #         rescue=False
+    
+    
+    
+    
+    
+    
+        ## @brief   Détermine dynamiquement le nombre de nœuds à anticiper.
+    #
+    #  Adapte le lookahead en fonction de l'intensité du virage détecté :
+    #  plus le virage est serré, plus on regarde proche pour rester précis.
+    #  Détecte également si le virage est long pour ajuster en conséquence.
+    #
+    #  @param   obs  Dictionnaire d'observation retourné par l'environnement.
+    #                Doit contenir la clé "paths_start".
+    #  @return  int  : nombre de nœuds à regarder devant le kart.
+    #  @see     detectVirage()
+    def get_dynamicLookahead(self, obs):
+        node_path = obs.get("paths_start")
+        if len(node_path) < self.look_limite:
+            return self.path_lookahead
+
+        angle = abs(self.detectVirage(obs))
+
+        if angle < self.look_droite:       # ligne droite
+            lookahead = self.droite
+        elif angle <= self.look_leger:    # virage léger
+            lookahead = self.leger
+        else:                 # virage serré
+            lookahead = self.serrer
+            # Vérification si le virage est long (courbure persistante)
+            i = min(7, len(node_path) - 1)
+            distance = np.linalg.norm(node_path[i] - node_path[0])
+            self.virage_long = distance > self.dist
+            if self.virage_long:
+                lookahead = self.long   # on regarde loin pour anticiper la sortie
+
+        self.path_lookahead = lookahead
+        return self.path_lookahead
+
