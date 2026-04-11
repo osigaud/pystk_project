@@ -55,39 +55,21 @@ class AnticipeKart:
     #                   Proche de zéro = ligne droite.
     def detectVirage(self, obs):
         noeuds_piste = obs["paths_start"]
+        path_lookahead = 5
 
-        path_lookahead = min(10, len(noeuds_piste) - 2)
-        if path_lookahead < 1:
-            return 0.0
+        noeud_cour = noeuds_piste[0]
+        noeud_loin = noeuds_piste[path_lookahead]
 
-        deviations = []
+        x1, z1 = noeud_cour[0], noeud_cour[2]
+        x2, z2 = noeud_loin[0], noeud_loin[2]
 
-        for i in range(path_lookahead):
-            # Vecteur du segment i -> i+1
-            dx0 = noeuds_piste[i+1][0] - noeuds_piste[i][0]
-            dz0 = noeuds_piste[i+1][2] - noeuds_piste[i][2]
+        dx = x2 - x1
+        dz = z2 - z1
 
-            # Vecteur du segment i+1 -> i+2
-            dx1 = noeuds_piste[i+2][0] - noeuds_piste[i+1][0]
-            dz1 = noeuds_piste[i+2][2] - noeuds_piste[i+1][2]
+        angle = np.arctan2(dx, dz)
 
-            angle0 = np.arctan2(dx0, dz0)
-            angle1 = np.arctan2(dx1, dz1)
+        return angle
 
-            # Déviation locale normalisée dans ]-pi, pi]
-            deviation = angle1 - angle0
-            deviation = (deviation + np.pi) % (2 * np.pi) - np.pi
-
-            deviations.append(deviation)
-
-        # Tri par valeur absolue décroissante : les virages les plus serrés en premier
-        deviations.sort(key=abs, reverse=True)
-
-        # Moyenne des 3 pires déviations : pire cas lissé pour filtrer le bruit
-        top3 = deviations[:min(3, len(deviations))]
-        angle_final = sum(top3) / len(top3)
-
-        return angle_final
     
     def changementDirection(self, obs):
         changement = False
