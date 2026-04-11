@@ -29,7 +29,7 @@ vitesse: 0.1730058694074001
 
 
 look_limite: 6
-look_droite: 0.1
+look_droite: 0.65
 look_leger: 0.5
 
 lookahead:
