@@ -1,7 +1,9 @@
 acceleration:
-  virage:1  #0.9972472427271639
+  virage: 1 
+                   #0.9972472427271639
   virage_moyen: 0.99
-  virage_serré: 0.8261081593205882
+  virage_serré: 0.90 
+  # 0.8261081593205882
   
   virage_tres_serré: 0.8067896957489046
   speed: 4.0
