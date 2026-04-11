@@ -5,7 +5,7 @@ acceleration:
   virage_serré: 0.90 
   # 0.8261081593205882
   
-  virage_tres_serré: 0.85 
+  virage_tres_serré: 0.80 
   #67896957489046
   speed: 4.0
  
