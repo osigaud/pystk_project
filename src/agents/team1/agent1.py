@@ -7,7 +7,6 @@ from omegaconf import OmegaConf
 from agents.kart_agent import KartAgent
 from agents.team1.agent_center import AgentCenter
 from agents.team1.agent_speed import AgentSpeed
-from agents.team1.agent_obstacles import AgentObstacles
 from agents.team1.agent_rescue import AgentRescue
 from agents.team1.agent_items import AgentItems
 from agents.team1.agent_drift import AgentDrift
