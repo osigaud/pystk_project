@@ -334,9 +334,9 @@ class Agent5F1(KartAgent):
             dict: Dictionnaire d'actions (acceleration, steer, brake, drift, nitro, rescue, fire)
         """
 
-        points = obs.get("paths_start", [])
-        curvature = abs(compute_curvature(points[2:6]))
-        print("Courbure : ", curvature)
+        # points = obs.get("paths_start", [])
+        # curvature = abs(compute_curvature(points[2:6]))
+        # print("Courbure : ", curvature)
 
         target_x, target_z = self.position_track_dist(obs)
         steering = self.compute_turning_pps(target_x, target_z)
