@@ -1,5 +1,6 @@
 import numpy as np
 from agents.kart_agent import KartAgent
+from utils.track_utils import compute_curvature
 
 class Agent5UseItems(KartAgent):
     def __init__(self, env, pilot_agent, conf, path_lookahead=3):
@@ -58,8 +59,10 @@ class Agent5UseItems(KartAgent):
         #return False
     
     def use_boost(self, obs):
-        action = self.pilot.choose_action(obs)
-        if action["steer"] < 0.1:
+        points = obs.get("paths_start", [])
+        curvature = abs(compute_curvature(points[2:6]))
+        #action = self.pilot.choose_action(obs)
+        if curvature < 1.5:
             return True
 
         return False
@@ -72,7 +75,7 @@ class Agent5UseItems(KartAgent):
         for kart in obs["karts_position"]:
             dz = kart[2] 
             dx = kart[0]
-            if 0 < dz < 20 and -0.3 < dx < 0.3:
+            if 0 < dz < 30 and -1 < dx < 1:
                 return True
         return False
     
@@ -85,7 +88,7 @@ class Agent5UseItems(KartAgent):
             return True
         for kart in obs["karts_position"]:
             dz = kart[2]
-            if 0 < dz < 3:
+            if -5 < dz < 5:
                 return True
         return False
     

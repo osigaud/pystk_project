@@ -54,6 +54,8 @@ class Agent5Nitro(KartAgent):
         steer = action_pilot["steer"]
         accel = action_pilot["acceleration"]
         energy = obs["energy"]
+        points = obs.get("paths_start", [])
+        curvature = abs(compute_curvature(points[2:5]))
 
         if self.using_nitro: # Si on utilise le Nitro et que l’énergie est supérieure à 0, on va tout utiliser.
             if energy > 0:
@@ -62,7 +64,7 @@ class Agent5Nitro(KartAgent):
                 self.using_nitro = False
                 return False, steer, accel, False
         # Vérifier si la valeur absolue du steer est inférieure au seuil configuré
-        if abs(steer) < self.conf.nitro.detection.steering_threshold_nitro:
+        if curvature < 4:
 
             # Vérifier trois conditions supplémentaires pour utiliser le nitro :
             # 1. L'accélération est supérieure au minimum configuré (kart accélère)

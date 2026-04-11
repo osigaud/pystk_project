@@ -73,62 +73,86 @@ class Agent5Banana(KartAgent):
         return target_vector[0], target_vector[2]
 
 
-
-    def edge_safety(self, obs):
+    def position_track_fixe(self, obs):
         """
-        Vérifie si le kart s'éloigne trop du centre de la piste et génère une correction
-
-        Args:
-            obs (dict): Les observations courantes du simulateur
-
-        Returns:
-            tuple: (edge_detected, steering, acceleration)
-                - edge_detected (bool): True si une correction est nécessaire
-                - steering (float): Valeur de braquage corrective
-                - acceleration (float): Valeur d'accélération ajustée
+        La fonction retourne un noeud en fonction d'un indice et non pas en fonction d'une distance.
         """
-        dist_center = obs["center_path_distance"]
 
-        max_dist = self.conf.banana.edge_safety.max_center_dist
+        speed = np.linalg.norm(obs['velocity'])
 
-        if abs(dist_center) > max_dist:
+        # Plus on est rapide plus on regarde loin (mais on limite quand même au 4ème noeud pour ne pas voir trop loin)
+        lookahead = 2 #min(int(2 + self.conf.pilot.navigation.lookahead_speed_factor * speed), 4)
 
-            # Si trop à droite on braquer à gauche
-            if dist_center > 0:
-                steering = -self.conf.banana.edge_safety.steering_correction
-            else:
-                steering = self.conf.banana.edge_safety.steering_correction
+        paths = obs['paths_start'][lookahead]
 
-            accel = self.conf.banana.edge_safety.correction_accel
 
-            return True, steering, accel
-
-        return False, 0.0, 1.0
+        # On retourne l'écart latéral x et l'écart avant z du point cible
+        return paths[0], paths[2]
 
 
 
     # def edge_safety(self, obs):
+    #     """
+    #     Vérifie si le kart s'éloigne trop du centre de la piste et génère une correction
+
+    #     Args:
+    #         obs (dict): Les observations courantes du simulateur
+
+    #     Returns:
+    #         tuple: (edge_detected, steering, acceleration)
+    #             - edge_detected (bool): True si une correction est nécessaire
+    #             - steering (float): Valeur de braquage corrective
+    #             - acceleration (float): Valeur d'accélération ajustée
+    #     """
     #     dist_center = obs["center_path_distance"]
-    #     width_path = obs["paths_width"][0]
-    #     max_percentage = self.conf.banana.edge_safety.max_border_dist_percentage
 
-    #     dist_seuil = (width_path / 2) * max_percentage
+    #     max_dist = self.conf.banana.edge_safety.max_center_dist
 
-    #     print(
-    #         "center_path_distance=", obs["center_path_distance"],
-    #         "path_width=", obs["paths_width"][0]
-    #     )
+    #     if abs(dist_center) > max_dist:
 
-    #     if abs(dist_center) > dist_seuil:
+    #         # Si trop à droite on braquer à gauche
     #         if dist_center > 0:
     #             steering = -self.conf.banana.edge_safety.steering_correction
     #         else:
     #             steering = self.conf.banana.edge_safety.steering_correction
 
     #         accel = self.conf.banana.edge_safety.correction_accel
+
     #         return True, steering, accel
 
     #     return False, 0.0, 1.0
+
+
+
+    def edge_safety(self, obs):
+        dist_center = obs["center_path_distance"]
+        width_path = obs["paths_width"][0]
+        max_percentage = self.conf.banana.edge_safety.max_border_dist_percentage
+
+        dist_seuil = (width_path / 2) * max_percentage
+
+
+        if abs(dist_center) > dist_seuil:
+            # print(
+            # "DANGER\n",
+            # "center_path_distance=", obs["center_path_distance"],
+            # "path_width=", obs["paths_width"][0]
+            #  )
+            if dist_center > 0:
+                steering = -self.conf.banana.edge_safety.steering_correction
+            else:
+                steering = self.conf.banana.edge_safety.steering_correction
+
+            accel = self.conf.banana.edge_safety.correction_accel
+            return True, steering, accel
+
+        # print(
+        #     "NO DANGER\n",
+        #     "center_path_distance=", obs["center_path_distance"],
+        #     "path_width=", obs["paths_width"][0]
+        # )
+
+        return False, 0.0, 1.0
 
     def detect_banana_old(self, obs):
         """
@@ -196,7 +220,7 @@ class Agent5Banana(KartAgent):
         if len(index_bananas) == 0:
             return False, 0.0, 1.0
 
-        node_x, node_z = self.position_track(obs)
+        node_x, node_z = self.position_track_fixe(obs)
 
         denominator = np.sqrt(node_x**2 + node_z**2)
 
