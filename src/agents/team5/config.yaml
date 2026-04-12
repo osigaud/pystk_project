@@ -11,11 +11,10 @@
     steering_threshold: 0.45    
     hairpin_threshold: 0.55    
     hairpin_accel: 0.53          
-    hairpin_brake_speed: 14 
+    hairpin_brake_speed: 13 
 
     curvature_gain : 1
-    hairpin_curvature : 10
-    haripin_curvature : 10
+    hairpin_curvature : 5
     
   rescue:
     stuck_frames_limit: 40
