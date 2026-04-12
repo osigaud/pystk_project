@@ -49,7 +49,7 @@ class AnticipeKart:
     #  @param   obs  Dictionnaire d'observation retourné par l'environnement.
     #                Doit contenir la clé "paths_start" avec au moins 6 éléments.
     #  @return  float : angle en radian dans ]-pi, pi].
-    #                   Positif = virage à gauche, négatif = virage à droite.
+    #                    virage à gauche, négatif = virage à droite.
     #                   Proche de zéro = ligne droite.
     def detectVirage(self, obs):
         noeuds_piste = obs["paths_start"]
