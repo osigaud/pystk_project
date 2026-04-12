@@ -12,7 +12,6 @@ from .rival_attack import AttackRivals
 from .kart_rescue import StuckControl
 from .acceleration_kart import AccelerationControl
 from .shield_kart import ActiveShield
-from .hit_rivals import HitRivals
 
 # kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
 
