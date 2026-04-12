@@ -75,8 +75,7 @@ class Agent2(KartAgent):
         ## @var active_shield
         #  @brief Module de gestion du shield et des items défensifs/offensifs.
         self.active_shield = ActiveShield()
-        
-        self.hit_rivals = HitRivals()
+    
 
         ## @var agent_positions
         #  @brief Historique des positions du kart (utilisé pour la visualisation).
