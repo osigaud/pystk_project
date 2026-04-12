@@ -84,9 +84,6 @@ class AgentSpeed(KartAgent):
             act["acceleration"] = self.conf.accel_ligne_droite
 
             direction_segment = obs["paths_end"][0] - obs["paths_start"][0]
-            if direction_segment[1] > 0.05:
-                act["acceleration"] = np.clip(act["acceleration"], 0.1, 1)      #self.limit(act["acceleration"] + 0.2)
-            return act
 
         # virage serré
         if max_steer_angle <= self.conf.max_steer_angle_petit:
