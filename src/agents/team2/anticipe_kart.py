@@ -40,18 +40,16 @@ class AnticipeKart:
         self.dist = cfg.lookahead.dist
         self.prec_angle = 0.0
 
-    ## @brief   Calcule la courbure de la piste devant le kart.
+   ## @brief   Calcule la courbure de la piste devant le kart.
     #
-    #  Pour chaque triplet de nœuds consécutifs (i, i+1, i+2), calcule la
-    #  déviation angulaire locale entre les deux segments adjacents.
-    #  Retourne la moyenne des 3 déviations de plus grande valeur absolue,
-    #  ce qui représente l'intensité du virage le plus serré à venir tout
-    #  en filtrant les nœuds isolés bruités.
+    #  Prend le nœud courant (paths_start[0]) et le nœud situé 5 positions
+    #  plus loin (paths_start[5]), puis calcule l'angle du vecteur qui va
+    #  du premier au second par rapport à l'axe avant du kart via arctan2.
     #
     #  @param   obs  Dictionnaire d'observation retourné par l'environnement.
-    #                Doit contenir la clé "paths_start" avec au moins 3 éléments.
-    #  @return  float : courbure en radian dans ]-pi, pi].
-    #                   Positif = virage à droite, négatif = virage à gauche.
+    #                Doit contenir la clé "paths_start" avec au moins 6 éléments.
+    #  @return  float : angle en radian dans ]-pi, pi].
+    #                   Positif = virage à gauche, négatif = virage à droite.
     #                   Proche de zéro = ligne droite.
     def detectVirage(self, obs):
         noeuds_piste = obs["paths_start"]
