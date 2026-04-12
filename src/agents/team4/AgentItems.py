@@ -6,11 +6,11 @@ class AgentItems:
     
     """Module Agent Expert Item : Gère la logique d'utilisation des différents items"""
     
-    def __init__(self,config : DictConfig ,config_pilote : DictConfig) -> None:
+    def __init__(self,config : DictConfig ,config_steering : DictConfig) -> None:
         
         """Initialise les variables d'instances de l'agent expert"""
         
-        self.steerer = Steering(config_pilote)
+        self.steerer = Steering(config_steering)
         """@private"""
         self.c = config
         """@private"""
