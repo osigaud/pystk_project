@@ -125,7 +125,7 @@ class AgentCenter(KartAgent):
             dict: Action corrigée (steer dévié d'un possible kart en face de nous).
         """
         for kart in obs["karts_position"] :
-            if abs(kart[self.conf.x]) < 0.8 and 0 < kart[self.conf.z] < 1 :
+            if abs(kart[self.conf.x]) < 1 and 0 < kart[self.conf.z] < 2:
                 if action["steer"] >= 0 :
                     action["steer"] += 0.3
                 else :
@@ -176,6 +176,6 @@ class AgentCenter(KartAgent):
             "fire": False,
         }
         action = self.path_ajust(obs, action)
-        action = self.observation_next_item(obs, action)
         action = self.evite_ennemi(obs, action)
+        action = self.observation_next_item(obs, action)
         return action
