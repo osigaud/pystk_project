@@ -92,6 +92,8 @@ class Agent2(KartAgent):
         ## @var name
         #  @brief Nom affiché du pilote dans l'interface de la course.
         self.name = "DemoPilote "
+        ## @var skin
+        #  @brief Apparence (skin) du kart affiché en course.
         self.skin = 'adiumy'
         
     ## @brief   Réinitialise l'état de l'agent pour une nouvelle course.
@@ -117,10 +119,14 @@ class Agent2(KartAgent):
     #  4. Correction de centrage (SteeringPiste).
     #  5. Accélération adaptée au virage (AccelerationControl).
     #  6. Réaction aux items (ReactionItems).
-    #  7. Attaque des adversaires si item en main (ActiveShield).
+    #  7. Attaque des adversaires si item en main (AttackRivals).
     #
-    #  Le steer final est la somme clampée dans [-1, 1] de :
-    #  item_steering + correction_piste + steering_lookahead.
+    #  Le steer final dépend de la présence d'un item proche :
+    #  - si item_steering dépasse 0.2 en valeur absolue, il est pondéré par
+    #    cfg.steering.item_steer et ajouté au steering_lookahead et à la
+    #    correction de piste, le tout clampé dans [-1, 1] ;
+    #  - sinon, on garde uniquement correction_piste * cfg.steering.correction_steer
+    #    + steering_lookahead, clampé dans [-1, 1].
     #
     #  @param   obs  Dictionnaire d'observation retourné par l'environnement.
     #  @return  dict : action contenant les clés :
@@ -136,6 +142,7 @@ class Agent2(KartAgent):
     #  @see     AccelerationControl.adapteAcceleration()
     #  @see     ReactionItems.reaction_items()
     #  @see     ActiveShield.fire_shield()
+    #  @see     AttackRivals.attack_rivals()
     def choose_action(self, obs):
         velocity = np.array(obs["velocity"])
         speed = np.linalg.norm(velocity)
@@ -155,6 +162,11 @@ class Agent2(KartAgent):
         else:
             steering = 0
 
+        #attack_karts = self.hit_rivals.hit_karts(obs)       
+        #if attack_karts is not None:
+        #   return attack_karts
+
+
         # Activation de la nitro en ligne droite si énergie disponible
         nitro = obs["energy"][0] > 0 and abs(steering) < cfg.ligne_droite
 
@@ -167,10 +179,7 @@ class Agent2(KartAgent):
         # Ajustement du steering selon les items visibles sur la piste
         item_steering = self.items_steering.reaction_items(obs)
 
-        # Steering final : somme pondérée clampée dans [-1, 1]
-        final_steering = np.clip(item_steering + correction_piste + steering, -1, 1)
-
-        
+        # Steering final : pondération selon la présence d'un item proche
         if abs(item_steering) > 0.2 : 
             final_steering = np.clip(cfg.steering.item_steer*item_steering+steering+correction_piste,-1,1)
         else : 
