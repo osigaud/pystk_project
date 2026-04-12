@@ -98,10 +98,7 @@ class AgentEsquiveAdv:
         Args:
                 
             obs(dict) : Les données de télémétrie fournies par le simulateur.
-            gx(float) : Décalage latéral actuel de la cible.
-            gz(float) : Profondeur actuel de la cible.
-            acceleration(float) : Accéleration de l'agent.
-
+           
         Returns:
             
             bool : Permet de confirmer la présence d'un adversaire et la nécessité de le dépasser.
