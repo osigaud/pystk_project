@@ -7,7 +7,7 @@
     k: 3.9                   
   speed_control:
     default_accel: 1.0
-    cornering_accel: 0.7
+    cornering_accel: 0.8
     steering_threshold: 0.45    
     hairpin_threshold: 0.55    
     hairpin_accel: 0.53          
