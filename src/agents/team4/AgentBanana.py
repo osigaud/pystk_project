@@ -1,4 +1,5 @@
 from .steering import Steering
+from .speed import SpeedController
 from omegaconf import DictConfig
 import math
 from utils.track_utils import compute_curvature
@@ -9,7 +10,7 @@ class AgentBanana:
     Module Agent Expert Banana : Gère la logique de détection et de réaction face aux bananes et chewing-gum
     """
     
-    def __init__(self,config : DictConfig ,config_pilote : DictConfig) -> None:
+    def __init__(self,config : DictConfig ,config_steer : DictConfig,config_speed : DictConfig, path_lookahead : int) -> None:
         
         """Initialise les variables d'instances de l'agent expert"""
         
@@ -23,9 +24,13 @@ class AgentBanana:
         """@private"""
         self.locked_gx = 0.0
         """@private"""
-        self.pilotage = Steering(config_pilote)
+        self.pilotage = Steering(config_steer)
+        """@private"""
+        self.speedController = SpeedController(config_speed)
         """@private"""
         self.use_corde = False
+        """@private"""
+        self.path_lookahead = path_lookahead
         """@private"""
         
     def reset(self) -> None:
@@ -107,7 +112,7 @@ class AgentBanana:
             return "SINGLE",first_x,banana # Cas d'une seule banane
         
         
-    def choose_action(self,obs : dict,gx : float ,gz : float,acceleration : float) -> tuple[bool,dict]:
+    def choose_action(self,obs : dict) -> tuple[bool,dict]:
 
         """
         
@@ -129,6 +134,12 @@ class AgentBanana:
 
         points = obs['paths_start'] # Récupération des points
 
+        target = points[self.path_lookahead] # On récupère le x-ème point de la liste defini par la variable de classe
+        gx = target[0] # On récupère x, le décalage latéral
+        gz = target[2] # On récupère z, la profondeur
+
+        acceleration = self.speedController.manage_speed(obs)
+        
         courbe = compute_curvature(points[:self.c.nb_noeuds]) # Calcul de la courbe
         
         paths_width = obs.get("paths_width",0.0)

@@ -1,4 +1,5 @@
 from .steering import Steering
+from .speed import SpeedController
 from omegaconf import DictConfig
 import numpy as np
 
@@ -8,13 +9,15 @@ class AgentEsquiveAdv:
     Module Agent Expert Esquive Adversaire : Gère la logique de détection d'adversaires et de dépassement
     """
     
-    def __init__(self,config : DictConfig ,config_pilote : DictConfig) -> None:
+    def __init__(self,config : DictConfig ,config_steer: DictConfig,config_speed : DictConfig, path_lookahead :int) -> None:
         
         """Initialise les variables d'instances de l'agent expert"""
         
         self.c = config
         """@private"""
-        self.pilotage = Steering(config_pilote)
+        self.pilotage = Steering(config_steer)
+        """@private"""
+        self.speedController = SpeedController(config_speed)
         """@private"""
         self.curr_dist = 0
         """@private"""
@@ -23,6 +26,8 @@ class AgentEsquiveAdv:
         self.duration = 0
         """@private"""
         self.locked_ax = 0
+        """@private"""
+        self.path_lookahead = path_lookahead
         """@private"""
     
     def reset(self) -> None:
@@ -84,7 +89,7 @@ class AgentEsquiveAdv:
         return False, 0,0
 
     
-    def choose_action(self,obs : dict,gx : float,gz : float,acceleration : float) -> tuple[bool,dict]:
+    def choose_action(self,obs : dict) -> tuple[bool,dict]:
 
         """
         
@@ -103,6 +108,14 @@ class AgentEsquiveAdv:
             dict : Le dictionnaire d'actions à réaliser pour esquiver un adversaire.
         
         """
+        
+        points = obs['paths_start'] # Récupération des points
+
+        target = points[self.path_lookahead] # On récupère le x-ème point de la liste defini par la variable de classe
+        gx = target[0] # On récupère x, le décalage latéral
+        gz = target[2] # On récupère z, la profondeur
+
+        acceleration = self.speedController.manage_speed(obs)
         
         # Appel de la fonction de détection
         danger_adv, a_x,a_z = self.esquive_adv(obs)

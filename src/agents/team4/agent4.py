@@ -1,17 +1,8 @@
-from utils.track_utils import compute_curvature, compute_slope
 from agents.kart_agent import KartAgent
-from .steering import Steering
 from .AgentRescue import AgentRescue
-from .speed import SpeedController
-from .AgentNitro import AgentNitro
 from .AgentBanana import AgentBanana
 from .AgentEsquiveAdv import AgentEsquiveAdv
-from .AgentDrift import AgentDrift
-from .AgentItems import AgentItems
-from .AgentEdge import AgentEdge
-from .AgentEnd import AgentEnd
-from .AgentStart import AgentStart
-from .AgentApex import AgentApex
+from .AgentPilot import AgentPilot
 from omegaconf import OmegaConf
 from pathlib import Path
 
@@ -44,31 +35,15 @@ class Agent4(KartAgent):
         """@private"""
         self.name = "The Winners"
         """@private"""
-        self.steering = Steering(self.conf.steering)
-        """@private"""
         self.expert_rescue = AgentRescue(self.conf.rescue)
         """@private"""
-        self.speedcontroller=SpeedController(self.conf.speed)
+        self.expert_esquive_adv = AgentEsquiveAdv(self.conf.opponent, self.conf.steering, self.conf.speed,self.path_lookahead)
         """@private"""
-        self.expert_nitro = AgentNitro(self.conf.nitro)
+        self.expert_banana_dodge = AgentBanana(self.conf.banana, self.conf.steering, self.conf.speed,self.path_lookahead)
         """@private"""
-        self.expert_esquive_adv = AgentEsquiveAdv(self.conf.opponent, self.conf.steering)
+        self.expert_pilot = AgentPilot(self.conf.pilot,self.conf.steering,self.conf.speed,self.conf.powerup_type,self.conf.nitro,self.path_lookahead)
         """@private"""
-        self.expert_banana_dodge = AgentBanana(self.conf.banana, self.conf.steering)
-        """@private"""
-        self.expert_drift = AgentDrift(self.conf.drift)
-        """@private"""
-        self.expert_items = AgentItems(self.conf.powerup_type, self.conf.steering)
-        """@private"""
-        self.expert_edge = AgentEdge(self.conf.edge,self.conf.steering,path_lookahead=self.path_lookahead)
-        """@private"""
-        self.expert_end = AgentEnd(self.conf.end)
-        """@private"""
-        self.expert_start = AgentStart(self.conf.start)
-        """@private"""
-        self.expert_apex = AgentApex(self.conf.apex,self.conf.steering,self.path_lookahead)
-        """@private"""
-        self.skin = 'adiumy'
+        self.skin = 'tux'
         """@private"""        
         
     def reset(self) -> None:
@@ -77,15 +52,8 @@ class Agent4(KartAgent):
         self.isEnd = False
         self.expert_rescue.reset()
         self.expert_banana_dodge.reset()
-        self.steering.reset()
-        self.speedcontroller.reset()
-        self.expert_nitro.reset()
         self.expert_esquive_adv.reset()
-        self.expert_drift.reset()
-        self.expert_items.reset()
-        self.expert_edge.reset()
-        self.expert_end.reset()
-        self.expert_start.reset()
+        self.expert_pilot.reset()
         
     def endOfTrack(self) -> bool:
         """Indique si la course est fini."""
@@ -104,77 +72,29 @@ class Agent4(KartAgent):
             dict : Le dictionnaire d'actions (accélération, direction, nitro, etc.).
         """
         
-        points = obs.get("paths_start",[]) # On récupère la liste des points
-        #points_end = obs.get("paths_end",[])
+        points = obs.get("paths_start",[])
+
+        if len(points) <= self.conf.pilot.seuil_lenpoints:
+            return self.expert_pilot.choose_action(obs)
         
-        # Appel de la fonction start pour le début de course
-        start, action_start = self.expert_start.choose_action(obs)
-        if start:
-            return action_start
-        
-        # Appel de la fonction end pour la fin de course
-        end, action_end = self.expert_end.choose_action(obs)
-        if end : 
-            return action_end
-        
-        target = points[self.path_lookahead] # On récupère le x-ème point de la liste defini par la variable de classe
-        gx = target[0] # On récupère x, le décalage latéral
-        gz = target[2] # On récupère z, la profondeur
-        
-        drift = False
-        gain_volant = self.c.default_gain  #Gain par défaut
-        steering = self.steering.manage_pure_pursuit(gx,gz,gain_volant)
-        acceleration, brake = self.speedcontroller.manage_speed(obs) # Appel à la fonction gerer_vitesse
-        nitro = self.expert_nitro.manage_nitro(obs,steering) # Appel à la fonction manage_nitro
+        steering = self.expert_pilot.get_steering(obs)
         
         # Appel en priorité de la fonction rescue
         is_stuck, action_stuck = self.expert_rescue.choose_action(obs,steering)
         if is_stuck and obs['distance_down_track'] >= self.c.seuil_distance_stuck:
             self.expert_banana_dodge.reset()
             self.expert_esquive_adv.reset()
-            self.expert_apex.reset()
             return action_stuck
         
-        # Appel de la fonction edge
-        """edge, action_edge = self.expert_edge.choose_action(obs)
-        if edge:
-            self.expert_esquive_adv.reset()
-            self.expert_banana_dodge.reset()
-            #print("Danger Limite Piste")
-            return action_edge"""
-        
         # Appel de la fonction esquive banane
-        danger_banane, action_banane = self.expert_banana_dodge.choose_action(obs,gx,gz,acceleration)
+        danger_banane, action_banane = self.expert_banana_dodge.choose_action(obs)
         if danger_banane:
             self.expert_esquive_adv.reset()
-            self.expert_apex.reset()
             return action_banane
         
         # Appel de la fonction esquive adversaire
-        danger_adv, action_adv = self.expert_esquive_adv.choose_action(obs,gx,gz,acceleration)
+        danger_adv, action_adv = self.expert_esquive_adv.choose_action(obs)
         if danger_adv:
-            self.expert_apex.reset()
             return action_adv
         
-        # Appel de apex
-        """apex, action_apex = self.expert_apex.choose_action(obs,acceleration)
-        if apex:
-            return action_apex"""
-        
-        # Mécanisme Anti Vibration
-        epsilon = self.c.epsilon
-        road_straight = abs(points[2][0]) < self.c.seuil_road_straight
-        if road_straight and abs(steering) <= epsilon:
-            steering = 0.0
-
-        fire, steering = self.expert_items.use_items(obs, steering)
-        action = {
-            "acceleration": acceleration,
-            "steer": steering,
-            "brake": brake,
-            "drift": drift,
-            "nitro": nitro,
-            "rescue":False,
-            "fire": fire,
-        }
-        return action
+        return self.expert_pilot.choose_action(obs)

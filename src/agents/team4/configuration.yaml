@@ -5,6 +5,14 @@ main_agent:
   seuil_road_straight: 0.8
   seuil_distance_stuck : 3
   default_gain : 7.0
+  seuil_lenpoints : 2
+
+pilot:
+  default_gain : 7.0
+  seuil_lenpoints : 2
+  seuil_distance : 2
+  epsilon : 0.05
+  seuil_road_straight: 0.8
 
 speed:
   vitesse_seuil : 20.0
