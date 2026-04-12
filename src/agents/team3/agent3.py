@@ -1,45 +1,33 @@
+import numpy as np
 import math
-import numpy
+
 from agents.kart_agent import KartAgent
 
-#On importe les fichiers wrappers steer, speed, fire et rescue
-from .steer import Steer
-from .speed import Speed
-from .fire import Fire
-from .rescue import Rescue
-
-# kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
+from agents.team3.Rescue import Rescue
 
 class Agent3(KartAgent):
     def __init__(self, env, path_lookahead=3):
         super().__init__(env)
-        self.name = "Team L'eclair"
+        self.track = env.default_track
+        self.agent_positions = []
+        self.obs = None
         self.isEnd = False
-        self.path_lookahead = path_lookahead
-        
-        """
-        Les wrappers :
-        - Steer qui contrôle le pilotage du kart 
-        ainsi que les esquives de peaux de bananes et des bubbles gums
-        - Speed qui contrôle la vitesse du kart, les noeuds
-        ainsi que l'usage du drift et du nitro
-        - Fire permet d'utiliser les items collectés
-        notre agent utilise l'angle afin de viser le kart adverse devant nous
-        - Rescue permet de secourir notre kart si le kart est bloqué dans un mur
-        """
-        
-        self.base_pilot = Steer(env)
-        self.speed_pilot = Speed(env, self.base_pilot)
-        self.fire_pilot = Fire(env, self.speed_pilot)
-        self.rescue = Rescue(env, self.fire_pilot)
-        self.skin = 'adiumy'
-        
+        self.name = "Team L'Eclair"
+        self.drift_dir = 0 
+        self.stuck_timer = 0
+
     def reset(self):
         self.obs, _ = self.env.reset()
-        self.rescue.reset()
-    
+        self.agent_positions = []
+        self.drift_dir = 0 
+        self.stuck_timer = 0
+
     def endOfTrack(self):
         return self.isEnd
 
     def choose_action(self, obs):
-        return self.rescue.choose_action(obs)
+
+        action = Rescue.choose_action(self, obs)
+        
+        
+        return action
