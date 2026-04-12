@@ -138,7 +138,7 @@ class AgentBanana:
         gx = target[0] # On récupère x, le décalage latéral
         gz = target[2] # On récupère z, la profondeur
 
-        acceleration = self.speedController.manage_speed(obs)
+        acceleration, _ = self.speedController.manage_speed(obs)
         
         courbe = compute_curvature(points[:self.c.nb_noeuds]) # Calcul de la courbe
         
