@@ -155,11 +155,6 @@ class Agent2(KartAgent):
         else:
             steering = 0
 
-        #attack_karts = self.hit_rivals.hit_karts(obs)       
-        #if attack_karts is not None:
-        #   return attack_karts
-
-
         # Activation de la nitro en ligne droite si énergie disponible
         nitro = obs["energy"][0] > 0 and abs(steering) < cfg.ligne_droite
 
