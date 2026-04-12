@@ -189,7 +189,7 @@ def objective(trial):
 
     return score  # plus petit = meilleure position
 
-study = optuna.create_study(direction="minimize")
+study = optuna.create_study(direction="min imize")
 study.optimize(objective, n_trials= 200)
 
 print(study.best_params)

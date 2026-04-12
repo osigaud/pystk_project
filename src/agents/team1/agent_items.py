@@ -162,11 +162,7 @@ class AgentItems(KartAgent) :
         Returns:
             dict: Action corrigée avec la clé `nitro` éventuellement activée.
         """
-        nit = obs["energy"]
-        virage_serre = AgentSpeed.detecter_virage(self.conf, obs)
-        if nit > 1 :
-            if obs["velocity"][2] >= self.conf.seuil_vitesse:
-                act["nitro"] = True
+        act["nitro"] = True
         return act 
 
     def choose_action(self, obs) : 
