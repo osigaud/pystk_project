@@ -57,10 +57,13 @@ range_bonus_y : 3
 range_bonus_z : 3
 range_enemy_x : 3
 #seuils d'activation des items 
-range_cake : 80
-range_bowling_z : 25
-seuil_vitesse : 2
-range_plunger : 50
+range_cake_min : 10
+range_cake_max : 80
+range_bowling_min : 10
+range_bowling_max : 25
+seuil_vitesse : 18
+range_plunger_min : 10
+range_plunger_max : 50
 range_swatter : 9
 range_swatter_y : 5
 
