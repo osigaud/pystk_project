@@ -14,6 +14,14 @@ path_lookahead : 3
 dist : 0.673833673012193
 # à quel point on ajuste la direction
 ajust : 0.6386812473361506
+maps_zero : 
+    - 1
+maps_one : 
+    - 83
+    - 109
+    - 115
+maps_three : 
+    - 263
 
 
 #       AGENT SPEED
