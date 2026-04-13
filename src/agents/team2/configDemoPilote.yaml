@@ -1,9 +1,12 @@
 acceleration:
-  virage: 0.9972472427271639
-  virage_moyen: 0.9544710574047249
-  virage_serré: 0.8261081593205882
+  virage: 1 
+                   #0.9972472427271639
+  virage_moyen: 0.99
+  virage_serré: 0.90 
+  # 0.8261081593205882
   
-  virage_tres_serré: 0.8067896957489046
+  virage_tres_serré: 0.80 
+  #67896957489046
   speed: 4.0
  
 angle_evite_n: -0.7560262910779454
@@ -29,7 +32,7 @@ vitesse: 0.1730058694074001
 
 
 look_limite: 6
-look_droite: 0.1
+look_droite: 0.65
 look_leger: 0.5
 
 lookahead:
@@ -39,7 +42,9 @@ lookahead:
   long: 7
   dist: 20
 
-hit:
-  dist_centre: 50
 
 ligne_droite: 0.2
+
+steering : 
+  item_steer: 0.7
+  correction_steer: 0.9

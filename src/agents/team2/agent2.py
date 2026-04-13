@@ -12,7 +12,6 @@ from .rival_attack import AttackRivals
 from .kart_rescue import StuckControl
 from .acceleration_kart import AccelerationControl
 from .shield_kart import ActiveShield
-from .hit_rivals import HitRivals
 
 # kart_skin = ['adiumy', 'sara_the_racer', 'amanda', 'tux', 'beastie', 'emule', 'gavroche', 'gnu', 'hexley', 'kiki', 'konqi', 'nolok', 'pidgin', 'puffy', 'sara_the_wizard', 'suzanne', 'wilber', 'xue']
 
@@ -76,8 +75,7 @@ class Agent2(KartAgent):
         ## @var active_shield
         #  @brief Module de gestion du shield et des items défensifs/offensifs.
         self.active_shield = ActiveShield()
-        
-        self.hit_rivals = HitRivals()
+    
 
         ## @var agent_positions
         #  @brief Historique des positions du kart (utilisé pour la visualisation).
@@ -94,6 +92,8 @@ class Agent2(KartAgent):
         ## @var name
         #  @brief Nom affiché du pilote dans l'interface de la course.
         self.name = "DemoPilote "
+        ## @var skin
+        #  @brief Apparence (skin) du kart affiché en course.
         self.skin = 'adiumy'
         
     ## @brief   Réinitialise l'état de l'agent pour une nouvelle course.
@@ -119,10 +119,14 @@ class Agent2(KartAgent):
     #  4. Correction de centrage (SteeringPiste).
     #  5. Accélération adaptée au virage (AccelerationControl).
     #  6. Réaction aux items (ReactionItems).
-    #  7. Attaque des adversaires si item en main (ActiveShield).
+    #  7. Attaque des adversaires si item en main (AttackRivals).
     #
-    #  Le steer final est la somme clampée dans [-1, 1] de :
-    #  item_steering + correction_piste + steering_lookahead.
+    #  Le steer final dépend de la présence d'un item proche :
+    #  - si item_steering dépasse 0.2 en valeur absolue, il est pondéré par
+    #    cfg.steering.item_steer et ajouté au steering_lookahead et à la
+    #    correction de piste, le tout clampé dans [-1, 1] ;
+    #  - sinon, on garde uniquement correction_piste * cfg.steering.correction_steer
+    #    + steering_lookahead, clampé dans [-1, 1].
     #
     #  @param   obs  Dictionnaire d'observation retourné par l'environnement.
     #  @return  dict : action contenant les clés :
@@ -138,6 +142,7 @@ class Agent2(KartAgent):
     #  @see     AccelerationControl.adapteAcceleration()
     #  @see     ReactionItems.reaction_items()
     #  @see     ActiveShield.fire_shield()
+    #  @see     AttackRivals.attack_rivals()
     def choose_action(self, obs):
         velocity = np.array(obs["velocity"])
         speed = np.linalg.norm(velocity)
@@ -157,9 +162,6 @@ class Agent2(KartAgent):
         else:
             steering = 0
 
-        #attack_karts = self.hit_rivals.hit_karts(obs)       
-        #if attack_karts is not None:
-        #   return attack_karts
 
 
         # Activation de la nitro en ligne droite si énergie disponible
@@ -174,14 +176,11 @@ class Agent2(KartAgent):
         # Ajustement du steering selon les items visibles sur la piste
         item_steering = self.items_steering.reaction_items(obs)
 
-        # Steering final : somme pondérée clampée dans [-1, 1]
-        final_steering = np.clip(item_steering + correction_piste + steering, -1, 1)
-
-        
-        if abs(item_steering) > 0.3 : 
-            final_steering = np.clip(0.7*item_steering+steering+0.7*correction_piste,-1,1)
+        # Steering final : pondération selon la présence d'un item proche
+        if abs(item_steering) > 0.2 : 
+            final_steering = np.clip(cfg.steering.item_steer*item_steering+steering+correction_piste,-1,1)
         else : 
-            final_steering = np.clip(correction_piste*0.9+ steering, -1, 1)
+            final_steering = np.clip(correction_piste*cfg.steering.correction_steer+ steering, -1, 1)
 
         
         # Tir de l'item si un adversaire est dans le champ de vision

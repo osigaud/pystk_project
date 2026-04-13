@@ -40,54 +40,34 @@ class AnticipeKart:
         self.dist = cfg.lookahead.dist
         self.prec_angle = 0.0
 
-    ## @brief   Calcule la courbure de la piste devant le kart.
+   ## @brief   Calcule la courbure de la piste devant le kart.
     #
-    #  Pour chaque triplet de nœuds consécutifs (i, i+1, i+2), calcule la
-    #  déviation angulaire locale entre les deux segments adjacents.
-    #  Retourne la moyenne des 3 déviations de plus grande valeur absolue,
-    #  ce qui représente l'intensité du virage le plus serré à venir tout
-    #  en filtrant les nœuds isolés bruités.
+    #  Prend le nœud courant (paths_start[0]) et le nœud situé 5 positions
+    #  plus loin (paths_start[5]), puis calcule l'angle du vecteur qui va
+    #  du premier au second par rapport à l'axe avant du kart via arctan2.
     #
     #  @param   obs  Dictionnaire d'observation retourné par l'environnement.
-    #                Doit contenir la clé "paths_start" avec au moins 3 éléments.
-    #  @return  float : courbure en radian dans ]-pi, pi].
-    #                   Positif = virage à droite, négatif = virage à gauche.
+    #                Doit contenir la clé "paths_start" avec au moins 6 éléments.
+    #  @return  float : angle en radian dans ]-pi, pi].
+    #                    virage à gauche, négatif = virage à droite.
     #                   Proche de zéro = ligne droite.
     def detectVirage(self, obs):
         noeuds_piste = obs["paths_start"]
+        path_lookahead = 5
 
-        path_lookahead = min(10, len(noeuds_piste) - 2)
-        if path_lookahead < 1:
-            return 0.0
+        noeud_cour = noeuds_piste[0]
+        noeud_loin = noeuds_piste[path_lookahead]
 
-        deviations = []
+        x1, z1 = noeud_cour[0], noeud_cour[2]
+        x2, z2 = noeud_loin[0], noeud_loin[2]
 
-        for i in range(path_lookahead):
-            # Vecteur du segment i -> i+1
-            dx0 = noeuds_piste[i+1][0] - noeuds_piste[i][0]
-            dz0 = noeuds_piste[i+1][2] - noeuds_piste[i][2]
+        dx = x2 - x1
+        dz = z2 - z1
 
-            # Vecteur du segment i+1 -> i+2
-            dx1 = noeuds_piste[i+2][0] - noeuds_piste[i+1][0]
-            dz1 = noeuds_piste[i+2][2] - noeuds_piste[i+1][2]
+        angle = np.arctan2(dx, dz)
 
-            angle0 = np.arctan2(dx0, dz0)
-            angle1 = np.arctan2(dx1, dz1)
+        return angle
 
-            # Déviation locale normalisée dans ]-pi, pi]
-            deviation = angle1 - angle0
-            deviation = (deviation + np.pi) % (2 * np.pi) - np.pi
-
-            deviations.append(deviation)
-
-        # Tri par valeur absolue décroissante : les virages les plus serrés en premier
-        deviations.sort(key=abs, reverse=True)
-
-        # Moyenne des 3 pires déviations : pire cas lissé pour filtrer le bruit
-        top3 = deviations[:min(3, len(deviations))]
-        angle_final = sum(top3) / len(top3)
-
-        return angle_final
     
     def changementDirection(self, obs):
         changement = False
@@ -98,36 +78,5 @@ class AnticipeKart:
         self.prec_angle = angle
         return changement 
 
-    ## @brief   Détermine dynamiquement le nombre de nœuds à anticiper.
-    #
-    #  Adapte le lookahead en fonction de l'intensité du virage détecté :
-    #  plus le virage est serré, plus on regarde proche pour rester précis.
-    #  Détecte également si le virage est long pour ajuster en conséquence.
-    #
-    #  @param   obs  Dictionnaire d'observation retourné par l'environnement.
-    #                Doit contenir la clé "paths_start".
-    #  @return  int  : nombre de nœuds à regarder devant le kart.
-    #  @see     detectVirage()
-    def get_dynamicLookahead(self, obs):
-        node_path = obs.get("paths_start")
-        if len(node_path) < self.look_limite:
-            return self.path_lookahead
 
-        angle = abs(self.detectVirage(obs))
-
-        if angle < self.look_droite:       # ligne droite
-            lookahead = self.droite
-        elif angle <= self.look_leger:    # virage léger
-            lookahead = self.leger
-        else:                 # virage serré
-            lookahead = self.serrer
-            # Vérification si le virage est long (courbure persistante)
-            i = min(7, len(node_path) - 1)
-            distance = np.linalg.norm(node_path[i] - node_path[0])
-            self.virage_long = distance > self.dist
-            if self.virage_long:
-                lookahead = self.long   # on regarde loin pour anticiper la sortie
-
-        self.path_lookahead = lookahead
-        return self.path_lookahead
-
+    

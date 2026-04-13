@@ -34,7 +34,7 @@ class ActiveShield:
                     if z < 0:
                         return True
                 
-                #pour tous les autres types d'items (bouclier, gateau, ventouse...)
+                #pour tous les autres types d'items (gateau, ventouse...)
                 else:
                     return True #activation peu importe z
                     
