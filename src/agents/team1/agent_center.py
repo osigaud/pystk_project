@@ -17,9 +17,7 @@ class AgentCenter(KartAgent):
         self.dist = self.conf.dist
         self.ajust = self.conf.ajust
         self.path_lookahead = path_lookahead
-
-
-    
+        self.path_decalage = -1
 
     def observation_next_item(self, obs, action) : 
         """Analyse les items visibles (bonus/obstacles) et corrige l'action soit en s'en approchant ou soit en esquivant.
@@ -37,6 +35,22 @@ class AgentCenter(KartAgent):
         Returns:
             dict: Action corrigée après prise en compte des bonus et obstacles.
         """
+        
+        #Modification de self.path_decalage au début de la course
+        if obs["distance_down_track"] < 1 :
+            nb_noeuds = len(obs["paths_end"])
+            if (nb_noeuds == 83) :  #3 maps ont ce nombre de noeuds 
+                next_item = obs["items_position"][0]
+                if abs(next_item[self.conf.x]) < 10 : 
+                    nb_noeuds = 1
+
+            if (nb_noeuds in self.conf.maps_zero) : 
+                self.path_decalage = -3
+            elif (nb_noeuds in self.conf.maps_one) : 
+                self.path_decalage = -2
+            elif (nb_noeuds in self.conf.maps_three) : 
+                self.path_decalage = 0
+
         for i in range(len(obs["items_type"])) :
             vecteur_item = obs["items_position"][i]
             type_item = obs["items_type"][i]
@@ -100,8 +114,25 @@ class AgentCenter(KartAgent):
         action["steer"] = steer
         return action
 
+    def evite_ennemi(self, obs, action) :
+        """Dévie légèrement le kart si on est collé à un kart ennemi en face
 
-
+        Args:
+            obs (dict): Observations (utilise `karts_position`).
+            action (dict): Action courante (modifie "steer").
+        
+        Returns:
+            dict: Action corrigée (steer dévié d'un possible kart en face de nous).
+        """
+        for kart in obs["karts_position"] :
+            if abs(kart[self.conf.x]) < 1 and 0 < kart[self.conf.z] < 3:
+                if action["steer"] >= 0 :
+                    action["steer"] += 0.3
+                else :
+                    action["steer"] -= 0.3
+                action["steer"] = np.clip(action["steer"], -1, 1)
+                return action
+        return action
 
     def path_ajust(self, obs, action):
         """
@@ -117,7 +148,7 @@ class AgentCenter(KartAgent):
                 "steer" comprise entre -1 et 1.
         """
         steer = action["steer"]
-        center = obs["paths_end"][2]
+        center = obs["paths_end"][self.path_lookahead + self.path_decalage]
         if (center[self.conf.z] > 20 and abs(obs["center_path_distance"]) < 3) : 
             steer = 0
         elif abs(center[self.conf.x]) > self.dist : 
@@ -145,5 +176,6 @@ class AgentCenter(KartAgent):
             "fire": False,
         }
         action = self.path_ajust(obs, action)
+        action = self.evite_ennemi(obs, action)
         action = self.observation_next_item(obs, action)
         return action

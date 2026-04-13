@@ -3,6 +3,7 @@ import numpy as np
 
 from agents.team1.agent_speed import AgentSpeed
 
+# Items tenus
 BUBBLEGUM = 1
 CAKE = 2
 BOWLING = 3
@@ -13,8 +14,11 @@ SWATTER = 7
 RUBBERBALL = 8
 PARACHUTE = 9
 
+# Attachments
 BONUS_BOX = 0
 BUBBLEGUM_SHIELD = 6
+SWATTER_ATTACHMENT = 3
+
 
 class AgentItems(KartAgent) : 
 
@@ -71,29 +75,29 @@ class AgentItems(KartAgent) :
                 action["fire"] = False
                 return action 
             for kart in obs["karts_position"]:
-                if kart[self.conf.z] >= 0 and kart[self.conf.z] < self.conf.range_cake :
+                if kart[self.conf.z] >= self.conf.range_cake_min and kart[self.conf.z] < self.conf.range_cake_max :
                    action["fire"] = True
                    return action
             return action
             
         if current_item == BOWLING :
-            if obs["powerup_count"] >1:
+            if obs["powerup_count"] > 1:
                 action["fire"] = True
                 return action
             premier_kart = obs["karts_position"][0]
-            if premier_kart[self.conf.z]<0:
+            if premier_kart[self.conf.z] < 0:
                 action["fire"] = False
             if self.is_bonus_close(obs) : 
-                action ["fire"] = True
+                action["fire"] = True
             for kart in obs["karts_position"]:
-                if kart[self.conf.z]>=0 and kart[self.conf.z]<=self.conf.range_bowling_z :         
+                if kart[self.conf.z] >= self.conf.range_bowling_min and kart[self.conf.z] < self.conf.range_bowling_max :         
                     if abs(kart[self.conf.x]) <= self.conf.range_enemy_x :
                         action["fire"] = True                
             return action
 
         if current_item == ZIPPER : 
             if obs["powerup_count"] >= 1:
-                if  abs(obs["paths_end"][1][self.conf.x]) >=2:
+                if abs(obs["paths_end"][1][self.conf.x]) >= 2:
                     action["fire"] = False
                     return action
                 if obs["velocity"][self.conf.z] >= self.conf.seuil_vitesse :
@@ -102,14 +106,14 @@ class AgentItems(KartAgent) :
                 return action 
 
         if current_item == PLUNGER :
-            if obs["powerup_count"] >1:
+            if obs["powerup_count"] > 1 or self.is_bonus_close(obs):
                 action["fire"] = True
                 return action
             premier_kart = obs["karts_position"][0]
-            if premier_kart[self.conf.z]<0:
+            if premier_kart[self.conf.z] < 0:
                 action["fire"] = False
             for kart in obs["karts_position"]:
-                if kart[self.conf.z]>=0 and kart[self.conf.z] < self.conf.range_plunger :
+                if kart[self.conf.z] >= self.conf.range_plunger_min and kart[self.conf.z] < self.conf.range_plunger_max :
                     if abs(kart[self.conf.x]) <= self.conf.range_enemy_x :
                         action["fire"] = True 
             return action
@@ -125,11 +129,11 @@ class AgentItems(KartAgent) :
             if obs["powerup_count"] > 1 or self.is_bonus_close(obs):
                 action["fire"] = True
                 return action
-            if obs["attachment"] == 3:
+            if obs["attachment"] == SWATTER_ATTACHMENT:
                 action["fire"] = False
                 return action
             for kart in obs["karts_position"]:
-                if abs(kart[self.conf.z]) <= self.conf.range_swatter and abs(kart[self.conf.x]) <= self.conf.range_swatter and abs(kart[self.conf.y])<= self.conf.range_swatter_y :
+                if abs(kart[self.conf.z]) < self.conf.range_swatter and abs(kart[self.conf.x]) < self.conf.range_swatter and abs(kart[self.conf.y]) < self.conf.range_swatter_y :
                     action["fire"] = True
             return action
 
@@ -162,11 +166,7 @@ class AgentItems(KartAgent) :
         Returns:
             dict: Action corrigée avec la clé `nitro` éventuellement activée.
         """
-        nit = obs["energy"]
-        virage_serre = AgentSpeed.detecter_virage(self.conf, obs)
-        if nit > 1 :
-            if obs["velocity"][2] >= self.conf.seuil_vitesse:
-                act["nitro"] = True
+        act["nitro"] = True
         return act 
 
     def choose_action(self, obs) : 

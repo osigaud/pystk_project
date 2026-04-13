@@ -65,10 +65,9 @@ class AgentRescue(KartAgent) :
         """
 
         if ((obs["center_path_distance"][0])<0):
-            direction = -1
+            direction = -0.6
         else:
-            direction = 1
-        
+            direction = 0.6
 
         if self.unblock_steps > 0 : 
             self.unblock_steps -= 1

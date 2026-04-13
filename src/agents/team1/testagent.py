@@ -13,11 +13,6 @@ from dataclasses import dataclass
 # Append the "src" folder to sys.path.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "src"))) #Changement du path ici pour que ce soit adapté
 
-from agents.team1.agent_center import AgentCenter
-from agents.team1.agent_speed import AgentSpeed
-from agents.team1.agent_obstacles import AgentObstacles
-from agents.team1.agent_rescue import AgentRescue
-from agents.team1.agent_virage import AgentVirage
 from agents.team1.agent1 import Agent1
 
 from pystk2_gymnasium.envs import STKRaceMultiEnv, AgentSpec
