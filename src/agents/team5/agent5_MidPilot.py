@@ -121,9 +121,9 @@ class Agent5Mid(KartAgent):
         # On limite entre -1 et 1
         steering_normalise = np.clip(steering, -1, 1)
 
-        return steering_normalise, z
+        return steering_normalise
 
-    def manage_speed(self, obs, steering, z):
+    def manage_speed(self, obs, steering):
         """
         Gère l'accélération, le freinage et la logique de sauvetage (rescue)
         Réduit la vitesse en virage et gère les épingles serrées (hairpin)
@@ -173,8 +173,8 @@ class Agent5Mid(KartAgent):
             dict: Dictionnaire d'actions (acceleration, steer, brake, drift, nitro, rescue, fire)
         """
         target_x, target_z = self.position_track(obs)
-        steering, z = self.compute_turning(target_x, target_z)
-        accel, brake, steering = self.manage_speed(obs, steering, z)
+        steering = self.compute_turning(target_x, target_z)
+        accel, brake, steering = self.manage_speed(obs, steering)
 
         action = {
             "acceleration": accel,

@@ -1,5 +1,6 @@
 import numpy as np
 from agents.kart_agent import KartAgent
+from utils.track_utils import compute_curvature
 
 class Agent5UseItems(KartAgent):
     def __init__(self, env, pilot_agent, conf, path_lookahead=3):
@@ -51,14 +52,17 @@ class Agent5UseItems(KartAgent):
         
         elif item in self.Tap_mouche:
             return self.use_tap_mouche(obs)
+        
+        else:
+            return self.use_last_time(obs)
 
-
-
-        return False
+        #return False
     
     def use_boost(self, obs):
-        action = self.pilot.choose_action(obs)
-        if action["steer"] < 0.1:
+        points = obs.get("paths_start", [])
+        curvature = abs(compute_curvature(points[2:6]))
+        #action = self.pilot.choose_action(obs)
+        if curvature < 1.5:
             return True
 
         return False
@@ -70,7 +74,8 @@ class Agent5UseItems(KartAgent):
     def use_attack(self, obs):
         for kart in obs["karts_position"]:
             dz = kart[2] 
-            if 0 < dz < 20:
+            dx = kart[0]
+            if 0 < dz < 30 and -1 < dx < 1:
                 return True
         return False
     
@@ -83,6 +88,23 @@ class Agent5UseItems(KartAgent):
             return True
         for kart in obs["karts_position"]:
             dz = kart[2]
-            if 0 < dz < 3:
+            if -5 < dz < 5:
                 return True
         return False
+    
+    def use_last_time(self, obs):
+        items_pos = np.array(obs["items_position"])
+        items_type = obs["items_type"]
+        index_box = [i for i, j in enumerate(items_type) if (j == 0)]
+        index_box = items_pos[index_box]
+
+        for b in index_box:
+            x_b = b[0]
+            z_b = b[2]
+            if(-2 < x_b < 2 and z_b < 2):
+                return True
+            
+        return False
+
+    
+    

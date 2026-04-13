@@ -1,5 +1,7 @@
 ﻿import numpy as np
 from agents.kart_agent import KartAgent
+from utils.track_utils import compute_curvature, compute_slope
+
 
 class Agent5Drift(KartAgent):
     """
@@ -65,23 +67,13 @@ class Agent5Drift(KartAgent):
         paths = obs['paths_end']
         speed = np.linalg.norm(obs['velocity'])
 
+        points = obs.get("paths_start", [])
+        curvature = abs(compute_curvature(points[2:5]))
+
         # Sécurité si aucune donnée de piste n'est disponible
         if len(paths) == 0:
             return action
 
-        # On regarde très loin pour détecter l'entrée d'une épingle avant d'y être
-        far_target_x = paths[-1][0]
-        for p in paths:
-            if p[2] > self.far_lookahead:
-                far_target_x = p[0]
-                break
-
-        # On regarde plus près pour anticiper la sortie du virage
-        near_target_x = paths[-1][0]
-        for p in paths:
-            if p[2] > self.near_lookahead:
-                near_target_x = p[0]
-                break
 
         # On interdit de redrifter immédiatement après un drift pour éviter les saccades
         if self.cooldown_timer > 0:
@@ -92,7 +84,7 @@ class Agent5Drift(KartAgent):
         # CAS : ON NE DRIFT PAS ENCORE
         elif not self.is_drifting:
             # On vérifie si la piste au loin est très décalée ou si le pilote braque déjà fort.
-            if abs(far_target_x) > self.far_x_trigger or abs(action['steer']) > self.steer_trigger:
+            if curvature > self.conf.pilot.speed_control.hairpin_curvature:
                 self.turn_confirm_counter += 1 # On incrémente le compteur de confirmation
             else:
                 self.turn_confirm_counter = 0 # Reset si l'intention de tourner disparaît
@@ -106,15 +98,14 @@ class Agent5Drift(KartAgent):
         # CAS : ON EST EN TRAIN DE DRIFTER
         else:
             # On arrête si la piste devient droite OU si le kart s'éloigne trop du centre
-            dist_to_center = abs(paths[0][0])
-            if abs(near_target_x) < self.exit_x_limit or dist_to_center > self.max_dist_center:
+            if curvature < 2:
                 self.is_drifting = False
                 self.cooldown_timer = self.cooldown_limit # Pause pour stabiliser la trajectoire
 
         if self.is_drifting:
             # Si le mode drift est actif, on écrase les commandes du pilote de base.
             action['drift'] = True
-            action['steer'] = self.conf.drift.drift_steer_angle if far_target_x > 0 else -self.conf.drift.drift_steer_angle
+            action['steer'] = self.conf.drift.drift_steer_angle if curvature > self.conf.pilot.speed_control.hairpin_curvature else -self.conf.drift.drift_steer_angle
             action['acceleration'] = self.drift_accel
             action['nitro'] = False
         else:
